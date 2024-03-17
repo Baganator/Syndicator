@@ -1,3 +1,5 @@
+local addonName = ...
+
 local TOOLTIP_OPTIONS = {
   {
     type = "checkbox",
@@ -51,3 +53,29 @@ local TOOLTIP_OPTIONS = {
     option = "tooltips_character_limit",
   },
 }
+
+function Syndicator.Options.Initialize()
+  local optionsFrame = CreateFrame("Frame")
+
+
+  local instructions = optionsFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalHuge3")
+  instructions:SetPoint("CENTER", optionsFrame)
+  instructions:SetText(WHITE_FONT_COLOR:WrapTextInColorCode("Options to control tooltips coming soon"))
+
+  local header = optionsFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
+  header:SetPoint("TOPLEFT", optionsFrame, 15, -15)
+  header:SetText(NORMAL_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_SYNDICATOR))
+
+  local version = C_AddOns.GetAddOnMetadata(addonName, "Version")
+  local versionText = optionsFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
+  versionText:SetPoint("TOPLEFT", header, "BOTTOMLEFT", 0, -5)
+  versionText:SetText(WHITE_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_VERSION_COLON_X:format(version)))
+
+  optionsFrame.OnCommit = function() end
+  optionsFrame.OnDefault = function() end
+  optionsFrame.OnRefresh = function() end
+
+  local category = Settings.RegisterCanvasLayoutCategory(optionsFrame, SYNDICATOR_L_SYNDICATOR)
+  category.ID = SYNDICATOR_L_SYNDICATOR
+  Settings.RegisterAddOnCategory(category)
+end

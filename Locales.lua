@@ -16,6 +16,10 @@ SYNDICATOR_LOCALES = Locales
 
 local L = Locales.enUS
 
+L["SYNDICATOR"] = "Syndicator"
+
+L["VERSION_COLON_X"] = "Version: %s"
+
 L["ALL_CHARACTERS_COLON"] = "All Characters:"
 
 L["INVENTORY"] = "Inventory"

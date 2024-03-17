@@ -21,6 +21,8 @@ Core\Utilities.lua
 Core\SlashCmd.lua
 Core\Main.lua
 
+Options\Initialize.lua
+
 Tracking\Utilities.lua
 Tracking\BagCache.lua
 Tracking\MailCache.lua
