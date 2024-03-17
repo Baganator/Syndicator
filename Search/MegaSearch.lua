@@ -309,7 +309,6 @@ end
 
 EventRegistry:RegisterCallback("SetItemRef", function(_, link, text, button, chatFrame)
     local linkType, addonName, searchText, mode, entity, container, itemLink = strsplit(":", link)
-    StaticPopup_Hide(dialogName)
     if linkType == "addon" and addonName == "SyndicatorSearch" then
       -- Revert changes to item link to make it fit in the addon link
       itemLink = itemLink:gsub("%(", ":"):gsub("%)", "|")
