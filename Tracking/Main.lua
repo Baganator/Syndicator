@@ -16,7 +16,6 @@ end
 
 local function InitializeSavedVariables()
   if BAGANATOR_DATA ~= nil and SYNDICATOR_DATA == nil then
-    print("copy")
     SYNDICATOR_DATA = BAGANATOR_DATA
   end
   if SYNDICATOR_DATA == nil then
@@ -193,15 +192,17 @@ local function SetupTooltips()
 end
 
 function Syndicator.Tracking.Initialize()
-  InitializeSavedVariables()
-
   local frame = CreateFrame("Frame")
+  -- We initialize everything at PLAYER_LOGIN for 2 reasons
+  -- 1. Character normalized realm name is only available at this point
+  -- 2. To ensure data from Baganator is imported
   frame:RegisterEvent("PLAYER_LOGIN")
   frame:SetScript("OnEvent", function()
+    InitializeSavedVariables()
     InitCurrentCharacter()
     SetupDataProcessing()
+    SetupItemSummaries()
   end)
-  SetupItemSummaries()
 
   Syndicator.CallbackRegistry:RegisterCallback("CharacterDeleted", function(_, name)
     if name == currentCharacter then
