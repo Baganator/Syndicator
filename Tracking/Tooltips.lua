@@ -144,7 +144,6 @@ function Syndicator.Tooltips.AddItemLines(tooltip, summaries, itemLink)
         break
       end
       AddDoubleLine("  " .. character, LINK_FONT_COLOR:WrapTextInColorCode(strjoin(", ", unpack(entries))))
-    else
       charactersShown = charactersShown + 1
     end
   end
