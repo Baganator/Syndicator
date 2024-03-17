@@ -1,0 +1,7 @@
+<Ui>
+  <Frame name="SyndicatorOfflineListSearchTemplate" virtual="true" mixin="SyndicatorOfflineListSearchMixin">
+    <Scripts>
+      <OnLoad method="OnLoad"/>
+    </Scripts>
+  </Frame>
+</Ui>

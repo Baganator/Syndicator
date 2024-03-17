@@ -1,0 +1,30 @@
+name: Build
+
+on:
+  push:
+    branches:
+    - main
+    tags:
+    - '*'
+
+    paths-ignore:
+    - ".github/**"
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        type: [retail, wrath, classic, cata]
+
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - uses: BigWigsMods/packager@master
+      with:
+        args: -p 988370 -a X -g ${{matrix.type}}
+      env:
+        CF_API_KEY: ${{ secrets.plusmouse_curseforge }}
+        WAGO_API_TOKEN: ${{ secrets.plusmouse_wago }}
