@@ -20,6 +20,18 @@ L["SYNDICATOR"] = "Syndicator"
 
 L["VERSION_COLON_X"] = "Version: %s"
 
+L["SHOW_INVENTORY_IN_TOOLTIPS"] = "Show inventory in item tooltips"
+L["TOOLTIP_SETTINGS"] = "Tooltip Settings"
+L["PRESS_SHIFT_TO_SHOW_TOOLTIPS"] = "Press shift to display info in tooltips"
+L["ONLY_USE_SAME_CONNECTED_REALMS"] = "Only use same connected realms for inventory"
+L["ONLY_USE_SAME_FACTION_CHARACTERS"] = "Only use same faction characters for inventory"
+L["X_CHARACTERS_SHOWN"] = "%s Characters Shown"
+L["SORT_BY_CHARACTER_NAME"] = "Sort by character name"
+L["SHOW_GUILD_BANKS_IN_INVENTORY_TOOLTIPS"] = "Show guild banks in inventory tooltips"
+L["SHOW_EQUIPPED_ITEMS_IN_INVENTORY_TOOLTIPS"] = "Show equipped items in inventory tooltips"
+L["SHOW_CURRENCY_TOOLTIPS"] = "Show other characters currency in tooltips"
+L["SHOW_CHARACTER_RACE_ICONS"] = "Show character race icons"
+
 L["ALL_CHARACTERS_COLON"] = "All Characters:"
 
 L["INVENTORY"] = "Inventory"

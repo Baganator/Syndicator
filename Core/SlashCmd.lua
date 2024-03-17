@@ -2,7 +2,7 @@ Syndicator.SlashCmd = {}
 
 function Syndicator.SlashCmd.Initialize()
   SlashCmdList["Syndicator"] = Syndicator.SlashCmd.Handler
-  SLASH_Syndicator = "/syndicator"
+  SLASH_Syndicator1 = "/syndicator"
   SLASH_Syndicator2 = "/syn"
 end
 

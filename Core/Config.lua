@@ -60,10 +60,6 @@ function Syndicator.Config.Set(name, value)
   else
     local oldValue = SYNDICATOR_CONFIG[name]
     SYNDICATOR_CONFIG[name] = value
-    if value ~= oldValue then
-      Syndicator.CallbackRegistry:TriggerEvent("SettingChangedEarly", name)
-      Syndicator.CallbackRegistry:TriggerEvent("SettingChanged", name)
-    end
   end
 end
 
