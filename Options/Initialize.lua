@@ -111,6 +111,31 @@ function Syndicator.Options.Initialize()
         end)
         lastItem = checkButton
       elseif entry.type == "slider" then
+        local sliderWrapper = CreateFrame("Frame", nil, optionsFrame)
+        sliderWrapper:SetPoint("TOPLEFT", lastItem, "BOTTOMLEFT", -5)
+        sliderWrapper:SetPoint("RIGHT", optionsFrame)
+        sliderWrapper:SetHeight(60)
+        local slider = CreateFrame("Slider", nil, sliderWrapper, "OptionsSliderTemplate")
+        slider:SetPoint("RIGHT", sliderWrapper, -30, -10)
+        slider:SetPoint("LEFT", sliderWrapper, 30, -10)
+        slider:SetMinMaxValues(entry.min, entry.max)
+        slider.High:SetText(entry.highText)
+        slider.Low:SetText(entry.lowText)
+        slider:SetValueStep(1)
+        slider:SetObeyStepOnDrag(true)
+
+        slider:SetScript("OnValueChanged", function()
+          local value = slider:GetValue()
+          if entry.scale then
+            value = value / entry.scale
+          end
+          Syndicator.Config.Set(entry.option, value)
+          slider.Text:SetText(entry.valuePattern:format(math.floor(slider:GetValue())))
+        end)
+        slider:SetScript("OnShow", function(self)
+          self:SetValue(Syndicator.Config.Get(entry.option) * (entry.scale or 1))
+        end)
+        lastItem = sliderWrapper
       end
     end
   end
