@@ -295,7 +295,7 @@ local function PrintSource(indent, source, searchTerm)
     local characterData = SYNDICATOR_DATA.Characters[source.character]
     local className = characterData.details.className
     if className then
-      character = RAID_CLASS_COLORS[className]:WrapTextInColorCode(character)
+      character = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[className]:WrapTextInColorCode(character)
     end
     print(indent, PASSIVE_SPELL_FONT_COLOR:WrapTextInColorCode(CONTAINER_TYPE_TO_TEXT[source.container]) .. count, character)
   elseif source.guild then

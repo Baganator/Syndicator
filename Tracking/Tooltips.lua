@@ -133,7 +133,7 @@ function Syndicator.Tooltips.AddItemLines(tooltip, summaries, itemLink)
       character = character .. "-" .. s.realmNormalized
     end
     if s.className then
-      character = RAID_CLASS_COLORS[s.className]:WrapTextInColorCode(character)
+      character = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[s.className]:WrapTextInColorCode(character)
     end
     if Syndicator.Config.Get(Syndicator.Config.Options.SHOW_CHARACTER_RACE_ICONS) and s.race then
       character = Syndicator.Utilities.GetCharacterIcon(s.race, s.sex) .. " " .. character
@@ -215,7 +215,7 @@ function Syndicator.Tooltips.AddCurrencyLines(tooltip, currencyID)
       character = character .. "-" .. s.realmNormalized
     end
     if s.className then
-      character = RAID_CLASS_COLORS[s.className]:WrapTextInColorCode(character)
+      character = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[s.className]:WrapTextInColorCode(character)
     end
     if Syndicator.Config.Get(Syndicator.Config.Options.SHOW_CHARACTER_RACE_ICONS) and s.race then
       character = Syndicator.Utilities.GetCharacterIcon(s.race, s.sex) .. " " .. character
