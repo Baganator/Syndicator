@@ -74,13 +74,12 @@ local function CacheGuild(guild, callback)
     end
   end
 
-  Syndicator.Search.GetBaseInfoFromList(guildList, function(results)
-    for _, r in ipairs(results) do
-      r.source = {guild = guild, container = linkToTabIndex[r.itemLink]}
-      table.insert(cache, r)
-    end
-    callback()
-  end)
+  local results = Syndicator.Search.GetBaseInfoFromList(guildList)
+  for _, r in ipairs(results) do
+    r.source = {guild = guild, container = linkToTabIndex[r.itemLink]}
+    table.insert(cache, r)
+  end
+  callback()
 end
 
 local pendingQueries = {}
