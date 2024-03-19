@@ -10,10 +10,6 @@ function Syndicator.Search.GetBaseInfoFromList(cachedItems)
 end
 
 if Syndicator.Constants.IsClassic then
-  function Syndicator.Search.ClassicHasItemLevel(details)
-    return details.classID == Enum.ItemClass.Armor or details.classID == Enum.ItemClass.Weapon
-  end
-
   local tooltip = CreateFrame("GameTooltip", "BaganatorUtilitiesScanTooltip", nil, "GameTooltipTemplate")
   tooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
 

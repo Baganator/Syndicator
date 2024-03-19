@@ -691,8 +691,14 @@ if Syndicator.Constants.IsRetail then
     return false
   end
 else
+  local function HasItemLevel(details)
+    return details.classID == Enum.ItemClass.Armor or details.classID == Enum.ItemClass.Weapon
+  end
+
   GetItemLevel = function(details)
-    if not Syndicator.Search.ClassicHasItemLevel(details) then
+    GetClassSubClass(details)
+
+    if not HasItemLevel(details) then
       return false
     end
 
