@@ -1,9 +1,42 @@
+local function GetItemName(details)
+  if details.itemName then
+    return
+  end
+
+  if details.itemID == Syndicator.Constants.BattlePetCageID then
+    local petID = details.itemLink:match("battlepet:(%d+)")
+    details.itemName = C_PetJournal.GetPetInfoBySpeciesID(tonumber(petID))
+  elseif C_Item.IsItemDataCachedByID(details.itemID) then
+    details.itemName = C_Item.GetItemNameByID(details.itemLink) or C_Item.GetItemNameByID(details.itemID)
+  end
+end
+
+local function GetClassSubClass(details)
+  if details.classID then
+    return
+  end
+
+  if details.itemID == Syndicator.Constants.BattlePetCageID then
+    local petID = details.itemLink:match("battlepet:(%d+)")
+    local itemName, _, petType = C_PetJournal.GetPetInfoBySpeciesID(tonumber(petID))
+    details.classID = Enum.ItemClass.Battlepet
+    details.subClassID = petType - 1
+  else
+    local classID, subClassID = select(6, GetItemInfoInstant(details.itemLink))
+    if not classID then
+      classID, subClassID = GetItemInfoInstant(details.itemID)
+    end
+    details.classID = classID
+    details.subClassID = subClassID
+  end
+end
+
 local function PetCheck(details)
   return details.classID == Enum.ItemClass.Battlepet or (details.classID == Enum.ItemClass.Miscellaneous and details.subClassID == Enum.ItemMiscellaneousSubclass.CompanionPet)
 end
 
 local function ReagentCheck(details)
-  return details.isCraftingReagent
+  return (select(17, GetItemInfo(details.itemID)))
 end
 
 local function SetCheck(details)
@@ -39,6 +72,10 @@ local function JunkCheck(details)
 end
 
 local function CosmeticCheck(details)
+  if not C_Item.IsItemDataCachedByID(details.itemID) then
+    return nil
+  end
+  details.isCosmetic = IsCosmeticItem(details.itemLink)
   return details.isCosmetic
 end
 
@@ -73,6 +110,7 @@ local function RelicCheck(details)
 end
 
 local function StackableCheck(details)
+  details.isStackable = details.isStackable or select(15, GetItemInfo(details.itemLink))
   return details.isStackable
 end
 
@@ -308,7 +346,7 @@ end
 
 local function PetCollectedCheck(details)
   local speciesID
-  if details.itemLink:match("battlepet:") then
+  if details.itemID == Syndicator.Constants.BattlePetCageID then
     speciesID = tonumber((details.itemLink:match("battlepet:(%d+)")))
   elseif C_PetJournal.GetPetInfoByItemID(details.itemID) ~= nil then
     speciesID = select(13, C_PetJournal.GetPetInfoByItemID(details.itemID))
@@ -387,6 +425,14 @@ local inventorySlots = {
   "INVTYPE_CHEST",
   "INVTYPE_ROBE",
 }
+
+local function GetInvType(details)
+  if not C_Item.IsItemDataCachedByID(details.itemID) then
+    return
+  end
+  details.invType = details.invType or C_Item.GetItemInventoryTypeByID(details.itemLink)
+end
+
 for _, slot in ipairs(inventorySlots) do
   local text = _G[slot]
   if text ~= nil then
@@ -447,8 +493,24 @@ for key, quality in pairs(Enum.ItemQuality) do
 end
 
 if Syndicator.Constants.IsRetail then
+  function Syndicator.Search.GetExpansion(details)
+    if details.itemID == Syndicator.Constants.BattlePetCageID then
+      return -1
+    end
+
+    if ItemVersion then
+      local itemVersionDetails = ItemVersion.API:getItemVersion(details.itemID, true)
+      if itemVersionDetails then
+        return itemVersionDetails.major - 1
+      end
+    end
+    return (select(15, GetItemInfo(details.itemID)))
+  end
   for key, expansionID in pairs(TextToExpansion) do
-    AddKeyword(key, function(details) return details.expacID == expansionID end)
+    AddKeyword(key, function(details)
+      details.expacID = details.expacID or Syndicator.Search.GetExpansion(details)
+      return details.expacID and details.expacID == expansionID
+    end)
   end
 end
 
@@ -592,6 +654,18 @@ if Syndicator.Constants.IsRetail then
   -- are used.
   local ITEM_LEVEL_PATTERN = ITEM_LEVEL:gsub("%%d", "(%%d+)")
   GetItemLevel = function(details)
+    if details.itemID == Syndicator.Constants.BattlePetCageID then
+      if details.itemLevel then
+        return
+      end
+
+      local _, level = details.itemLink:match("battlepet:(%d+):(%d*)")
+
+      if level and level ~= "" then
+        details.itemLevel = tonumber(level)
+      end
+    end
+
     GetTooltipInfoSpell(details)
 
     if not details.tooltipInfoSpell then
@@ -691,8 +765,10 @@ local function GetTooltipSpecialTerms(details)
   end
 
   GetTooltipInfoSpell(details)
+  GetClassSubClass(details)
+  GetItemName(details)
 
-  if not details.tooltipInfoSpell then
+  if not details.tooltipInfoSpell or not details.classID or not details.itemName then
     return
   end
 
@@ -735,6 +811,12 @@ local function MatchesText(details, searchString)
 end
 
 local function MatchesTextExclusive(details, searchString)
+  GetItemName(details)
+
+  if not details.itemName then
+    return
+  end
+
   if details.itemNameLower == nil then
     details.itemNameLower = details.itemName:lower()
   end

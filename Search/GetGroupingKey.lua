@@ -1,6 +1,9 @@
+local function GetLower(item)
+  return item.itemNameLower or (string.match(itemLink, "h%[(.*)%]|h")):lower()
+end
 function Syndicator.Search.GetGroupingKey(item)
-  local lower = item.itemNameLower or (item.searchKeywords and item.searchKeywords[1]) or item.itemName:lower()
-  if item.classID == Enum.ItemClass.Battlepet then
+  local lower = GetLower()
+  if itme.itemID == Syndicator.Constants.BattlePetCageID then
     return lower .. "_" .. strjoin("-", BattlePetToolTip_UnpackBattlePetLink(item.itemLink)) .. "_" .. tostring(item.isBound)
   elseif item.isStackable then
     return lower .. "_" .. tostring(item.itemID) .. "_" .. tostring(item.isBound)
