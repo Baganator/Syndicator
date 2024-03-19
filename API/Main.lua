@@ -1,5 +1,10 @@
 local _, addonTable = ...
 
+-- Returns details about which characters and owned guilds contain items
+-- matching the item link.
+--   itemLink: string
+--   onlyConnectedRealms: boolean
+--   onlyCurrentFaction: boolean
 function Syndicator.API.GetInventoryInfo(itemLink, sameConnectedRealm, sameFaction)
   local success, key = pcall(Syndicator.Utilities.GetItemKey, itemLink)
   if not success then
@@ -10,6 +15,13 @@ function Syndicator.API.GetInventoryInfo(itemLink, sameConnectedRealm, sameFacti
   return Syndicator.ItemSummaries:GetTooltipInfo(key, sameConnectedRealm == true, sameFaction == true)
 end
 
+-- Set the callback used when an item's location is clicked in the /syns search results
+-- callback: function(mode, entity, container, itemLink, searchText)
+--    mode: "character" or "guild"
+--    entity: Name of character or guild
+--    container: "bag", "bank" or guild bank tab (number)
+--    itemLink: Item Link for the item who's owner has been clicked on
+--    searchText: Search text to help focus the item
 function Syndicator.API.RegisterShowItemLocation(callback)
   addonTable.ShowItemLocationCallback = callback
 end
