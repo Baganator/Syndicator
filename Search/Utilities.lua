@@ -1,28 +1,12 @@
-function Syndicator.Search.GetBaseInfoFromList(cachedItems, callback)
+function Syndicator.Search.GetBaseInfoFromList(cachedItems)
   local results = {}
-
-  local waiting = #cachedItems
   for _, item in ipairs(cachedItems) do
     if item.itemID ~= nil then
-      Syndicator.Search.GetBaseInfo(item, function(info)
-        table.insert(results, info)
-      end, function(info)
-        waiting = waiting - 1
-        if waiting == 0 then
-          callback(results)
-        end
-      end)
-    else
-      waiting = waiting - 1
-      if waiting == 0 then
-        callback(results)
-      end
+      local info = Syndicator.Search.GetBaseInfo(item)
+      table.insert(results, info)
     end
   end
-
-  if #cachedItems == 0 then
-    callback(results)
-  end
+  return results
 end
 
 if Syndicator.Constants.IsClassic then

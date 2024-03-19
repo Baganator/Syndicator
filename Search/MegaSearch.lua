@@ -25,9 +25,7 @@ local function CacheCharacter(character, callback)
     end
   end
 
-  Syndicator.Search.GetBaseInfoFromList(bagsList, function(results)
-    finishCheck("bag", results)
-  end)
+  finishCheck("bag", Syndicator.Search.GetBaseInfoFromList(bagsList))
 
   local bankList = {}
   for _, bag in ipairs(characterData.bank) do
@@ -36,17 +34,11 @@ local function CacheCharacter(character, callback)
     end
   end
 
-  Syndicator.Search.GetBaseInfoFromList(bankList, function(results)
-    finishCheck("bank", results)
-  end)
+  finishCheck("bank", Syndicator.Search.GetBaseInfoFromList(bankList))
 
-  Syndicator.Search.GetBaseInfoFromList(characterData.mail or {}, function(results)
-    finishCheck("mail", results)
-  end)
+  finishCheck("mail", Syndicator.Search.GetBaseInfoFromList(characterData.mail or {}))
 
-  Syndicator.Search.GetBaseInfoFromList(characterData.auctions or {}, function(results)
-    finishCheck("auctions", results)
-  end)
+  finishCheck("auctions", Syndicator.Search.GetBaseInfoFromList(characterData.auctions or {}))
 
   local equippedList = {}
   for _, slot in pairs(characterData.equipped or {}) do
@@ -58,9 +50,7 @@ local function CacheCharacter(character, callback)
     end
   end
 
-  Syndicator.Search.GetBaseInfoFromList(equippedList, function(results)
-    finishCheck("equipped", results)
-  end)
+  finishCheck("equipped", Syndicator.Search.GetBaseInfoFromList(equippedList))
 
   local voidList = {}
   for _, tab in ipairs(characterData.void or {}) do
@@ -69,9 +59,7 @@ local function CacheCharacter(character, callback)
     end
   end
 
-  Syndicator.Search.GetBaseInfoFromList(voidList, function(results)
-    finishCheck("void", results)
-  end)
+  finishCheck("void", Syndicator.Search.GetBaseInfoFromList(voidList))
 end
 
 local function CacheGuild(guild, callback)
