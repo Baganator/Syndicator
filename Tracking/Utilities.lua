@@ -11,6 +11,15 @@ function Syndicator.Utilities.GetItemKey(itemLink)
   return parts[1] .. ":" .. parts[2]
 end
 
+function Syndicator.Utilities.GetItemKeyByItemID(itemID)
+  local classID, subClassID = select(6, GetItemInfoInstant(itemID))
+  if classID == Enum.ItemClass.Reagent and subClassID == Enum.ItemReagentSubclass.Keystone then
+    return "keystone:" .. tostring(itemID)
+  else
+    return "item:" .. tostring(itemID)
+  end
+end
+
 function Syndicator.Utilities.IsEquipment(itemLink)
   local classID = select(6, GetItemInfoInstant(itemLink))
   return classID ~= nil and (

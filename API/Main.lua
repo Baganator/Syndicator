@@ -15,6 +15,13 @@ function Syndicator.API.GetInventoryInfo(itemLink, sameConnectedRealm, sameFacti
   return Syndicator.ItemSummaries:GetTooltipInfo(key, sameConnectedRealm == true, sameFaction == true)
 end
 
+Syndicator.API.GetInventoryInfoByItemLink = Syndicator.API.GetInventoryInfo
+
+function Syndicator.API.GetInventoryInfoByItemID(itemID, sameConnectedRealm, sameFaction)
+  local key = Syndicator.Utilities.GetItemKeyByItemID(itemID)
+  return Syndicator.ItemSummaries:GetTooltipInfo(key, sameConnectedRealm == true, sameFaction == true)
+end
+
 -- Returns currency counts for a specific currency on all characters
 --   currencyID: number
 --   sameConnectedRealms: boolean
