@@ -15,6 +15,15 @@ function Syndicator.API.GetInventoryInfo(itemLink, sameConnectedRealm, sameFacti
   return Syndicator.ItemSummaries:GetTooltipInfo(key, sameConnectedRealm == true, sameFaction == true)
 end
 
+-- Returns currency counts for a specific currency on all characters
+--   currencyID: number
+--   onlyConnectedRealms: boolean
+--   onlyCurrentFaction: boolean
+function Syndicator.API.GetCurrencyInfo(currencyID, sameConnectedRealm, sameFaction)
+  assert(type(currencyID) == "number")
+  return Syndicator.Core.GetCurrencyTooltipData(currencyID, sameConnectedRealm == true, sameFaction == true)
+end
+
 -- Set the callback used when an item's location is clicked in the /syns search results
 -- callback: function(mode, entity, container, itemLink, searchText)
 --    mode: "character" or "guild"
