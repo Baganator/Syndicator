@@ -1,5 +1,5 @@
 # Syndicator
-Syndicator will keep track of where your items are in all your characters bags, banks, mail, auctions, and guilds and also all your gold and currencies and shows the details in your tooltips. This addon is also used by Baganator to power the inventory functionality.
+Syndicator will keep track of where your items are in all your characters bags, banks, mail, void storage, auctions, and guilds and also all your gold and currencies and shows the details in your tooltips. This addon is also used by Baganator to power the inventory functionality.
 
 This addon serves multiple purposes
 - A backend for Baganator to store all the bag information and search queries
