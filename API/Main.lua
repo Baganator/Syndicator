@@ -34,3 +34,33 @@ end
 function Syndicator.API.RegisterShowItemLocation(callback)
   addonTable.ShowItemLocationCallback = callback
 end
+
+function Syndicator.API.GetAllCharacters()
+  return GetKeysArray(SYNDICATOR_DATA.Characters)
+end
+
+-- characterFullName: string, e.g. "Martin-NormalizedRealmName"
+function Syndicator.API.GetByCharacterFullName(characterFullName)
+  return SYNDICATOR_DATA.Characters[characterFullName]
+end
+
+function Syndicator.API.GetAllGuilds()
+  return GetKeysArray(SYNDICATOR_DATA.Guilds)
+end
+
+-- guildFullName: string, e.g. "The Jokesters-NormalizedRealmName"
+function Syndicator.API.GetByGuildFullName(guildFullName)
+  if SYNDICATOR_DATA.Guilds[guildFullName] then
+    return SYNDICATOR_DATA.Guilds[guildFullName]
+  end
+
+  local guildName, realmName = strsplit("-", guildFullName)
+
+  -- The guild isn't stored in Syndicator against this realmName, so it must be
+  -- stored against another connected realm's name, try to find it.
+  for guild, data in pairs(SYNDICATOR_DATA.Guilds) do
+    if data.details.guildName == guildName and tIndexOf(data.details.realms, realmName) ~= nil then
+      return data, guild
+    end
+  end
+end
