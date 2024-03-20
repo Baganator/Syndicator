@@ -1,4 +1,4 @@
-function Syndicator.Core.GetCurrencyTooltipData(currencyID, sameConnectedRealm, sameFaction)
+function Syndicator.Tracking.GetCurrencyTooltipData(currencyID, sameConnectedRealm, sameFaction)
   local matchingRealms
   if sameConnectedRealm then
     local realms = Syndicator.Utilities.GetConnectedRealms()

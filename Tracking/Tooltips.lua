@@ -171,7 +171,7 @@ function Syndicator.Tooltips.AddCurrencyLines(tooltip, currencyID)
     return
   end
 
-  local summary = Syndicator.Core.GetCurrencyTooltipData(currencyID, Syndicator.Config.Get("tooltips_connected_realms_only"), Syndicator.Config.Get("tooltips_faction_only"))
+  local summary = Syndicator.Tracking.GetCurrencyTooltipData(currencyID, Syndicator.Config.Get("tooltips_connected_realms_only"), Syndicator.Config.Get("tooltips_faction_only"))
 
   if Syndicator.Config.Get("tooltips_sort_by_name") then
     table.sort(summary, CharacterAndRealmComparator)

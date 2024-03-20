@@ -21,7 +21,7 @@ end
 --   onlyCurrentFaction: boolean
 function Syndicator.API.GetCurrencyInfo(currencyID, sameConnectedRealm, sameFaction)
   assert(type(currencyID) == "number")
-  return Syndicator.Core.GetCurrencyTooltipData(currencyID, sameConnectedRealm == true, sameFaction == true)
+  return Syndicator.Tracking.GetCurrencyTooltipData(currencyID, sameConnectedRealm == true, sameFaction == true)
 end
 
 -- Set the callback used when an item's location is clicked in the /syns search results
