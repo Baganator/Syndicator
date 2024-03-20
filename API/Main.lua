@@ -3,8 +3,8 @@ local _, addonTable = ...
 -- Returns details about which characters and owned guilds contain items
 -- matching the item link.
 --   itemLink: string
---   onlyConnectedRealms: boolean
---   onlyCurrentFaction: boolean
+--   sameConnectedRealms: boolean
+--   sameCurrentFaction: boolean
 function Syndicator.API.GetInventoryInfo(itemLink, sameConnectedRealm, sameFaction)
   local success, key = pcall(Syndicator.Utilities.GetItemKey, itemLink)
   if not success then
@@ -17,8 +17,8 @@ end
 
 -- Returns currency counts for a specific currency on all characters
 --   currencyID: number
---   onlyConnectedRealms: boolean
---   onlyCurrentFaction: boolean
+--   sameConnectedRealms: boolean
+--   sameCurrentFaction: boolean
 function Syndicator.API.GetCurrencyInfo(currencyID, sameConnectedRealm, sameFaction)
   assert(type(currencyID) == "number")
   return Syndicator.Tracking.GetCurrencyTooltipData(currencyID, sameConnectedRealm == true, sameFaction == true)
