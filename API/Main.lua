@@ -1,6 +1,6 @@
 local _, addonTable = ...
 
--- Returns details about which characters and owned guilds contain items
+-- Returns details about which not hidden characters and guilds contain items
 -- matching the item link.
 --   itemLink: string
 --   sameConnectedRealms: boolean
@@ -17,6 +17,11 @@ end
 
 Syndicator.API.GetInventoryInfoByItemLink = Syndicator.API.GetInventoryInfo
 
+-- Returns details about which not hidden characters and guilds contain items
+-- matching the item ID (does not work for battle pet cages).
+--   itemID: number
+--   sameConnectedRealms: boolean
+--   sameCurrentFaction: boolean
 function Syndicator.API.GetInventoryInfoByItemID(itemID, sameConnectedRealm, sameFaction)
   local key = Syndicator.Utilities.GetItemKeyByItemID(itemID)
   return Syndicator.ItemSummaries:GetTooltipInfo(key, sameConnectedRealm == true, sameFaction == true)
