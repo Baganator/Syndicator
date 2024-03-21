@@ -202,6 +202,9 @@ function Syndicator.Tracking.Initialize()
     InitCurrentCharacter()
     SetupDataProcessing()
     SetupItemSummaries()
+
+    Syndicator.CallbackRegistry:TriggerEvent("Ready")
+    Syndicator.Tracking.isReady = true
   end)
 
   Syndicator.CallbackRegistry:RegisterCallback("CharacterDeleted", function(_, name)

@@ -48,6 +48,7 @@ end
 
 Syndicator.Constants.Events = {
   "CharacterDeleted",
+  "GuildDeleted",
 
   "BagCacheUpdate",
   "MailCacheUpdate",
@@ -57,6 +58,8 @@ Syndicator.Constants.Events = {
   "EquippedCacheUpdate",
   "VoidCacheUpdate",
   "AuctionsCacheUpdate",
+
+  "Ready",
 }
 
 -- Hidden currencies for all characters tooltips as they are shared between characters

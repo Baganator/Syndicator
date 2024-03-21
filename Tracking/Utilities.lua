@@ -75,15 +75,7 @@ function Syndicator.Utilities.GetConnectedRealms()
 end
 
 function Syndicator.Utilities.RemoveCharacter(characterName)
-  local characterData = SYNDICATOR_DATA.Characters[characterName or ""]
-  assert(characterData, "Unrecognised character")
-
-  SYNDICATOR_DATA.Characters[characterName] = nil
-  local realmSummary = SYNDICATOR_SUMMARIES.Characters.ByRealm[characterData.details.realmNormalized]
-  if realmSummary and realmSummary[characterData.details.character] then
-    realmSummary[characterData.details.character] = nil
-  end
-  Syndicator.CallbackRegistry:TriggerEvent("CharacterDeleted", characterName)
+  Syndicator.API.DeleteCharacter(characterName)
 end
 
 local genders = {"unknown", "male", "female"}

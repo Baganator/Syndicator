@@ -58,39 +58,46 @@ function Syndicator.SlashCmd.Debug(...)
 end
 
 function Syndicator.SlashCmd.RemoveCharacter(characterName)
-  local characterData = SYNDICATOR_DATA.Characters[characterName or ""]
-  if not characterData then
-    Syndicator.Utilities.Message("Unrecognised character")
-    return
+  local success = pcall(Syndicator.API.DeleteCharacter, characterName)
+
+  if not success then
+    Syndicator.Utilities.Message("Unrecognised or current character")
+  else
+    Syndicator.Utilities.Message("Character '" .. characterName .. "' removed.")
   end
+end
 
-  Syndicator.Utilities.RemoveCharacter(characterName)
+function Syndicator.SlashCmd.RemoveGuild(...)
+  local guildName = strjoin(" ", ...)
+  local success = pcall(Syndicator.API.DeleteGuild, guildName)
 
-  Syndicator.Utilities.Message("Character '" .. characterName .. "' removed.")
+  if not success then
+    Syndicator.Utilities.Message("Unrecognised or current guild")
+  else
+    Syndicator.Utilities.Message("Guild '" .. guildName .. "' removed.")
+  end
 end
 
 function Syndicator.SlashCmd.HideCharacter(characterName)
-  local characterData = SYNDICATOR_DATA.Characters[characterName or ""]
-  if not characterData then
+  local success = pcall(Syndicator.API.ToggleCharacterHidden, characterName)
+  if not success then
     Syndicator.Utilities.Message("Unrecognised character")
-    return
+  else
+    local guildData = Syndicator.API.GetByCharacterFullName(characterName)
+    Syndicator.Utilities.Message("Character '" .. characterName .. "' hidden: " .. tostring(characterData.details.hidden))
   end
-
-  characterData.details.hidden = not characterData.details.hidden
-
-  Syndicator.Utilities.Message("Character '" .. characterName .. "' hidden: " .. tostring(characterData.details.hidden))
 end
 
-function Syndicator.SlashCmd.HideGuild(guildName)
-  local guildData = SYNDICATOR_DATA.Guilds[guildName or ""]
-  if not guildData then
+function Syndicator.SlashCmd.HideGuild(...)
+  local guildName = strjoin(" ", ...)
+  local success = pcall(Syndicator.API.ToggleGuildHidden, guildName)
+
+  if not success then
     Syndicator.Utilities.Message("Unrecognised guild")
-    return
+  else
+    local guildData = Syndicator.API.GetByGuildFullName(guildName)
+    Syndicator.Utilities.Message("Guild '" .. guildName .. "' hidden: " .. tostring(guildData.details.hidden))
   end
-
-  guildData.details.hidden = not guildData.details.hidden
-
-  Syndicator.Utilities.Message("Character '" .. guildName .. "' hidden: " .. tostring(guildData.details.hidden))
 end
 
 function Syndicator.SlashCmd.CustomiseUI()
@@ -103,7 +110,10 @@ local COMMANDS = {
   ["d"] = Syndicator.SlashCmd.Debug,
   ["debug"] = Syndicator.SlashCmd.Debug,
   ["remove"] = Syndicator.SlashCmd.RemoveCharacter,
+  ["removecharacter"] = Syndicator.SlashCmd.RemoveCharacter,
+  ["removeguild"] = Syndicator.SlashCmd.RemoveGuild,
   ["hide"] = Syndicator.SlashCmd.HideCharacter,
+  ["hidecharacter"] = Syndicator.SlashCmd.HideCharacter,
   ["hideguild"] = Syndicator.SlashCmd.HideGuild,
 }
 function Syndicator.SlashCmd.Handler(input)
