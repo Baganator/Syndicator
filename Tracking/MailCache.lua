@@ -8,7 +8,8 @@ local PENDING_OUTGOING_EVENTS = {
 -- Assumed to run after PLAYER_LOGIN
 function SyndicatorMailCacheMixin:OnLoad()
   FrameUtil.RegisterFrameForEvents(self, {
-    "MAIL_INBOX_UPDATE"
+    "PLAYER_INTERACTION_MANAGER_FRAME_SHOW",
+    "PLAYER_INTERACTION_MANAGER_FRAME_HIDE",
   })
 
   self.currentCharacter = Syndicator.Utilities.GetCharacterFullName()
@@ -52,9 +53,9 @@ function SyndicatorMailCacheMixin:OnLoad()
 end
 
 function SyndicatorMailCacheMixin:OnEvent(eventName, ...)
-  -- General mailbox scan
   if eventName == "MAIL_INBOX_UPDATE" then
-    self:SetScript("OnUpdate", self.OnUpdate)
+    self:ScanMail()
+    self:UnregisterEvent("MAIL_INBOX_UPDATE")
   -- Sending to an another character failed
   elseif eventName == "MAIL_FAILED" then
     FrameUtil.UnregisterFrameForEvents(self, PENDING_OUTGOING_EVENTS)
@@ -70,6 +71,16 @@ function SyndicatorMailCacheMixin:OnEvent(eventName, ...)
 
     FrameUtil.UnregisterFrameForEvents(self, PENDING_OUTGOING_EVENTS)
     self.pendingOutgoingMail = nil
+  elseif eventName == "PLAYER_INTERACTION_MANAGER_FRAME_SHOW" then
+    local interactType = ...
+    if interactType == Enum.PlayerInteractionType.MailInfo then
+      self:RegisterEvent("MAIL_INBOX_UPDATE")
+    end
+  elseif eventName == "PLAYER_INTERACTION_MANAGER_FRAME_HIDE" then
+    local interactType = ...
+    if interactType == Enum.PlayerInteractionType.MailInfo then
+      self:ScanMail()
+    end
   end
 end
 
@@ -81,9 +92,8 @@ local function ExtractBattlePetLink(mailIndex, attachmentIndex)
   return Syndicator.Utilities.RecoverBattlePetLink(tooltipInfo)
 end
 
-function SyndicatorMailCacheMixin:OnUpdate()
-  self:SetScript("OnUpdate", nil)
-
+-- General mailbox scan
+function SyndicatorMailCacheMixin:ScanMail()
   local start = debugprofilestop()
 
   local function FireMailChange(attachments)
