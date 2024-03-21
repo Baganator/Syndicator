@@ -140,3 +140,7 @@ end
 function Syndicator.API.IsReady()
   return Syndicator.Tracking.isReady
 end
+
+function Syndicator.API.IsBagEventPending()
+  return Syndicator.BagCache.isUpdatePending
+end
