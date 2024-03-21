@@ -406,7 +406,6 @@ local inventorySlots = {
   "INVTYPE_FINGER",
   "INVTYPE_TRINKET",
   "INVTYPE_WEAPON",
-  "INVTYPE_SHIELD",
   "INVTYPE_RANGED",
   "INVTYPE_CLOAK",
   "INVTYPE_2HWEAPON",
@@ -427,22 +426,25 @@ local inventorySlots = {
 }
 
 local function GetInvType(details)
-  if not C_Item.IsItemDataCachedByID(details.itemID) then
+  if details.invType then
     return
   end
-  details.invType = details.invType or C_Item.GetItemInventoryTypeByID(details.itemLink)
+  details.invType = (select(4, GetItemInfoInstant(details.itemID))) or "NONE"
 end
 
 for _, slot in ipairs(inventorySlots) do
   local text = _G[slot]
   if text ~= nil then
-    AddKeyword(text:lower(),  function(details) return details.invType == slot end)
+    AddKeyword(text:lower(),  function(details) GetInvType(details) return details.invType == slot end)
   end
 end
 
-AddKeyword(SYNDICATOR_L_KEYWORD_OFF_HAND, function(details)
-  return details.invType == "INVTYPE_HOLDABLE" or details.invType == "INVTYPE_SHIELD"
-end)
+do
+  AddKeyword(SYNDICATOR_L_KEYWORD_OFF_HAND, function(details)
+    GetInvType(details)
+    return details.invType == "INVTYPE_HOLDABLE" or details.invType == "INVTYPE_SHIELD"
+  end)
+end
 
 local moreSlotMappings = {
   [SYNDICATOR_L_KEYWORD_HELM] = "INVTYPE_HEAD",
@@ -454,7 +456,7 @@ local moreSlotMappings = {
 }
 
 for keyword, slot in pairs(moreSlotMappings) do
-  AddKeyword(keyword, function(details) return details.invType == slot end)
+  AddKeyword(keyword, function(details) GetInvType(details) return details.invType == slot end)
 end
 
 if Syndicator.Constants.IsRetail then
