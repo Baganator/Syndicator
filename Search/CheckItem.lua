@@ -110,7 +110,7 @@ local function RelicCheck(details)
 end
 
 local function StackableCheck(details)
-  details.isStackable = details.isStackable or select(15, GetItemInfo(details.itemLink))
+  details.isStackable = details.isStackable or C_Item.GetItemMaxStackSizeByID(details.itemID) > 1
   return details.isStackable
 end
 

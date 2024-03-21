@@ -183,69 +183,88 @@ function Syndicator.Search.RequestMegaSearchResults(searchTerm, callback)
   end
 end
 
-function Syndicator.Search.CombineMegaSearchResults(results)
+local function GetKeys(results, callback)
+  local waiting = #results
+  for _, r in ipairs(results) do
+    local key = Syndicator.Search.GetGroupingKey(r, function(key)
+      r.key = key
+      waiting = waiting - 1
+      if waiting == 0 then
+        callback()
+      end
+    end)
+  end
+  if #results == 0 then
+    callback()
+  end
+end
+
+function Syndicator.Search.CombineMegaSearchResults(results, callback)
   local items = {}
   local seenCharacters = {}
   local seenGuilds = {}
-  for _, r in ipairs(results) do
-    local key = Syndicator.Search.GetGroupingKey(r)
-    if not items[key] then
-      items[key] = CopyTable(r)
-      items[key].itemCount = 0
-      items[key].sources = {}
-      seenCharacters[key] = {}
-      seenGuilds[key] = {}
-    end
-    local source = CopyTable(r.source)
-    source.itemCount = r.itemCount
-    if source.character then
-      local characterData = SYNDICATOR_DATA.Characters[source.character]
-      if not characterData.details.hidden and (source.container ~= "equipped" or Syndicator.Config.Get(Syndicator.Config.Options.SHOW_EQUIPPED_ITEMS_IN_TOOLTIPS)) then
-        if seenCharacters[key][source.character .. "_" .. source.container] then
-          local entry = items[key].sources[seenCharacters[key][source.character .. "_" .. source.container]]
+
+  GetKeys(results, function()
+    for _, r in ipairs(results) do
+      local key = r.key
+      if not items[key] then
+        items[key] = CopyTable(r)
+        items[key].itemCount = 0
+        items[key].sources = {}
+        seenCharacters[key] = {}
+        seenGuilds[key] = {}
+      end
+      local source = CopyTable(r.source)
+      source.itemCount = r.itemCount
+      if source.character then
+        local characterData = SYNDICATOR_DATA.Characters[source.character]
+        if not characterData.details.hidden and (source.container ~= "equipped" or Syndicator.Config.Get(Syndicator.Config.Options.SHOW_EQUIPPED_ITEMS_IN_TOOLTIPS)) then
+          if seenCharacters[key][source.character .. "_" .. source.container] then
+            local entry = items[key].sources[seenCharacters[key][source.character .. "_" .. source.container]]
+            entry.itemCount = entry.itemCount + source.itemCount
+          else
+            table.insert(items[key].sources, source)
+            source.itemLink = r.itemLink
+            source.itemName = r.itemName
+            seenCharacters[key][source.character .. "_" .. source.container] = #items[key].sources
+          end
+        end
+      elseif source.guild then
+        if seenGuilds[key][source.guild] then
+          local entry = items[key].sources[seenGuilds[key][source.guild]]
           entry.itemCount = entry.itemCount + source.itemCount
         else
           table.insert(items[key].sources, source)
           source.itemLink = r.itemLink
           source.itemName = r.itemName
-          seenCharacters[key][source.character .. "_" .. source.container] = #items[key].sources
+          seenGuilds[key][source.guild] = #items[key].sources
         end
       end
-    elseif source.guild then
-      if seenGuilds[key][source.guild] then
-        local entry = items[key].sources[seenGuilds[key][source.guild]]
-        entry.itemCount = entry.itemCount + source.itemCount
-      else
-        table.insert(items[key].sources, source)
-        source.itemLink = r.itemLink
-        source.itemName = r.itemName
-        seenGuilds[key][source.guild] = #items[key].sources
+      items[key].itemCount = items[key].itemCount + r.itemCount
+    end
+
+    local keys = {}
+    for key in pairs(items) do
+      table.insert(keys, key)
+    end
+    table.sort(keys)
+
+    local final = {}
+    for _, key in ipairs(keys) do
+      if #items[key].sources > 0 then
+        table.insert(final, items[key])
+        table.sort(items[key].sources, function(a, b)
+          if a.itemCount == b.itemCount then
+            return tostring(a.container) < tostring(b.container)
+          else
+            return a.itemCount > b.itemCount
+          end
+        end)
       end
     end
-    items[key].itemCount = items[key].itemCount + r.itemCount
-  end
 
-  local keys = {}
-  for key in pairs(items) do
-    table.insert(keys, key)
-  end
-  table.sort(keys)
-
-  local final = {}
-  for _, key in ipairs(keys) do
-    if #items[key].sources > 0 then
-      table.insert(final, items[key])
-      table.sort(items[key].sources, function(a, b)
-        if a.itemCount == b.itemCount then
-          return tostring(a.container) < tostring(b.container)
-        else
-          return a.itemCount > b.itemCount
-        end
-      end)
-    end
-  end
-
-  return final
+    callback(final)
+  end)
 end
 
 local function GetLink(source, searchTerm, text)
@@ -312,12 +331,13 @@ function Syndicator.Search.RunMegaSearchAndPrintResults(searchTerm)
   searchTerm = searchTerm:lower()
   Syndicator.Search.RequestMegaSearchResults(searchTerm, function(results)
     print(GREEN_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_SEARCHED_EVERYWHERE_COLON) .. " " .. YELLOW_FONT_COLOR:WrapTextInColorCode(searchTerm))
-    results = Syndicator.Search.CombineMegaSearchResults(results)
-    for _, r in ipairs(results) do
-      print("   " .. r.itemLink, BLUE_FONT_COLOR:WrapTextInColorCode("x" .. FormatLargeNumber(r.itemCount)))
-      for _, s in ipairs(r.sources) do
-        PrintSource("       ", s, s.itemName:lower())
+    Syndicator.Search.CombineMegaSearchResults(results, function(results)
+      for _, r in ipairs(results) do
+        print("   " .. r.itemLink, BLUE_FONT_COLOR:WrapTextInColorCode("x" .. FormatLargeNumber(r.itemCount)))
+        for _, s in ipairs(r.sources) do
+          PrintSource("       ", s, s.itemName:lower())
+        end
       end
-    end
+    end)
   end)
 end
