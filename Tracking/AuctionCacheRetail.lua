@@ -170,6 +170,9 @@ function SyndicatorAuctionCacheMixin:OnEvent(eventName, ...)
 
   elseif eventName == "AUCTION_HOUSE_NEW_RESULTS_RECEIVED" then
     local itemKey = ...
+    if itemKey == nil then
+      return
+    end
     -- Slight delay to allow C_AuctionHouse.GetAuctionInfoByID to populate info
     C_Timer.After(0, function()
       self:ProcessPostedItemsQueue(itemKey)
