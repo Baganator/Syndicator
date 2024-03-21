@@ -56,16 +56,10 @@ function Syndicator.API.GetByCharacterFullName(characterFullName)
   return SYNDICATOR_DATA.Characters[characterFullName]
 end
 
+Syndicator.API.GetCharacter = Syndicator.API.GetByCharacterFullName
+
 function Syndicator.API.GetAllGuilds()
   return GetKeysArray(SYNDICATOR_DATA.Guilds)
-end
-
-function Syndicator.API.GetCurrentCharacter()
-  return Syndicator.BagCache.currentCharacter
-end
-
-function Syndicator.API.GetCurrentGuild()
-  return Syndicator.GuildCache.currentGuild
 end
 
 -- guildFullName: string, e.g. "The Jokesters-NormalizedRealmName"
@@ -83,6 +77,16 @@ function Syndicator.API.GetByGuildFullName(guildFullName)
       return data, guild
     end
   end
+end
+
+Syndicator.API.GetGuild = Syndicator.API.GetByGuildFullName
+
+function Syndicator.API.GetCurrentCharacter()
+  return Syndicator.BagCache.currentCharacter
+end
+
+function Syndicator.API.GetCurrentGuild()
+  return Syndicator.GuildCache.currentGuild
 end
 
 function Syndicator.API.DeleteCharacter(characterFullName)
