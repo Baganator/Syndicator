@@ -3,7 +3,39 @@ SyndicatorMailCacheMixin = {}
 local PENDING_OUTGOING_EVENTS = {
   "MAIL_SEND_SUCCESS",
   "MAIL_FAILED",
+  "MAIL_SUCCESS",
 }
+
+local PENDING_NEW_MAIL_OUTGOING_EVENTS = {
+  "MAIL_SEND_SUCCESS",
+  "MAIL_FAILED",
+}
+
+-- Convert an attachment to a battle pet link as by default only the cage item
+-- is supplied on the attachment link, missing all the battle pet stats (retail
+-- only)
+local function ExtractBattlePetLink(mailIndex, attachmentIndex)
+  local tooltipInfo = C_TooltipInfo.GetInboxItem(mailIndex, attachmentIndex)
+  return Syndicator.Utilities.RecoverBattlePetLink(tooltipInfo)
+end
+
+local function DoAttachment(attachments, mailIndex, attachmentIndex)
+  local _, itemID, texture, count, quality, canUse = GetInboxItem(mailIndex, attachmentIndex)
+  if itemID == nil then
+    return
+  end
+  local itemLink = GetInboxItemLink(mailIndex, attachmentIndex)
+  if itemID == Syndicator.Constants.BattlePetCageID then
+    itemLink, quality = ExtractBattlePetLink(mailIndex, attachmentIndex)
+  end
+  table.insert(attachments, {
+    itemID = itemID,
+    itemCount = count,
+    iconTexture = texture,
+    itemLink = itemLink,
+    quality = quality,
+  })
+end
 
 -- Assumed to run after PLAYER_LOGIN
 function SyndicatorMailCacheMixin:OnLoad()
@@ -32,7 +64,7 @@ function SyndicatorMailCacheMixin:OnLoad()
     for index = 1, ATTACHMENTS_MAX_SEND do
       local itemLink = GetSendMailItemLink(index)
       if itemLink ~= nil then
-        local name, itemID, texture, itemCount, quality = GetSendMailItem(index)
+        local _, itemID, iconTexture, itemCount, quality = GetSendMailItem(index)
         table.insert(mail.items, {
           itemLink = itemLink,
           itemID = itemID,
@@ -48,7 +80,57 @@ function SyndicatorMailCacheMixin:OnLoad()
     end
 
     self.pendingOutgoingMail = mail
-    FrameUtil.RegisterFrameForEvents(self, PENDING_OUTGOING_EVENTS)
+    FrameUtil.RegisterFrameForEvents(self, PENDING_NEW_MAIL_OUTGOING_EVENTS)
+  end)
+
+  hooksecurefunc("ReturnInboxItem", function(mailIndex)
+    local recipient = select(3, GetInboxHeaderInfo(mailIndex))
+    print(recipient)
+
+    if not recipient:find("-", nil, true) then
+      recipient = recipient .. "-" .. GetNormalizedRealmName()
+    end
+    print(recipient)
+
+    local mail = {
+      recipient = recipient,
+      items = {},
+    }
+
+    if not SYNDICATOR_DATA.Characters[mail.recipient] then
+      print("reject")
+      return
+    end
+
+    local function OnComplete()
+      self.pendingOutgoingMail = mail
+      self:RegisterEvent("MAIL_SUCCESS")
+    end
+
+    local waiting = 0
+    for attachmentIndex = 1, ATTACHMENTS_MAX do
+      local _, itemID = GetInboxItem(mailIndex, attachmentIndex)
+      if itemID ~= nil then
+        if C_Item.IsItemDataCachedByID(itemID) then
+          DoAttachment(mail.items, mailIndex, attachmentIndex)
+        else
+          waiting = waiting + 1
+          local item = Item:CreateFromItemID(itemID)
+          item:ContinueOnItemLoad(function()
+            DoAttachment(mail.items, mailIndex, attachmentIndex)
+            waiting = waiting - 1
+            if loopsComplete and waiting == 0 then
+              OnComplete(attachments)
+            end
+          end)
+        end
+      end
+    end
+
+    loopsComplete = true
+    if waiting == 0 then
+      OnComplete()
+    end
   end)
 end
 
@@ -60,8 +142,9 @@ function SyndicatorMailCacheMixin:OnEvent(eventName, ...)
   elseif eventName == "MAIL_FAILED" then
     FrameUtil.UnregisterFrameForEvents(self, PENDING_OUTGOING_EVENTS)
     self.pendingOutgoingMail = nil
-  -- Sending to an another character was successful
-  elseif eventName == "MAIL_SEND_SUCCESS" then
+  -- Sending to an another character was successful.
+  -- MAIL_SUCCESS is for returned mail, MAIL_SEND_SUCCESS is for new mails.
+  elseif eventName == "MAIL_SEND_SUCCESS" or eventName == "MAIL_SUCCESS" then
     local characterData = SYNDICATOR_DATA.Characters[self.pendingOutgoingMail.recipient]
     characterData.mail = characterData.mail or {}
     for _, item in ipairs(self.pendingOutgoingMail.items) do
@@ -84,14 +167,6 @@ function SyndicatorMailCacheMixin:OnEvent(eventName, ...)
   end
 end
 
--- Convert an attachment to a battle pet link as by default only the cage item
--- is supplied on the attachment link, missing all the battle pet stats (retail
--- only)
-local function ExtractBattlePetLink(mailIndex, attachmentIndex)
-  local tooltipInfo = C_TooltipInfo.GetInboxItem(mailIndex, attachmentIndex)
-  return Syndicator.Utilities.RecoverBattlePetLink(tooltipInfo)
-end
-
 -- General mailbox scan
 function SyndicatorMailCacheMixin:ScanMail()
   local start = debugprofilestop()
@@ -106,37 +181,19 @@ function SyndicatorMailCacheMixin:ScanMail()
 
   local attachments = {}
 
-  local function DoAttachment(mailIndex, attachmentIndex)
-    local name, itemID, texture, count, quality, canUse = GetInboxItem(mailIndex, attachmentIndex)
-    if itemID == nil then
-      return
-    end
-    local itemLink = GetInboxItemLink(mailIndex, attachmentIndex)
-    if itemID == Syndicator.Constants.BattlePetCageID then
-      itemLink, quality = ExtractBattlePetLink(mailIndex, attachmentIndex)
-    end
-    table.insert(attachments, {
-      itemID = itemID,
-      itemCount = count,
-      iconTexture = texture,
-      itemLink = itemLink,
-      quality = quality,
-    })
-  end
-
   local waiting = 0
   local loopsComplete = false
   for mailIndex = 1, (GetInboxNumItems()) do
     for attachmentIndex = 1, ATTACHMENTS_MAX do
-      local name, itemID, texture, count, quality, canUse = GetInboxItem(mailIndex, attachmentIndex)
+      local _, itemID = GetInboxItem(mailIndex, attachmentIndex)
       if itemID ~= nil then
         if C_Item.IsItemDataCachedByID(itemID) then
-          DoAttachment(mailIndex, attachmentIndex)
+          DoAttachment(attachments, mailIndex, attachmentIndex)
         else
           waiting = waiting + 1
           local item = Item:CreateFromItemID(itemID)
           item:ContinueOnItemLoad(function()
-            DoAttachment(mailIndex, attachmentIndex)
+            DoAttachment(attachments, mailIndex, attachmentIndex)
             waiting = waiting - 1
             if loopsComplete and waiting == 0 then
               FireMailChange(attachments)
