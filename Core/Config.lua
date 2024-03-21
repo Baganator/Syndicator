@@ -13,6 +13,8 @@ Syndicator.Config.Options = {
   TOOLTIPS_CHARACTER_LIMIT = "tooltips_character_limit",
   TOOLTIPS_SORT_BY_NAME = "tooltips_sort_by_name",
 
+  LAZY_MAILBOX_SCANNING = "lazy_mailbox_scanning",
+
   DEBUG = "debug",
   DEBUG_TIMERS = "debug_timers",
 }
@@ -28,6 +30,7 @@ Syndicator.Config.Defaults = {
   [Syndicator.Config.Options.TOOLTIPS_FACTION_ONLY] = false,
   [Syndicator.Config.Options.TOOLTIPS_CHARACTER_LIMIT] = 4,
   [Syndicator.Config.Options.SHOW_CHARACTER_RACE_ICONS] = true,
+  [Syndicator.Config.Options.LAZY_MAILBOX_SCANNING] = false,
 
   [Syndicator.Config.Options.DEBUG] = false,
   [Syndicator.Config.Options.DEBUG_TIMERS] = false,

@@ -40,6 +40,7 @@ end
 -- Assumed to run after PLAYER_LOGIN
 function SyndicatorMailCacheMixin:OnLoad()
   FrameUtil.RegisterFrameForEvents(self, {
+    "MAIL_INBOX_UPDATE",
     "PLAYER_INTERACTION_MANAGER_FRAME_SHOW",
     "PLAYER_INTERACTION_MANAGER_FRAME_HIDE",
   })
@@ -136,8 +137,10 @@ end
 
 function SyndicatorMailCacheMixin:OnEvent(eventName, ...)
   if eventName == "MAIL_INBOX_UPDATE" then
-    self:ScanMail()
-    self:UnregisterEvent("MAIL_INBOX_UPDATE")
+    if self.overrideScan or not Syndicator.Config.Get(Syndicator.Config.Options.LAZY_MAILBOX_SCANNING) then
+      self:SetScript("OnUpdate", self.ScanMail)
+    end
+    self.overrideScan = false
   -- Sending to an another character failed
   elseif eventName == "MAIL_FAILED" then
     FrameUtil.UnregisterFrameForEvents(self, PENDING_OUTGOING_EVENTS)
@@ -157,7 +160,7 @@ function SyndicatorMailCacheMixin:OnEvent(eventName, ...)
   elseif eventName == "PLAYER_INTERACTION_MANAGER_FRAME_SHOW" then
     local interactType = ...
     if interactType == Enum.PlayerInteractionType.MailInfo then
-      self:RegisterEvent("MAIL_INBOX_UPDATE")
+      self.overrideScan = true
     end
   elseif eventName == "PLAYER_INTERACTION_MANAGER_FRAME_HIDE" then
     local interactType = ...
@@ -169,6 +172,8 @@ end
 
 -- General mailbox scan
 function SyndicatorMailCacheMixin:ScanMail()
+  self:SetScript("OnUpdate", nil)
+
   local start = debugprofilestop()
 
   local function FireMailChange(attachments)
