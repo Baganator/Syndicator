@@ -117,9 +117,9 @@ function Syndicator.API.DeleteGuild(guildFullName)
 
   SYNDICATOR_DATA.Guilds[guildFullName] = nil
 
-  local realmSummary = SYNDICATOR_SUMMARIES.Guilds.ByRealm[guildData.details.realmNormalized]
-  if realmSummary and realmSummary[characterData.details.guild] then
-    realmSummary[characterData.details.guild] = nil
+  local realmSummary = SYNDICATOR_SUMMARIES.Guilds.ByRealm[guildData.details.realms[1]]
+  if realmSummary and realmSummary[guildData.details.guild] then
+    realmSummary[guildData.details.guild] = nil
   end
   Syndicator.CallbackRegistry:TriggerEvent("GuildDeleted", guildFullName)
 end
