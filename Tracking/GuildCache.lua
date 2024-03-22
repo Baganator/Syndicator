@@ -230,7 +230,7 @@ function SyndicatorGuildCacheMixin:ExamineBankTab(tabIndex, callback)
     local changed = false
     for index, item in ipairs(tab.slots) do
       local oldItem = oldSlots[index]
-      if item.itemID ~= oldItem.itemID or item.itemLink ~= oldItem.itemLink or item.itemCount ~= oldItem.itemCount then
+      if not oldItem or item.itemID ~= oldItem.itemID or item.itemLink ~= oldItem.itemLink or item.itemCount ~= oldItem.itemCount then
         changed = true
         break
       end
