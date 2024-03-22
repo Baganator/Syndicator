@@ -41,8 +41,6 @@ end
 function SyndicatorMailCacheMixin:OnLoad()
   FrameUtil.RegisterFrameForEvents(self, {
     "MAIL_INBOX_UPDATE",
-    "PLAYER_INTERACTION_MANAGER_FRAME_SHOW",
-    "PLAYER_INTERACTION_MANAGER_FRAME_HIDE",
   })
 
   self.currentCharacter = Syndicator.Utilities.GetCharacterFullName()
@@ -137,10 +135,7 @@ end
 
 function SyndicatorMailCacheMixin:OnEvent(eventName, ...)
   if eventName == "MAIL_INBOX_UPDATE" then
-    if self.overrideScan or not Syndicator.Config.Get(Syndicator.Config.Options.LAZY_MAILBOX_SCANNING) then
-      self:SetScript("OnUpdate", self.ScanMail)
-    end
-    self.overrideScan = false
+    self:SetScript("OnUpdate", self.ScanMail)
   -- Sending to an another character failed
   elseif eventName == "MAIL_FAILED" then
     FrameUtil.UnregisterFrameForEvents(self, PENDING_OUTGOING_EVENTS)
@@ -157,18 +152,6 @@ function SyndicatorMailCacheMixin:OnEvent(eventName, ...)
 
     FrameUtil.UnregisterFrameForEvents(self, PENDING_OUTGOING_EVENTS)
     self.pendingOutgoingMail = nil
-  elseif eventName == "PLAYER_INTERACTION_MANAGER_FRAME_SHOW" then
-    local interactType = ...
-    if interactType == Enum.PlayerInteractionType.MailInfo then
-      self.overrideScan = true
-    end
-  elseif eventName == "PLAYER_INTERACTION_MANAGER_FRAME_HIDE" then
-    local interactType = ...
-    if interactType == Enum.PlayerInteractionType.MailInfo then
-      if Syndicator.Config.Get(Syndicator.Config.Options.LAZY_MAILBOX_SCANNING) then
-        self:ScanMail()
-      end
-    end
   end
 end
 
