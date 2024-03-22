@@ -227,10 +227,18 @@ function SyndicatorGuildCacheMixin:ExamineBankTab(tabIndex, callback)
   local oldSlots = tab.slots
 
   local function FireGuildChange()
+    local changed = false
+    for index, item in ipairs(tab.slots) do
+      local oldItem = oldSlots[index]
+      if item.itemID ~= oldItem.itemID or item.itemLink ~= oldItem.itemLink or item.itemCount ~= oldItem.itemCount then
+        changed = true
+        break
+      end
+    end
     if Syndicator.Config.Get(Syndicator.Config.Options.DEBUG_TIMERS) then
       print("guild tab " .. tabIndex .. " took", debugprofilestop() - start)
     end
-    callback(tabIndex, not tCompare(oldSlots, tab.slots, 15))
+    callback(tabIndex, changed)
   end
 
   tab.slots = {}
