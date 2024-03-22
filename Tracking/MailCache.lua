@@ -165,7 +165,9 @@ function SyndicatorMailCacheMixin:OnEvent(eventName, ...)
   elseif eventName == "PLAYER_INTERACTION_MANAGER_FRAME_HIDE" then
     local interactType = ...
     if interactType == Enum.PlayerInteractionType.MailInfo then
-      self:ScanMail()
+      if Syndicator.Config.Get(Syndicator.Config.Options.LAZY_MAILBOX_SCANNING) then
+        self:ScanMail()
+      end
     end
   end
 end
