@@ -81,5 +81,5 @@ function SyndicatorVoidCacheMixin:ScanVoidStorage()
     FireVoidChange()
   end
 
-  BAGANATOR_DATA.Characters[self.currentCharacter].void = void
+  SYNDICATOR_DATA.Characters[self.currentCharacter].void = void
 end
