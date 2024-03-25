@@ -9,6 +9,7 @@ local function InitGuild(key, guild, realms)
         guild = guild,
         faction = UnitFactionGroup("player"),
         hidden = false,
+        visited = false,
       },
     }
   end
@@ -163,6 +164,7 @@ function SyndicatorGuildCacheMixin:ExamineGeneralTabInfo()
   local data = SYNDICATOR_DATA.Guilds[self.currentGuild]
 
   data.money = GetGuildBankMoney()
+  data.details.visited = true
 
   local numTabs = GetNumGuildBankTabs()
 
