@@ -63,16 +63,22 @@ function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
     self:QueueCaching()
 
   elseif eventName == "PLAYERBANKSLOTS_CHANGED" then
-    self.pending.bank[Enum.BagIndex.Bank] = true
-    self:QueueCaching()
+    if self.bankOpen then
+      self.pending.bank[Enum.BagIndex.Bank] = true
+      self:QueueCaching()
+    end
 
   elseif eventName == "PLAYERREAGENTBANKSLOTS_CHANGED" then
-    self.pending.bank[Enum.BagIndex.Reagentbank] = true
-    self:QueueCaching()
+    if self.bankOpen then
+      self.pending.bank[Enum.BagIndex.Reagentbank] = true
+      self:QueueCaching()
+    end
 
   elseif eventName == "REAGENTBANK_UPDATE" then
-    self.pending.bank[Enum.BagIndex.Reagentbank] = true
-    self:QueueCaching()
+    if self.bankOpen then
+      self.pending.bank[Enum.BagIndex.Reagentbank] = true
+      self:QueueCaching()
+    end
 
   elseif eventName == "BAG_CONTAINER_UPDATE" then
     self:UpdateContainerSlots()
