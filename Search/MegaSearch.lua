@@ -228,19 +228,23 @@ function Syndicator.Search.CombineMegaSearchResults(results, callback)
             source.itemName = r.itemName
             seenCharacters[key][source.character .. "_" .. source.container] = #items[key].sources
           end
+          items[key].itemCount = items[key].itemCount + r.itemCount
         end
       elseif source.guild then
-        if seenGuilds[key][source.guild] then
-          local entry = items[key].sources[seenGuilds[key][source.guild]]
-          entry.itemCount = entry.itemCount + source.itemCount
-        else
-          table.insert(items[key].sources, source)
-          source.itemLink = r.itemLink
-          source.itemName = r.itemName
-          seenGuilds[key][source.guild] = #items[key].sources
+        local guildData = SYNDICATOR_DATA.Guilds[source.guild]
+        if not guildData.details.hidden then
+          if seenGuilds[key][source.guild] then
+            local entry = items[key].sources[seenGuilds[key][source.guild]]
+            entry.itemCount = entry.itemCount + source.itemCount
+          else
+            table.insert(items[key].sources, source)
+            source.itemLink = r.itemLink
+            source.itemName = r.itemName
+            seenGuilds[key][source.guild] = #items[key].sources
+          end
+          items[key].itemCount = items[key].itemCount + r.itemCount
         end
       end
-      items[key].itemCount = items[key].itemCount + r.itemCount
     end
 
     local keys = {}
