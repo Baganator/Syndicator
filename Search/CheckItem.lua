@@ -52,7 +52,7 @@ local function EngravedCheck(details)
 end
 
 local function BindOnEquipCheck(details)
-  return not details.isBound and Syndicator.Utilities.IsEquipment(details.itemLink) == true
+  return not details.isBound and (Syndicator.Utilities.IsEquipment(details.itemLink) or details.classID == Enum.ItemClass.Container)
 end
 
 local function EquipmentCheck(details)
