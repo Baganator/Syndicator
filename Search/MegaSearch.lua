@@ -225,7 +225,7 @@ function Syndicator.Search.CombineMegaSearchResults(results, callback)
           else
             table.insert(items[key].sources, source)
             source.itemLink = r.itemLink
-            source.itemName = r.itemName
+            source.itemNameLower = r.itemNameLower
             seenCharacters[key][source.character .. "_" .. source.container] = #items[key].sources
           end
           items[key].itemCount = items[key].itemCount + r.itemCount
@@ -239,7 +239,7 @@ function Syndicator.Search.CombineMegaSearchResults(results, callback)
           else
             table.insert(items[key].sources, source)
             source.itemLink = r.itemLink
-            source.itemName = r.itemName
+            source.itemNameLower = r.itemNameLower
             seenGuilds[key][source.guild] = #items[key].sources
           end
           items[key].itemCount = items[key].itemCount + r.itemCount
@@ -339,7 +339,7 @@ function Syndicator.Search.RunMegaSearchAndPrintResults(searchTerm)
       for _, r in ipairs(results) do
         print("   " .. r.itemLink, BLUE_FONT_COLOR:WrapTextInColorCode("x" .. FormatLargeNumber(r.itemCount)))
         for _, s in ipairs(r.sources) do
-          PrintSource("       ", s, s.itemName:lower())
+          PrintSource("       ", s, s.itemNameLower)
         end
       end
     end)
