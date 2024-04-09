@@ -1,7 +1,7 @@
 local stackable = {}
 
 local function GetLower(item)
-  item.itemNameLower = item.itemNameLower or (string.match(item.itemLink, "h%[(.*)%]|h")):lower()
+  item.itemNameLower = item.itemNameLower or (string.match(item.itemLink, "h%[(.*)%]|h")):gsub(" |A.*|a", ""):lower()
   return item.itemNameLower
 end
 
