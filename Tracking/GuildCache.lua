@@ -281,7 +281,7 @@ function SyndicatorGuildCacheMixin:ExamineBankTab(tabIndex, callback)
       local itemLink = GetGuildBankItemLink(tabIndex, slotIndex)
       tab.slots[slotIndex] = {}
       if itemLink ~= nil then
-        local itemID = GetItemInfoInstant(itemLink)
+        local itemID = C_Item.GetItemInfoInstant(itemLink)
         if C_Item.IsItemDataCachedByID(itemID) then
           DoSlot(slotIndex, itemID)
         else

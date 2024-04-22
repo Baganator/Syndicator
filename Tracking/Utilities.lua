@@ -12,7 +12,7 @@ function Syndicator.Utilities.GetItemKey(itemLink)
 end
 
 function Syndicator.Utilities.GetItemKeyByItemID(itemID)
-  local classID, subClassID = select(6, GetItemInfoInstant(itemID))
+  local classID, subClassID = select(6, C_Item.GetItemInfoInstant(itemID))
   if classID == Enum.ItemClass.Reagent and subClassID == Enum.ItemReagentSubclass.Keystone then
     return "keystone:" .. tostring(itemID)
   else
@@ -21,7 +21,7 @@ function Syndicator.Utilities.GetItemKeyByItemID(itemID)
 end
 
 function Syndicator.Utilities.IsEquipment(itemLink)
-  local classID = select(6, GetItemInfoInstant(itemLink))
+  local classID = select(6, C_Item.GetItemInfoInstant(itemLink))
   return classID ~= nil and (
     -- Regular equipment
     classID == Enum.ItemClass.Armor or classID == Enum.ItemClass.Weapon

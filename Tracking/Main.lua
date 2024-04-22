@@ -107,7 +107,7 @@ local function SetupTooltips()
         -- tooltip shown via a hyperlink
         local info = tooltip.processingInfo
         if info and info.getterName == "GetHyperlink" then
-          local _, newItemLink = GetItemInfo(info.getterArgs[1])
+          local _, newItemLink = C_Item.GetItemInfo(info.getterArgs[1])
           if newItemLink ~= nil then
             itemLink = newItemLink
           end

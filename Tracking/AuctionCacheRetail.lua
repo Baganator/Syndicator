@@ -33,7 +33,7 @@ function SyndicatorAuctionCacheMixin:OnLoad()
         if C_Item.DoesItemExist(itemLocation) then
           self.lastPostedItem.itemLink = C_Item.GetItemLink(itemLocation)
         else
-          self.lastPostedItem.itemLink = select(2, GetItemInfo(self.lastPostedItem.itemLink))
+          self.lastPostedItem.itemLink = select(2, C_Item.GetItemInfo(self.lastPostedItem.itemLink))
         end
       end)
     end
@@ -59,7 +59,7 @@ function SyndicatorAuctionCacheMixin:OnLoad()
         local auctionInfo = C_AuctionHouse.GetAuctionInfoByID(auctionID)
         if not auctionInfo then
           if self.purchasedItem.auctionInfo.itemLink then
-            self.purchasedItem.auctionInfo.itemLink = select(2, GetItemInfo(self.purchasedItem.auctionInfo.itemLink))
+            self.purchasedItem.auctionInfo.itemLink = select(2, C_Item.GetItemInfo(self.purchasedItem.auctionInfo.itemLink))
           end
         else
           auctionInfo.auctionID = auctionID
@@ -77,7 +77,7 @@ function SyndicatorAuctionCacheMixin:OnLoad()
 end
 
 local function ConvertAuctionInfoToItem(auctionInfo, itemCount)
-  local itemInfo = {GetItemInfo(auctionInfo.itemLink or auctionInfo.itemKey.itemID)}
+  local itemInfo = {C_Item.GetItemInfo(auctionInfo.itemLink or auctionInfo.itemKey.itemID)}
   local itemLink = auctionInfo.itemLink or itemInfo[2]
   local iconTexture = itemInfo[10]
   local quality = itemInfo[3] 
@@ -224,7 +224,7 @@ function SyndicatorAuctionCacheMixin:ProcessPostedItemsQueue(itemKey)
       self.postedItemsQueue[auctionID] = nil
       local itemLink = details.itemLink
       local function DoItem()
-        local itemInfo = {GetItemInfo(itemLink)}
+        local itemInfo = {C_Item.GetItemInfo(itemLink)}
         local item = {
           itemID = itemID,
           itemCount = 1,
@@ -288,7 +288,7 @@ function SyndicatorAuctionCacheMixin:ProcessCommodityPurchase()
   local itemCount = self.purchasedCommodity.itemCount
 
   local function GetItem()
-    local itemInfo = {GetItemInfo(self.purchasedCommodity.itemID)}
+    local itemInfo = {C_Item.GetItemInfo(self.purchasedCommodity.itemID)}
     return {
       itemID = itemID,
       itemCount = itemCount,
@@ -319,7 +319,7 @@ function SyndicatorAuctionCacheMixin:ProcessAuctionCreated(auctionID)
     local itemID = self.postedCommodity.itemID
 
     local function DoItem()
-      local itemInfo = {GetItemInfo(itemLink or itemID)}
+      local itemInfo = {C_Item.GetItemInfo(itemLink or itemID)}
       local item = {
         itemID = itemID,
         itemCount = itemCount,
