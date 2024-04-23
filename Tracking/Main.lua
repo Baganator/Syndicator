@@ -94,7 +94,7 @@ local function SetupItemSummaries()
 end
 
 local function SetupTooltips()
-  if TooltipDataProcessor then
+  if TooltipDataProcessor and C_TooltipInfo then
     local function ValidateTooltip(tooltip)
       return tooltip == GameTooltip or tooltip == GameTooltipTooltip or tooltip == ItemRefTooltip or tooltip == GarrisonShipyardMapMissionTooltipTooltip or (not tooltip:IsForbidden() and (tooltip:GetName() or ""):match("^NotGameTooltip"))
     end
