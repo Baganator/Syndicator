@@ -82,7 +82,7 @@ end
 function SyndicatorGuildCacheMixin:OnEvent(eventName, ...)
   if eventName == "PLAYER_INTERACTION_MANAGER_FRAME_SHOW" then
     local interactionType = ...
-    if interactionType == Enum.PlayerInteractionType.GuildBanker then
+    if interactionType == Enum.PlayerInteractionType.GuildBanker and self.currentGuild ~= nil then
       FrameUtil.RegisterFrameForEvents(self, GUILD_OPEN_EVENTS)
       self:ExamineGeneralTabInfo()
       self:StartFullBankScan()
