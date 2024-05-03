@@ -59,7 +59,7 @@ function SyndicatorBagCacheMixin:QueueCaching()
 end
 
 function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
-  if eventName == "BAG_UPDATE" or eventName == "ITEM_CHANGED" then
+  if eventName == "BAG_UPDATE" then
     local bagID = ...
     if bagBags[bagID] then
       self.pending.bags[bagID] = true
