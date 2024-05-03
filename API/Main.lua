@@ -144,3 +144,7 @@ end
 function Syndicator.API.IsBagEventPending()
   return Syndicator.BagCache.isUpdatePending
 end
+
+function Syndicator.API.IsGuildEventPending()
+  return Syndicator.GuildCache.isUpdatePending
+end

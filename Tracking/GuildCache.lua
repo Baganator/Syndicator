@@ -83,6 +83,7 @@ function SyndicatorGuildCacheMixin:OnEvent(eventName, ...)
   if eventName == "PLAYER_INTERACTION_MANAGER_FRAME_SHOW" then
     local interactionType = ...
     if interactionType == Enum.PlayerInteractionType.GuildBanker and self.currentGuild ~= nil then
+      self.isUpdatePending = true
       FrameUtil.RegisterFrameForEvents(self, GUILD_OPEN_EVENTS)
       self:ExamineGeneralTabInfo()
       self:StartFullBankScan()
@@ -93,8 +94,10 @@ function SyndicatorGuildCacheMixin:OnEvent(eventName, ...)
       FrameUtil.UnregisterFrameForEvents(self, GUILD_OPEN_EVENTS)
     end
   elseif eventName == "GUILDBANKBAGSLOTS_CHANGED" then
+    self.isUpdatePending = true
     self:SetScript("OnUpdate", self.OnUpdate)
   elseif eventName == "GUILDBANK_UPDATE_TABS" then
+    self.isUpdatePending = true
     self:ExamineGeneralTabInfo()
   elseif eventName == "GUILDBANK_UPDATE_MONEY" then
     local key = GetGuildKey()
@@ -174,6 +177,7 @@ function SyndicatorGuildCacheMixin:ExamineGeneralTabInfo()
       print("guild clear took", debugprofilestop() - start)
     end
     Syndicator.CallbackRegistry:TriggerEvent("GuildCacheUpdate", self.currentGuild)
+    self.isUpdatePending = false
     return
   end
 
@@ -193,6 +197,7 @@ function SyndicatorGuildCacheMixin:ExamineGeneralTabInfo()
   if Syndicator.Config.Get(Syndicator.Config.Options.DEBUG_TIMERS) then
     print("guild general", debugprofilestop() - start)
   end
+  self.isUpdatePending = false
   Syndicator.CallbackRegistry:TriggerEvent("GuildCacheUpdate", self.currentGuild)
 end
 
@@ -200,6 +205,7 @@ function SyndicatorGuildCacheMixin:ExamineAllBankTabs()
   local start = debugprofilestop()
   local waiting = GetNumGuildBankTabs()
   if waiting == 0 then
+    self.isUpdatePending = false
     return
   end
   local finished = false
@@ -214,6 +220,7 @@ function SyndicatorGuildCacheMixin:ExamineAllBankTabs()
         if Syndicator.Config.Get(Syndicator.Config.Options.DEBUG_TIMERS) then
           print("guild full scan", debugprofilestop() - start)
         end
+        self.isUpdatePending = false
         Syndicator.CallbackRegistry:TriggerEvent("GuildCacheUpdate", self.currentGuild, changed)
       end
     end)
