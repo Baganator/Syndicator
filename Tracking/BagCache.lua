@@ -28,11 +28,17 @@ function SyndicatorBagCacheMixin:OnLoad()
     "BANKFRAME_OPENED",
     "BANKFRAME_CLOSED",
     "PLAYERBANKSLOTS_CHANGED",
+
+    -- Upgrade/downgrade of gear/keystone
+    "ITEM_CHANGED",
   })
-  if not Syndicator.Constants.IsClassic then
+  if Syndicator.Constants.IsRetail then
     -- Bank items reagent bank updating
     self:RegisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED")
     self:RegisterEvent("REAGENTBANK_UPDATE")
+    -- Keystone level changing due to start/end of an M+ dungeon
+    self:RegisterEvent("CHALLENGE_MODE_START")
+    self:RegisterEvent("CHALLENGE_MODE_COMPLETED")
   end
 
   self.currentCharacter = Syndicator.Utilities.GetCharacterFullName()
@@ -53,7 +59,7 @@ function SyndicatorBagCacheMixin:QueueCaching()
 end
 
 function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
-  if eventName == "BAG_UPDATE" then
+  if eventName == "BAG_UPDATE" or eventName == "ITEM_CHANGED" then
     local bagID = ...
     if bagBags[bagID] then
       self.pending.bags[bagID] = true
@@ -90,16 +96,16 @@ function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
     end
     self:ScanContainerBagSlots()
     self:QueueCaching()
+
   elseif eventName == "BANKFRAME_CLOSED" then
     self.bankOpen = false
-  elseif eventName == "EQUIPMENT_SETS_CHANGED" then
+
+  elseif eventName == "ITEM_CHANGED" or eventName == "CHALLENGE_MODE_START" or eventName == "CHALLENGE_MODE_COMPLETED" then
     for bagID in pairs(bagBags) do
       self.pending.bags[bagID] = true
     end
-    if self.bankOpen then
-      for bagID in pairs(bankBags) do
-        self.pending.bank[bagID] = true
-      end
+    for bagID in pairs(bankBags) do
+      self.pending.bank[bagID] = true
     end
     self:QueueCaching()
   end
