@@ -240,6 +240,8 @@ end
   end
 end]]
 
+local GetItemStats = C_Item.GetItemStats or GetItemStats
+
 local function SaveBaseStats(details)
   if not Syndicator.Utilities.IsEquipment(details.itemLink) then
     details.baseItemStats = {}
@@ -247,7 +249,7 @@ local function SaveBaseStats(details)
   end
 
   local cleanedLink = details.itemLink:gsub("item:(%d+):(%d*):(%d*):(%d*):(%d*):", "item:%1:::::")
-  details.baseItemStats = C_Item.GetItemStats(cleanedLink)
+  details.baseItemStats = GetItemStats(cleanedLink)
 end
 
 local function SocketCheck(details)
@@ -545,7 +547,7 @@ local function SaveStats(details)
     return
   end
 
-  details.itemStats = C_Item.GetItemStats(details.itemLink)
+  details.itemStats = GetItemStats(details.itemLink)
 end
 
 local function GetStatCheck(statKey)
