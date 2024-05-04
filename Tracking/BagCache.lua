@@ -28,15 +28,13 @@ function SyndicatorBagCacheMixin:OnLoad()
     "BANKFRAME_OPENED",
     "BANKFRAME_CLOSED",
     "PLAYERBANKSLOTS_CHANGED",
-
-    -- Upgrade/downgrade of gear/keystone
-    "ITEM_CHANGED",
   })
   if Syndicator.Constants.IsRetail then
     -- Bank items reagent bank updating
     self:RegisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED")
     self:RegisterEvent("REAGENTBANK_UPDATE")
     -- Keystone level changing due to start/end of an M+ dungeon
+    self:RegisterEvent("ITEM_CHANGED")
     self:RegisterEvent("CHALLENGE_MODE_START")
     self:RegisterEvent("CHALLENGE_MODE_COMPLETED")
   end
