@@ -959,7 +959,7 @@ local function ApplyCombinedTerms(fullSearchString)
       end
       return true
     end
-  elseif fullSearchString:match("^~") then
+  elseif fullSearchString:match("^[~!]") then
     local newSearchString = fullSearchString:sub(2, #fullSearchString)
     local nested = ApplyCombinedTerms(newSearchString)
     return function(details)
