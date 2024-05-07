@@ -13,6 +13,7 @@ local function GetEmptyPending()
   return {
     bags = {},
     bank = {},
+    reagentBankSlots = {},
   }
 end
 
@@ -73,14 +74,15 @@ function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
     end
 
   elseif eventName == "PLAYERREAGENTBANKSLOTS_CHANGED" then
-    if self.bankOpen then
-      self.pending.bank[Enum.BagIndex.Reagentbank] = true
-      self:QueueCaching()
+    self.pending.bank[Enum.BagIndex.Reagentbank] = true
+    if not self.bankOpen then -- can only scan changed slots when bank is closed
+      self.pending.reagentBankSlots[...] = true
     end
+    self:QueueCaching()
 
   elseif eventName == "REAGENTBANK_UPDATE" then
+    self.pending.bank[Enum.BagIndex.Reagentbank] = true
     if self.bankOpen then
-      self.pending.bank[Enum.BagIndex.Reagentbank] = true
       self:QueueCaching()
     end
 
@@ -209,6 +211,7 @@ function SyndicatorBagCacheMixin:OnUpdate()
   local start = debugprofilestop()
 
   local pendingCopy = CopyTable(self.pending)
+  pendingCopy.reagentBankSlots = nil
 
   local function FireBagChange()
     if Syndicator.Config.Get(Syndicator.Config.Options.DEBUG_TIMERS) then
@@ -233,31 +236,29 @@ function SyndicatorBagCacheMixin:OnUpdate()
   end
 
 
-  local function DoBag(bagID, bag)
-    for slotID = 1, C_Container.GetContainerNumSlots(bagID) do
-      local location = ItemLocation:CreateFromBagAndSlot(bagID, slotID)
-      local itemID = C_Item.DoesItemExist(location) and C_Item.GetItemID(location)
-      bag[slotID] = {}
-      if itemID then
-        if C_Item.IsItemDataCachedByID(itemID) then
+  local function DoSlot(bagID, slotID, bag)
+    local location = ItemLocation:CreateFromBagAndSlot(bagID, slotID)
+    local itemID = C_Item.DoesItemExist(location) and C_Item.GetItemID(location)
+    bag[slotID] = {}
+    if itemID then
+      if C_Item.IsItemDataCachedByID(itemID) then
+        local slotInfo = C_Container.GetContainerItemInfo(bagID, slotID)
+        if slotInfo then
+          bag[slotID] = GetInfo(slotInfo)
+        end
+      else
+        waiting = waiting + 1
+        local item = Item:CreateFromItemID(itemID)
+        item:ContinueOnItemLoad(function()
           local slotInfo = C_Container.GetContainerItemInfo(bagID, slotID)
-          if slotInfo then
+          if slotInfo and slotInfo.itemID == itemID then
             bag[slotID] = GetInfo(slotInfo)
           end
-        else
-          waiting = waiting + 1
-          local item = Item:CreateFromItemID(itemID)
-          item:ContinueOnItemLoad(function()
-            local slotInfo = C_Container.GetContainerItemInfo(bagID, slotID)
-            if slotInfo and slotInfo.itemID == itemID then
-              bag[slotID] = GetInfo(slotInfo)
-            end
-            waiting = waiting - 1
-            if loopsFinished and waiting == 0 then
-              FireBagChange()
-            end
-          end)
-        end
+          waiting = waiting - 1
+          if loopsFinished and waiting == 0 then
+            FireBagChange()
+          end
+        end)
       end
     end
   end
@@ -267,16 +268,31 @@ function SyndicatorBagCacheMixin:OnUpdate()
   for bagID in pairs(self.pending.bags) do
     local bagIndex = bagBags[bagID]
     bags[bagIndex] = {}
-    DoBag(bagID, bags[bagIndex])
+    local bagData = bags[bagIndex]
+    for slotID = 1, C_Container.GetContainerNumSlots(bagID) do
+      DoSlot(bagID, slotID, bagData)
+    end
   end
 
   local bank = SYNDICATOR_DATA.Characters[self.currentCharacter].bank
 
-  for bagID in pairs(self.pending.bank) do
-    local bagIndex = bankBags[bagID]
-    bank[bagIndex] = {}
-    if bagID ~= Enum.BagIndex.Reagentbank or IsReagentBankUnlocked() then
-      DoBag(bagID, bank[bagIndex])
+  if self.bankOpen then
+    for bagID in pairs(self.pending.bank) do
+      local bagIndex = bankBags[bagID]
+      bank[bagIndex] = {}
+      local bagData = bank[bagIndex]
+      if bagID ~= Enum.BagIndex.Reagentbank or IsReagentBankUnlocked() then
+        for slotID = 1, C_Container.GetContainerNumSlots(bagID) do
+          DoSlot(bagID, slotID, bagData)
+        end
+      end
+    end
+  elseif self.pending.bank[Enum.BagIndex.Reagentbank] and bank[bankBags[Enum.BagIndex.Reagentbank]] then
+    local reagentBankData = bank[bankBags[Enum.BagIndex.Reagentbank]]
+    for slotID in pairs(self.pending.reagentBankSlots) do
+      if #reagentBankData >= slotID then
+        DoSlot(Enum.BagIndex.Reagentbank, slotID, reagentBankData)
+      end
     end
   end
 
