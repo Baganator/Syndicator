@@ -10,7 +10,7 @@ function SyndicatorEquippedCacheMixin:OnLoad()
 end
 
 local function GetSlotInfo(slot)
-  local location = ItemLocation:CreateFromEquipmentSlot(slot)
+  local location = {equipmentSlotIndex = slot}
   if not C_Item.DoesItemExist(location) then
     return {}
   end

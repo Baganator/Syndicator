@@ -145,7 +145,7 @@ end
 
 function SyndicatorBagCacheMixin:ScanContainerBagSlots()
   local function DoBagSlot(inventorySlot)
-    local location = ItemLocation:CreateFromEquipmentSlot(inventorySlot)
+    local location = {equipmentSlotIndex = inventorySlot}
     local itemID = GetInventoryItemID("player", inventorySlot)
     if not itemID then
       return {}
@@ -237,7 +237,9 @@ function SyndicatorBagCacheMixin:OnUpdate()
 
 
   local function DoSlot(bagID, slotID, bag)
-    local location = ItemLocation:CreateFromBagAndSlot(bagID, slotID)
+    -- Create raw location as optimisation (~20% time saving)
+    -- Equivalent to ItemLocation:CreateFromBagAndSlot(bagID, slotID)
+    local location = {bagID = bagID, slotIndex = slotID}
     local itemID = C_Item.DoesItemExist(location) and C_Item.GetItemID(location)
     bag[slotID] = {}
     if itemID then
