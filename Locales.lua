@@ -46,6 +46,7 @@ L["EQUIPPED_X"] = "Equipped: %s"
 L["VOID_X"] = "Void: %s"
 L["AUCTIONS_X"] = "Auctions: %s"
 L["GUILD_X"] = "Guild: %s"
+L["WARBAND"] = "Warband"
 
 L["KEYWORD_REAGENT"] = "reagent"
 L["KEYWORD_PET"] = "pet"

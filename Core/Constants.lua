@@ -16,6 +16,8 @@ Syndicator.Constants = {
     Enum.BagIndex.BankBag_6,
     Enum.BagIndex.BankBag_7,
   },
+  AllWarbandIndexes = {},
+
   IsRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE,
   IsClassic = WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE,
 
@@ -28,16 +30,22 @@ Syndicator.Constants = {
   EquippedInventorySlotOffset = 1,
 }
 
-if not Syndicator.Constants.IsRetail then
-  table.insert(Syndicator.Constants.AllBagIndexes, Enum.BagIndex.Keyring)
-end
 if Syndicator.Constants.IsRetail then
   table.insert(Syndicator.Constants.AllBagIndexes, Enum.BagIndex.ReagentBag)
   table.insert(Syndicator.Constants.AllBankIndexes, Enum.BagIndex.Reagentbank)
   Syndicator.Constants.BagSlotsCount = 5
   Syndicator.Constants.MaxBagSize = 42
+  Syndicator.Constants.AllWarbandIndexes = {
+    Enum.BagIndex.AccountBankTab_1,
+    Enum.BagIndex.AccountBankTab_2,
+    Enum.BagIndex.AccountBankTab_3,
+    Enum.BagIndex.AccountBankTab_4,
+    Enum.BagIndex.AccountBankTab_5,
+  }
 end
+
 if Syndicator.Constants.IsClassic then
+  table.insert(Syndicator.Constants.AllBagIndexes, Enum.BagIndex.Keyring)
   -- Workaround for the enum containing the wrong values for the bank bag slots
   for i = 1, Syndicator.Constants.BankBagSlotsCount do
     Syndicator.Constants.AllBankIndexes[i + 1] = NUM_BAG_SLOTS + i
@@ -51,6 +59,7 @@ Syndicator.Constants.Events = {
   "GuildDeleted",
 
   "BagCacheUpdate",
+  "WarbandCacheUpdate",
   "MailCacheUpdate",
   "CurrencyCacheUpdate",
   "GuildCacheUpdate",

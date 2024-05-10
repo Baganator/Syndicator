@@ -25,6 +25,7 @@ local function InitializeSavedVariables()
       Guilds = {},
     }
   end
+  SYNDICATOR_DATA.Warband = SYNDICATOR_DATA.Warband or { bank = {} }
 end
 
 local currentCharacter
