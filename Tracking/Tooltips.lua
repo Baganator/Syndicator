@@ -65,7 +65,7 @@ function Syndicator.Tooltips.AddItemLines(tooltip, summaries, itemLink)
     tooltipInfo.guilds = {}
   end
 
-  if #tooltipInfo.characters == 0 and #tooltipInfo.guilds == 0 and tooltipInfo.warband == 0 then
+  if #tooltipInfo.characters == 0 and #tooltipInfo.guilds == 0 and tooltipInfo.warband[1] == 0 then
     return
   end
 
@@ -90,7 +90,7 @@ function Syndicator.Tooltips.AddItemLines(tooltip, summaries, itemLink)
     totals = totals + s.bank
     seenRealms[s.realmNormalized] = true
   end
-  totals = totals + tooltipInfo.warband
+  totals = totals + tooltipInfo.warband[1]
   seenRealms[GetNormalizedRealmName() or ""] = true -- ensure realm name is shown for a different realm
 
   local realmCount = 0
@@ -164,8 +164,8 @@ function Syndicator.Tooltips.AddItemLines(tooltip, summaries, itemLink)
   if #tooltipInfo.guilds > Syndicator.Config.Get("tooltips_character_limit") then
     tooltip:AddLine("  ...")
   end
-  if tooltipInfo.warband > 0 then
-    AddDoubleLine("  " .. PASSIVE_SPELL_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_WARBAND), WHITE_FONT_COLOR:WrapTextInColorCode(tooltipInfo.warband))
+  if tooltipInfo.warband[1] > 0 then
+    AddDoubleLine("  " .. PASSIVE_SPELL_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_WARBAND), WHITE_FONT_COLOR:WrapTextInColorCode(tooltipInfo.warband[1]))
   end
   tooltip:Show()
 end

@@ -11,9 +11,15 @@ function SyndicatorItemSummariesMixin:OnLoad()
       Pending = true,
     }
   end
-  if SYNDICATOR_SUMMARIES == nil or SYNDICATOR_SUMMARIES.Version < 4 then
+  if SYNDICATOR_SUMMARIES.Version == 4 then
+    SYNDICATOR_SUMMARIES.Warband = {
+      Summary = {},
+      Pending = { true },
+    }
+  end
+  if SYNDICATOR_SUMMARIES == nil or SYNDICATOR_SUMMARIES.Version < 5 then
     SYNDICATOR_SUMMARIES = {
-      Version = 4,
+      Version = 5,
       Characters = {
         ByRealm = {},
         Pending = {},
@@ -24,7 +30,7 @@ function SyndicatorItemSummariesMixin:OnLoad()
       },
       Warband = {
         Summary = {},
-        Pending = true,
+        Pending = { true },
       },
     }
     for character, data in pairs(SYNDICATOR_DATA.Characters) do
@@ -49,7 +55,7 @@ function SyndicatorItemSummariesMixin:CharacterCacheUpdate(characterName)
 end
 
 function SyndicatorItemSummariesMixin:WarbandCacheUpdate()
-  self.SV.Warband.Pending = true
+  self.SV.Warband.Pending[1] = true
 end
 
 function SyndicatorItemSummariesMixin:GuildCacheUpdate(guildName)
@@ -199,7 +205,7 @@ end
 
 function SyndicatorItemSummariesMixin:GenerateWarbandSummary()
   local summary = {}
-  local details = SYNDICATOR_DATA.Warband.bank
+  local details = SYNDICATOR_DATA.Warband[1].bank
 
   for _, tab in ipairs(details) do
     for _, item in ipairs(tab.slots) do
@@ -213,8 +219,8 @@ function SyndicatorItemSummariesMixin:GenerateWarbandSummary()
     end
   end
 
-  self.SV.Warband.Summary = summary
-  self.SV.Warband.Pending = false
+  self.SV.Warband.Summary[1] = summary
+  self.SV.Warband.Pending[1] = false
 end
 
 function SyndicatorItemSummariesMixin:GetTooltipInfo(key, sameConnectedRealm, sameFaction)
@@ -238,7 +244,7 @@ function SyndicatorItemSummariesMixin:GetTooltipInfo(key, sameConnectedRealm, sa
       print("summaries guild", debugprofilestop() - start)
     end
   end
-  if self.SV.Warband.Pending then
+  if self.SV.Warband.Pending[1] then
     local start = debugprofilestop()
     self:GenerateWarbandSummary()
     if Syndicator.Config.Get(Syndicator.Config.Options.DEBUG_TIMERS) then
@@ -263,7 +269,7 @@ function SyndicatorItemSummariesMixin:GetTooltipInfo(key, sameConnectedRealm, sa
   local result = {
     characters = {},
     guilds = {},
-    warband = 0,
+    warband = { 0 },
   }
 
   local currentFaction = UnitFactionGroup("player")
@@ -307,8 +313,8 @@ function SyndicatorItemSummariesMixin:GetTooltipInfo(key, sameConnectedRealm, sa
     end
   end
 
-  if self.SV.Warband.Summary[key] then
-    result.warband = self.SV.Warband.Summary[key]
+  if self.SV.Warband.Summary[1][key] then
+    result.warband[1] = self.SV.Warband.Summary[1][key]
   end
 
   return result

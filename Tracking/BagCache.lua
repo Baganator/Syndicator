@@ -164,7 +164,7 @@ function SyndicatorBagCacheMixin:ScanWarbandSlots()
 
   local allTabs = C_Bank.FetchPurchasedBankTabData(Enum.BankType.Account)
 
-  local warband = SYNDICATOR_DATA.Warband
+  local warband = SYNDICATOR_DATA.Warband[1]
 
   for index, tabDetails in ipairs(allTabs) do
     if not warband.bank[index] then
@@ -335,7 +335,7 @@ function SyndicatorBagCacheMixin:OnUpdate()
     end
   end
 
-  local warband = SYNDICATOR_DATA.Warband
+  local warband = SYNDICATOR_DATA.Warband[1]
 
   for bagID in pairs(self.pending.warband) do
     local bagIndex = warbandBags[bagID]
