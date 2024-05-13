@@ -19,6 +19,11 @@ local function GetEmptyPending()
     bank = {},
     warband = {},
     reagentBankSlots = {},
+    containerBags = {
+      bags = false,
+      bank = false,
+      warband = false
+    }
   }
 end
 
@@ -174,6 +179,7 @@ function SyndicatorBagCacheMixin:ScanWarbandSlots()
     warband.bank[index].name = tabDetails.name
     warband.bank[index].depositFlags = tabDetails.depositFlags
   end
+  self.pending.containerBags.warband = true
 end
 
 function SyndicatorBagCacheMixin:ScanContainerBagSlots()
@@ -212,6 +218,7 @@ function SyndicatorBagCacheMixin:ScanContainerBagSlots()
         containerInfo.bags[index] = {}
       end
     end
+    self.pending.containerBags.bags = true
   end
 
   if self.bankOpen then
@@ -232,6 +239,7 @@ function SyndicatorBagCacheMixin:ScanContainerBagSlots()
         containerInfo.bank[index] = {}
       end
     end
+    self.pending.containerBags.bank = true
   end
 end
 
