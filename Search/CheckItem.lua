@@ -56,6 +56,7 @@ local function BindOnEquipCheck(details)
 end
 
 local function EquipmentCheck(details)
+  GetClassSubClass(details)
   return details.classID == Enum.ItemClass.Armor or details.classID == Enum.ItemClass.Weapon
 end
 
