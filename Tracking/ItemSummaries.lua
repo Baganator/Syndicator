@@ -4,14 +4,8 @@ function SyndicatorItemSummariesMixin:OnLoad()
   if BAGANATOR_SUMMARIES ~= nil and SYNDICATOR_SUMMARIES == nil then
     SYNDICATOR_SUMMARIES = BAGANATOR_SUMMARIES
   end
-  if SYNDICATOR_SUMMARIES.Version == 3 then
-    SYNDICATOR_SUMMARIES.Version = 4
-    SYNDICATOR_SUMMARIES.Warband = {
-      Summary = {},
-      Pending = true,
-    }
-  end
   if SYNDICATOR_SUMMARIES.Version == 4 then
+    SYNDICATOR_SUMMARIES.Version = 5
     SYNDICATOR_SUMMARIES.Warband = {
       Summary = {},
       Pending = { true },
