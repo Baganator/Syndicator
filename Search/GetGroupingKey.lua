@@ -11,7 +11,7 @@ function Syndicator.Search.GetGroupingKey(item, callback)
     if item.itemID == Syndicator.Constants.BattlePetCageID then
       callback(lower .. "_" .. strjoin("-", BattlePetToolTip_UnpackBattlePetLink(item.itemLink)) .. "_" .. tostring(item.isBound))
     elseif stackable[item.itemID] then
-      callback(lower .. "_" .. tostring(item.itemID) .. "_" .. tostring(item.isBound))
+      callback(lower .. "_" .. tostring(item.itemID))
     else
       local linkParts = {strsplit(":", item.itemLink)}
       -- Remove uniqueID, linkLevel, specializationID, modifiersMask, itemContext
