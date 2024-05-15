@@ -81,6 +81,11 @@ end
 
 Syndicator.API.GetGuild = Syndicator.API.GetByGuildFullName
 
+function Syndicator.API.GetWarband(index)
+  index = index or 1
+  return SYNDICATOR_DATA.Warband[index]
+end
+
 function Syndicator.API.GetCurrentCharacter()
   return Syndicator.BagCache.currentCharacter
 end
