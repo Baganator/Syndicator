@@ -17,7 +17,7 @@ local function GetEmptyPending()
   return {
     bags = {},
     bank = {},
-    warband = {},
+    warband = false,
     reagentBankSlots = {},
     containerBags = {
       bags = false,
@@ -261,7 +261,8 @@ function SyndicatorBagCacheMixin:OnUpdate()
     self.isUpdatePending = false
     if next(pendingCopy.bank) or next(pendingCopy.bags) then
       Syndicator.CallbackRegistry:TriggerEvent("BagCacheUpdate", self.currentCharacter, pendingCopy)
-    elseif next(pendingCopy.warband) then
+    end
+    if next(pendingCopy.warband) then
       Syndicator.CallbackRegistry:TriggerEvent("WarbandCacheUpdate", pendingCopy)
     end
   end
