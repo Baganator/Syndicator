@@ -17,7 +17,7 @@ local function GetEmptyPending()
   return {
     bags = {},
     bank = {},
-    warband = false,
+    warband = {},
     reagentBankSlots = {},
     containerBags = {
       bags = false,
