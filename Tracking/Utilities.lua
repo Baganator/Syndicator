@@ -62,7 +62,7 @@ function Syndicator.Utilities.RecoverBattlePetLink(tooltipInfo)
   return quality:WrapTextInColorCode("|H" .. itemString .. "|h[" .. name .. "]|h"), tooltipInfo.battlePetBreedQuality
 end
 
-local cachedConnectedRealms
+local cachedConnectedRealms = {}
 function Syndicator.Utilities.CacheConnectedRealms()
   cachedConnectedRealms = GetAutoCompleteRealms()
   if #cachedConnectedRealms == 0 then
