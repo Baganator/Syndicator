@@ -542,7 +542,7 @@ for keyword, bagBit in pairs(BAG_TYPES) do
   end)
 end
 
-local function SaveStats(details)
+local function SaveGearStats(details)
   if not Syndicator.Utilities.IsEquipment(details.itemLink) then
     details.itemStats = {}
     return
@@ -551,9 +551,9 @@ local function SaveStats(details)
   details.itemStats = GetItemStats(details.itemLink)
 end
 
-local function GetStatCheck(statKey)
+local function GetGearStatCheck(statKey)
   return function(details)
-    SaveStats(details)
+    SaveGearStats(details)
     if not details.itemStats then
       return
     end
@@ -564,6 +564,29 @@ local function GetStatCheck(statKey)
       end
     end
     return false
+  end
+end
+
+local function GetGemStatCheck(statKey)
+  local PATTERN1 = "^%+" .. statKey .. "$" -- Retail remix gems
+  local PATTERN2 = "^%+%d+ " .. statKey .. "$" -- Normal gems
+  return function(details)
+    GetClassSubClass(details)
+
+    if not details.classID == Enum.ItemClass.Gem then
+      return false
+    end
+
+    GetTooltipInfoSpell(details)
+
+    if details.tooltipInfoSpell then
+      for _, line in ipairs(details.tooltipInfoSpell.lines) do
+        if line.leftText:match(PATTERN1) or line.leftText:match(PATTERN2) then
+          return true
+        end
+      end
+      return false
+    end
   end
 end
 
@@ -621,7 +644,8 @@ local stats = {
 for _, s in ipairs(stats) do
   local keyword = _G["ITEM_MOD_" .. s .. "_SHORT"] or _G["ITEM_MOD_" .. s]
   if keyword ~= nil then
-    AddKeyword(keyword:lower(), GetStatCheck(s))
+    AddKeyword(keyword:lower(), GetGearStatCheck(s))
+    AddKeyword(keyword:lower(), GetGemStatCheck(keyword))
   end
 end
 
