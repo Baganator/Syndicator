@@ -648,6 +648,7 @@ for _, s in ipairs(stats) do
     AddKeyword(keyword:lower(), GetGemStatCheck(keyword))
   end
 end
+AddKeyword(STAT_ARMOR:lower(), GetGemStatCheck(STAT_ARMOR))
 
 -- Sorted in initialize function later
 local sortedKeywords = {}
