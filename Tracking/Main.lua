@@ -104,7 +104,7 @@ local function SetupTooltips()
     end
 
     TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tooltip, data)
-      if ValidateTooltip(tooltip) then
+      if ValidateTooltip(tooltip) and Syndicator.ItemSummaries then
         local itemName, itemLink = TooltipUtil.GetDisplayedItem(tooltip)
 
         -- Fix to get recipes to show the inventory data for the recipe when
@@ -128,7 +128,7 @@ local function SetupTooltips()
       end
     end)
     TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Currency, function(tooltip, data)
-      if ValidateTooltip(tooltip) then
+      if ValidateTooltip(tooltip) and Syndicator.ItemSummaries then
         local data = tooltip:GetPrimaryTooltipData()
         if AddCurrencyCheck() then
           AddToCurrencyTooltip(tooltip, data.id)
@@ -139,7 +139,7 @@ local function SetupTooltips()
     local function SetItemTooltipHandler(tooltip)
       local ready = true
       tooltip:HookScript("OnTooltipSetItem", function(tooltip)
-        if not ready then
+        if not ready or not Syndicator.ItemSummaries then
           return
         end
         local _, itemLink = tooltip:GetItem()
@@ -169,7 +169,7 @@ local function SetupTooltips()
 
   if BattlePetToolTip_Show then
     local function PetTooltipShow(tooltip, speciesID, level, breedQuality, maxHealth, power, speed, ...)
-      if not AddItemCheck() then
+      if not AddItemCheck() or not Syndicator.ItemSummaries then
         return
       end
       -- Reconstitute item link from tooltip arguments
