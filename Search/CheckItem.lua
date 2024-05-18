@@ -243,22 +243,21 @@ end]]
 
 local GetItemStats = C_Item.GetItemStats or GetItemStats
 
-local function SaveBaseStats(details)
+local function SaveGearStats(details)
   if not Syndicator.Utilities.IsEquipment(details.itemLink) then
-    details.baseItemStats = {}
+    details.itemStats = {}
     return
   end
 
-  local cleanedLink = details.itemLink:gsub("item:(%d+):(%d*):(%d*):(%d*):(%d*):", "item:%1:::::")
-  details.baseItemStats = GetItemStats(cleanedLink)
+  details.itemStats = GetItemStats(details.itemLink)
 end
 
 local function SocketCheck(details)
-  SaveBaseStats(details)
-  if not details.baseItemStats then
+  SaveGearStats(details)
+  if not details.itemStats then
     return nil
   end
-  for key in pairs(details.baseItemStats) do
+  for key in pairs(details.itemStats) do
     if key:find("EMPTY_SOCKET", nil, true) then
       return true
     end
@@ -387,9 +386,9 @@ for _, key in ipairs(sockets) do
   local global = _G[key]
   if global then
     AddKeyword(global:lower(), function(details)
-      SaveBaseStats(details)
-      if details.baseItemStats then
-        return details.baseItemStats[key] ~= nil
+      SaveGearStats(details)
+      if details.itemStats then
+        return details.itemStats[key] ~= nil
       end
       return nil
     end)
@@ -540,15 +539,6 @@ for keyword, bagBit in pairs(BAG_TYPES) do
       return bit.band(bagFamily, itemFamily) ~= 0
     end
   end)
-end
-
-local function SaveGearStats(details)
-  if not Syndicator.Utilities.IsEquipment(details.itemLink) then
-    details.itemStats = {}
-    return
-  end
-
-  details.itemStats = GetItemStats(details.itemLink)
 end
 
 local function GetGearStatCheck(statKey)
