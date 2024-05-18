@@ -559,7 +559,7 @@ end
 
 local function GetGemStatCheck(statKey)
   local PATTERN1 = "%+" .. statKey -- Retail remix gems
-  local PATTERN2 = "^%+%d+ " .. statKey .. "$" -- Normal gems
+  local PATTERN2 = "%+%d+ " .. statKey -- Normal gems
   return function(details)
     GetClassSubClass(details)
 
