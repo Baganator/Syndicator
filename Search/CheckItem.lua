@@ -360,10 +360,6 @@ local function PetCollectedCheck(details)
   end
 end
 
-if Syndicator.Constants.IsRetail then
-  AddKeyword(SYNDICATOR_L_KEYWORD_UNCOLLECTED_PET, PetCollectedCheck)
-end
-
 local sockets = {
   "EMPTY_SOCKET_BLUE",
   "EMPTY_SOCKET_COGWHEEL",
@@ -778,10 +774,6 @@ local EXCLUSIVE_KEYWORDS_NO_TOOLTIP_TEXT = {
   [SYNDICATOR_L_KEYWORD_EQUIPMENT] = true,
 }
 
-local NO_CACHING_KEYWORDS = {
-  [SYNDICATOR_L_KEYWORD_UNCOLLECTED_PET] = true,
-}
-
 local UPGRADE_PATH_PATTERN = ITEM_UPGRADE_TOOLTIP_FORMAT_STRING and "^" .. ITEM_UPGRADE_TOOLTIP_FORMAT_STRING:gsub("%%s", ".*"):gsub("%%d", ".*")
 
 local function GetTooltipSpecialTerms(details)
@@ -886,6 +878,7 @@ local function ApplyKeyword(searchString)
       -- the details match the keyword's criteria
       local check = function(details)
         local matches = matchesTextToUse(details, searchString)
+        local cacheBlock = false
         if matches == nil then
           return nil
         elseif matches then
@@ -897,7 +890,7 @@ local function ApplyKeyword(searchString)
         end
         local miss = false
         for _, k in ipairs(keywords) do
-          if details.matchInfo[k] == nil or NO_CACHING_KEYWORDS[k] then
+          if details.matchInfo[k] == nil then
             -- Keyword results not cached yet
             local result = KEYWORDS_TO_CHECK[k](details, searchString)
             if result then
@@ -991,13 +984,21 @@ local function ApplyCombinedTerms(fullSearchString)
 end
 
 function Syndicator.Search.CheckItem(details, searchString)
+  details.matchInfo = details.matchInfo or {}
+  local result = details.matchInfo[searchString]
+  if result ~= nil then
+    return details.matchInfo[searchString]
+  end
+
   local check = matches[searchString]
   if not check then
     check = ApplyCombinedTerms(searchString)
     matches[searchString] = check
   end
 
-  return check(details, searchString)
+  result = check(details, searchString)
+  details.matchInfo[searchString] = result
+  return result
 end
 
 function Syndicator.Search.ClearCache()
