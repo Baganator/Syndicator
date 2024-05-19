@@ -878,7 +878,6 @@ local function ApplyKeyword(searchString)
       -- the details match the keyword's criteria
       local check = function(details)
         local matches = matchesTextToUse(details, searchString)
-        local cacheBlock = false
         if matches == nil then
           return nil
         elseif matches then
