@@ -68,10 +68,6 @@ local function PotionCheck(details)
   return details.classID == Enum.ItemClass.Consumable and (details.subClassID == 1 or details.subClassID == 2)
 end
 
-local function JunkCheck(details)
-  return details.isJunk == true
-end
-
 local function CosmeticCheck(details)
   if not C_Item.IsItemDataCachedByID(details.itemID) then
     return nil
@@ -128,20 +124,27 @@ local function GetTooltipInfoSpell(details)
   details.tooltipInfoSpell = details.tooltipGetter() or {lines={}}
 end
 
---[[local function ReputationCheck(details)
+local JUNK_PATTERN = "^" .. SELL_PRICE
+local function JunkCheck(details)
+  if details.isJunk ~= nil then
+    return details.isJunk
+  end
+
+  if details.quality ~= Enum.ItemQuality.Poor then
+    return false
+  end
+
   GetTooltipInfoSpell(details)
 
   if details.tooltipInfoSpell then
-    for _, lineData in ipairs(details.tooltipInfoSpell.lines) do
-      if lineData.leftText:match(SYNDICATOR_L_KEYWORD_REPUTATION) then
-        return true
+    for _, row in ipairs(details.tooltipInfoSpell.lines) do
+      if row.leftText:match(JUNK_PATTERN) then
+        return false
       end
     end
-    return false
-  else
-    return nil
+    return true
   end
-end]]
+end
 
 local function BindOnAccountCheck(details)
   if not details.isBound then
