@@ -9,6 +9,10 @@ local function GetItemName(details)
   elseif C_Item.IsItemDataCachedByID(details.itemID) then
     details.itemName = C_Item.GetItemNameByID(details.itemLink) or C_Item.GetItemNameByID(details.itemID)
   end
+
+  if not details.itemName then
+    C_Item.RequestLoadItemDataByID(details.itemID)
+  end
 end
 
 local function GetClassSubClass(details)
