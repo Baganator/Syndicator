@@ -39,6 +39,7 @@ function SyndicatorBagCacheMixin:OnLoad()
     "BANKFRAME_OPENED",
     "BANKFRAME_CLOSED",
     "PLAYERBANKSLOTS_CHANGED",
+    "PLAYERBANKBAGSLOTS_CHANGED",
   })
   if Syndicator.Constants.IsRetail then
     -- Bank items reagent bank updating
@@ -99,6 +100,9 @@ function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
     end
 
   elseif eventName == "BAG_CONTAINER_UPDATE" then
+    self:UpdateContainerSlots()
+
+  elseif eventName == "PLAYERBANKBAGSLOTS_CHANGED" then
     self:UpdateContainerSlots()
 
   elseif eventName == "BANK_TAB_SETTINGS_UPDATED" then
@@ -261,10 +265,10 @@ function SyndicatorBagCacheMixin:OnUpdate()
       print("caching took", debugprofilestop() - start)
     end
     self.isUpdatePending = false
-    if next(pendingCopy.bank) or next(pendingCopy.bags) then
+    if next(pendingCopy.bank) or next(pendingCopy.bags) or pendingCopy.containerBags.bags or pendingCopy.containerBags.bank then
       Syndicator.CallbackRegistry:TriggerEvent("BagCacheUpdate", self.currentCharacter, pendingCopy)
     end
-    if next(pendingCopy.warband) then
+    if next(pendingCopy.warband) or pendingCopy.containerBags.warband then
       Syndicator.CallbackRegistry:TriggerEvent("WarbandCacheUpdate", pendingCopy)
     end
   end
