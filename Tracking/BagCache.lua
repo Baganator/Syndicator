@@ -184,7 +184,7 @@ function SyndicatorBagCacheMixin:ScanWarbandSlots()
 
   for index, tabDetails in ipairs(allTabs) do
     if not warband.bank[index] then
-      warband.bank[index] = { slots = {}, icon = QUESTION_MARK_ICON, name = "", depositFlags = 0 }
+      warband.bank[index] = { slots = {}, iconTexture = QUESTION_MARK_ICON, name = "", depositFlags = 0 }
     end
     warband.bank[index].iconTexture = tabDetails.icon
     warband.bank[index].name = tabDetails.name
