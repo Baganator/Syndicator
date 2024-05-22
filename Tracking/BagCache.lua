@@ -49,6 +49,10 @@ function SyndicatorBagCacheMixin:OnLoad()
     self:RegisterEvent("ITEM_CHANGED")
     self:RegisterEvent("CHALLENGE_MODE_START")
     self:RegisterEvent("CHALLENGE_MODE_COMPLETED")
+
+    if C_Bank and C_Bank.UpdateBankTabSettings then
+      self:RegisterEvent("BANK_TAB_SETTINGS_UPDATED")
+    end
   end
 
   self.currentCharacter = Syndicator.Utilities.GetCharacterFullName()
@@ -107,6 +111,7 @@ function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
 
   elseif eventName == "BANK_TAB_SETTINGS_UPDATED" then
     self:ScanWarbandSlots()
+    self:QueueCaching()
 
   elseif eventName == "BANKFRAME_OPENED" then
     self.bankOpen = true
