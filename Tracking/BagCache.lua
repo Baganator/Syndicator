@@ -51,6 +51,7 @@ function SyndicatorBagCacheMixin:OnLoad()
     self:RegisterEvent("CHALLENGE_MODE_COMPLETED")
 
     if C_Bank and C_Bank.UpdateBankTabSettings then
+      self:RegisterEvent("BANK_TABS_CHANGED")
       self:RegisterEvent("BANK_TAB_SETTINGS_UPDATED")
     end
   end
@@ -110,8 +111,20 @@ function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
     self:UpdateContainerSlots()
 
   elseif eventName == "BANK_TAB_SETTINGS_UPDATED" then
-    self:ScanWarbandSlots()
-    self:QueueCaching()
+    if self.bankOpen then
+      self:ScanWarbandSlots()
+      self:QueueCaching()
+    end
+
+  -- Guessing that this is fired when a new warband tab is purchased
+  elseif eventName == "BANK_TABS_CHANGED" then
+    if self.bankOpen then
+      self:ScanWarbandSlots()
+      for bagID in pairs(warbandBags) do
+        self.pending.warband[bagID] = true
+      end
+      self:QueueCaching()
+    end
 
   elseif eventName == "BANKFRAME_OPENED" then
     self.bankOpen = true
