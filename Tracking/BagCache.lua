@@ -50,7 +50,7 @@ function SyndicatorBagCacheMixin:OnLoad()
     self:RegisterEvent("CHALLENGE_MODE_START")
     self:RegisterEvent("CHALLENGE_MODE_COMPLETED")
 
-    if C_Bank and C_Bank.UpdateBankTabSettings then
+    if Syndicator.Constants.WarbandBankActive then
       self:RegisterEvent("BANK_TABS_CHANGED")
       self:RegisterEvent("BANK_TAB_SETTINGS_UPDATED")
     end
@@ -287,7 +287,7 @@ function SyndicatorBagCacheMixin:OnUpdate()
       Syndicator.CallbackRegistry:TriggerEvent("BagCacheUpdate", self.currentCharacter, pendingCopy)
     end
     if next(pendingCopy.warband) or pendingCopy.containerBags.warband then
-      Syndicator.CallbackRegistry:TriggerEvent("WarbandCacheUpdate", pendingCopy)
+      Syndicator.CallbackRegistry:TriggerEvent("WarbandBankCacheUpdate", pendingCopy)
     end
   end
 

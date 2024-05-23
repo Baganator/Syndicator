@@ -28,6 +28,8 @@ Syndicator.Constants = {
   MaxGuildBankTabItemSlots = 98,
 
   EquippedInventorySlotOffset = 1,
+
+  WarbandBankActive = false,
 }
 
 if Syndicator.Constants.IsRetail then
@@ -42,6 +44,7 @@ if Syndicator.Constants.IsRetail then
     Enum.BagIndex.AccountBankTab_4,
     Enum.BagIndex.AccountBankTab_5,
   }
+  Syndicator.Constants.WarbandBankActive = C_Bank ~= nil and C_Bank.UpdateBankTabSettings ~= nil
 end
 
 if Syndicator.Constants.IsClassic then
@@ -59,9 +62,10 @@ Syndicator.Constants.Events = {
   "GuildDeleted",
 
   "BagCacheUpdate",
-  "WarbandCacheUpdate",
+  "WarbandBankCacheUpdate",
   "MailCacheUpdate",
   "CurrencyCacheUpdate",
+  "WarbandCurrencyCacheUpdate",
   "GuildCacheUpdate",
   "GuildNameSet",
   "EquippedCacheUpdate",

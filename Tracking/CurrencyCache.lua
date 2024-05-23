@@ -4,6 +4,11 @@ SyndicatorCurrencyCacheMixin = {}
 function SyndicatorCurrencyCacheMixin:OnLoad()
   self:RegisterEvent("PLAYER_MONEY")
 
+  if Syndicator.Constants.WarbandBankActive then
+    self:RegisterEvent("ACCOUNT_MONEY")
+    self:RegisterEvent("BANKFRAME_OPENED")
+  end
+
   self.currentCharacter = Syndicator.Utilities.GetCharacterFullName()
 
   SYNDICATOR_DATA.Characters[self.currentCharacter].money = GetMoney()
@@ -30,6 +35,9 @@ function SyndicatorCurrencyCacheMixin:OnEvent(eventName, ...)
   elseif eventName == "PLAYER_MONEY" then
     SYNDICATOR_DATA.Characters[self.currentCharacter].money = GetMoney()
     Syndicator.CallbackRegistry:TriggerEvent("CurrencyCacheUpdate", self.currentCharacter)
+  elseif eventName == "ACCOUNT_MONEY" or eventName == "BANKFRAME_OPENED" then
+    SYNDICATOR_DATA.Warband[1].money = C_Bank.FetchDepositedMoney(Enum.BankType.Account)
+    Syndicator.CallbackRegistry:TriggerEvent("WarbandCurrencyCacheUpdate", 1)
   end
 end
 

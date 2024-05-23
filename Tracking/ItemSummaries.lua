@@ -36,7 +36,7 @@ function SyndicatorItemSummariesMixin:OnLoad()
   end
   self.SV = SYNDICATOR_SUMMARIES
   Syndicator.CallbackRegistry:RegisterCallback("BagCacheUpdate", self.CharacterCacheUpdate, self)
-  Syndicator.CallbackRegistry:RegisterCallback("WarbandCacheUpdate", self.WarbandCacheUpdate, self)
+  Syndicator.CallbackRegistry:RegisterCallback("WarbandBankCacheUpdate", self.WarbandCacheUpdate, self)
   Syndicator.CallbackRegistry:RegisterCallback("MailCacheUpdate", self.CharacterCacheUpdate, self)
   Syndicator.CallbackRegistry:RegisterCallback("GuildCacheUpdate", self.GuildCacheUpdate, self)
   Syndicator.CallbackRegistry:RegisterCallback("EquippedCacheUpdate", self.CharacterCacheUpdate, self)
