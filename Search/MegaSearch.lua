@@ -82,9 +82,29 @@ local function CacheGuild(guild, callback)
   callback()
 end
 
+local function CacheWarband(warbandIndex, callback)
+  local warbandList = {}
+  local linkToTabIndex = {}
+  for tabIndex, tab in ipairs(CopyTable(SYNDICATOR_DATA.Warband[warbandIndex].bank)) do
+    for _, item in ipairs(tab.slots) do
+      if item.itemLink then
+        linkToTabIndex[item.itemLink] = tabIndex
+      end
+      table.insert(warbandList, item)
+    end
+  end
+
+  local results = Syndicator.Search.GetBaseInfoFromList(warbandList)
+  for _, r in ipairs(results) do
+    r.source = {warband = warbandIndex, container = linkToTabIndex[r.itemLink]}
+    table.insert(cache, r)
+  end
+  callback()
+end
+
 local pendingQueries = {}
 local pending
-local toPurge = {Characters = {}, Guilds = {}}
+local toPurge = {Characters = {}, Guilds = {}, Warband = {}}
 local managingFrame = CreateFrame("Frame")
 
 local searchMonitorPool = CreateFramePool("Frame", UIParent, "SyndicatorOfflineListSearchTemplate")
@@ -117,11 +137,19 @@ Syndicator.CallbackRegistry:RegisterCallback("GuildCacheUpdate", function(_, gui
   end
 end)
 
+Syndicator.CallbackRegistry:RegisterCallback("WarbandBankCacheUpdate", function(_, index)
+  if pending then
+    pending.Warband[index] = true
+    toPurge.Warband[index] = true
+  end
+end)
+
 function Syndicator.Search.RequestMegaSearchResults(searchTerm, callback)
   if pending == nil then
     pending = {
       Characters = {},
       Guilds = {},
+      Warband = {},
     }
 
     for c in pairs(SYNDICATOR_DATA.Characters) do
@@ -131,10 +159,14 @@ function Syndicator.Search.RequestMegaSearchResults(searchTerm, callback)
     for g in pairs(SYNDICATOR_DATA.Guilds) do
       pending.Guilds[g] = true
     end
+
+    for i in pairs(SYNDICATOR_DATA.Warband) do
+      pending.Warband[i] = true
+    end
   end
 
   local function PendingCheck()
-    if next(pending.Characters) == nil and (not Syndicator.Config.Get(Syndicator.Config.Options.SHOW_GUILD_BANKS_IN_TOOLTIPS) or next(pending.Guilds) == nil) then
+    if next(pending.Characters) == nil and (not Syndicator.Config.Get(Syndicator.Config.Options.SHOW_GUILD_BANKS_IN_TOOLTIPS) or next(pending.Guilds) == nil) and next(pending.Warband) == nil then
       managingFrame:SetScript("OnUpdate", nil)
       for _, query in ipairs(pendingQueries) do
         Query(unpack(query))
@@ -142,8 +174,8 @@ function Syndicator.Search.RequestMegaSearchResults(searchTerm, callback)
       pendingQueries = {}
       return
     end
-    cache = tFilter(cache, function(item) return toPurge.Characters[item.source.character] == nil and toPurge.Guilds[item.source.guild] == nil end, true)
-    toPurge = {Characters = {}, Guilds = {}}
+    cache = tFilter(cache, function(item) return toPurge.Characters[item.source.character] == nil and toPurge.Guilds[item.source.guild] == nil and toPurge.Warband[item.source.warband] == nil end, true)
+    toPurge = {Characters = {}, Guilds = {}, Warband = {}}
     managingFrame:SetScript("OnUpdate", nil)
     local waiting = 0
     local complete = false
@@ -169,13 +201,23 @@ function Syndicator.Search.RequestMegaSearchResults(searchTerm, callback)
         end)
       end
     end
+    for warbandIndex in pairs(pending.Warband) do
+      waiting = waiting + 1
+      CacheWarband(warbandIndex, function()
+        pending.Warband[warbandIndex] = nil
+        waiting = waiting - 1
+        if complete and waiting == 0 then
+          managingFrame:SetScript("OnUpdate", PendingCheck)
+        end
+      end)
+    end
     complete = true
     if waiting == 0 then
       PendingCheck()
     end
   end
 
-  if next(pending.Characters) or next(pending.Guilds) then
+  if next(pending.Characters) or next(pending.Guilds) or next(pending.Warband) then
     managingFrame:SetScript("OnUpdate", PendingCheck)
     table.insert(pendingQueries, {searchTerm, callback})
   else
@@ -203,6 +245,7 @@ function Syndicator.Search.CombineMegaSearchResults(results, callback)
   local items = {}
   local seenCharacters = {}
   local seenGuilds = {}
+  local seenWarband = {}
 
   GetKeys(results, function()
     for _, r in ipairs(results) do
@@ -213,6 +256,7 @@ function Syndicator.Search.CombineMegaSearchResults(results, callback)
         items[key].sources = {}
         seenCharacters[key] = {}
         seenGuilds[key] = {}
+        seenWarband[key] = {}
       end
       local source = CopyTable(r.source)
       source.itemCount = r.itemCount
@@ -244,6 +288,18 @@ function Syndicator.Search.CombineMegaSearchResults(results, callback)
           end
           items[key].itemCount = items[key].itemCount + r.itemCount
         end
+      elseif source.warband then
+        local warbandData = SYNDICATOR_DATA.Warband[source.warband]
+        if seenWarband[key][source.warband] then
+          local entry = items[key].sources[seenWarbands[key][source.warband]]
+          entry.itemCount = entry.itemCount + source.itemCount
+        else
+          table.insert(items[key].sources, source)
+          source.itemLink = r.itemLink
+          source.itemNameLower = r.itemNameLower
+          seenGuilds[key][source.warband] = #items[key].sources
+        end
+        items[key].itemCount = items[key].itemCount + r.itemCount
       end
     end
 
@@ -277,6 +333,9 @@ local function GetLink(source, searchTerm, text)
     mode = "guild"
   elseif source.character then
     mode = "character"
+  elseif source.warband then
+    mode = "warband"
+    text = SYNDICATOR_L_WARBAND
   else
     return text
   end
@@ -314,6 +373,12 @@ local function PrintSource(indent, source, searchTerm)
       guild = GetLink(source, searchTerm, source.guild)
     end
     print(indent, SYNDICATOR_L_GUILD_LOWER .. count, TRANSMOGRIFY_FONT_COLOR:WrapTextInColorCode(guild))
+  elseif source.warband then
+    local warband = source.warband
+    if addonTable.ShowItemLocationCallback then
+      warband = GetLink(source, searchTerm, source.warband)
+    end
+    print(indent, SYNDICATOR_L_WARBAND_LOWER .. count, PASSIVE_SPELL_FONT_COLOR:WrapTextInColorCode(warband))
   end
 end
 

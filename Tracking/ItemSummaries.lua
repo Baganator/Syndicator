@@ -48,8 +48,8 @@ function SyndicatorItemSummariesMixin:CharacterCacheUpdate(characterName)
   self.SV.Characters.Pending[characterName] = true
 end
 
-function SyndicatorItemSummariesMixin:WarbandCacheUpdate()
-  self.SV.Warband.Pending[1] = true
+function SyndicatorItemSummariesMixin:WarbandCacheUpdate(index)
+  self.SV.Warband.Pending[index] = true
 end
 
 function SyndicatorItemSummariesMixin:GuildCacheUpdate(guildName)
