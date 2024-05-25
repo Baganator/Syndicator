@@ -284,7 +284,14 @@ function SyndicatorBagCacheMixin:OnUpdate()
     end
     self.isUpdatePending = false
     if next(pendingCopy.bank) or next(pendingCopy.bags) or pendingCopy.containerBags.bags or pendingCopy.containerBags.bank then
-      Syndicator.CallbackRegistry:TriggerEvent("BagCacheUpdate", self.currentCharacter, pendingCopy)
+      Syndicator.CallbackRegistry:TriggerEvent("BagCacheUpdate", self.currentCharacter, {
+        bags = pendingCopy.bags,
+        bank = pendingCopy.bank,
+        containerBags = {
+          bags = pendingCopy.containerBags.bags,
+          bank = pendingCopy.containerBags.bank,
+        }
+      })
     end
     if next(pendingCopy.warband) or pendingCopy.containerBags.warband then
       Syndicator.CallbackRegistry:TriggerEvent("WarbandBankCacheUpdate", 1, {bags = pendingCopy.warband, tabInfo = pendingCopy.containerBags.warband})
