@@ -58,6 +58,10 @@ function SyndicatorBagCacheMixin:OnLoad()
 
   self.currentCharacter = Syndicator.Utilities.GetCharacterFullName()
 
+  while #SYNDICATOR_DATA.Characters[self.currentCharacter].bags > #Syndicator.Constants.AllBagIndexes do
+    table.remove(SYNDICATOR_DATA.Characters[self.currentCharacter].bags)
+  end
+
   self:SetupPending()
 
   for bagID in pairs(bagBags) do

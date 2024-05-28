@@ -47,8 +47,10 @@ if Syndicator.Constants.IsRetail then
   Syndicator.Constants.WarbandBankActive = C_Bank ~= nil and C_Bank.UpdateBankTabSettings ~= nil
 end
 
-if Syndicator.Constants.IsClassic then
+if Syndicator.Constants.IsEra or KeyRingButtonIDToInvSlotID then
   table.insert(Syndicator.Constants.AllBagIndexes, Enum.BagIndex.Keyring)
+end
+if Syndicator.Constants.IsClassic then
   -- Workaround for the enum containing the wrong values for the bank bag slots
   for i = 1, Syndicator.Constants.BankBagSlotsCount do
     Syndicator.Constants.AllBankIndexes[i + 1] = NUM_BAG_SLOTS + i
