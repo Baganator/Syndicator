@@ -74,6 +74,7 @@ end
 
 local function CosmeticCheck(details)
   if not C_Item.IsItemDataCachedByID(details.itemID) then
+    C_Item.RequestLoadItemDataByID(details.itemID)
     return nil
   end
   details.isCosmetic = IsCosmeticItem(details.itemLink)
@@ -120,11 +121,17 @@ local function GetTooltipInfoSpell(details)
     return
   end
 
+  if not C_Item.IsItemDataCachedByID(details.itemID) then
+    C_Item.RequestLoadItemDataByID(details.itemID)
+    return
+  end
+
   local _, spellID = C_Item.GetItemSpell(details.itemID)
   if spellID and not C_Spell.IsSpellDataCached(spellID) then
     C_Spell.RequestLoadSpellData(spellID)
     return
   end
+
   details.tooltipInfoSpell = details.tooltipGetter() or {lines={}}
 end
 
