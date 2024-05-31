@@ -1032,6 +1032,7 @@ function Syndicator.Search.InitializeSearchEngine()
   end
 
   local tradeGoodsToCheck = {
+    1, -- parts
     5, -- cloth
     6, -- leather
     7, -- metal and stone
@@ -1087,6 +1088,15 @@ function Syndicator.Search.InitializeSearchEngine()
           return details.classID == Enum.ItemClass.Battlepet and details.subClassID == subClass
         end)
       end
+    end
+  end
+
+  for subClass = 1, 12 do
+    local keyword = C_Item.GetItemSubClassInfo(Enum.ItemClass.Glyph, subClass)
+    if keyword ~= nil then
+      AddKeyword(keyword:lower(), function(details)
+        return details.classID == Enum.ItemClass.Glyph and details.subClassID == subClass
+      end)
     end
   end
 
