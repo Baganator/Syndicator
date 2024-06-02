@@ -39,8 +39,17 @@ local function PetCheck(details)
   return details.classID == Enum.ItemClass.Battlepet or (details.classID == Enum.ItemClass.Miscellaneous and details.subClassID == Enum.ItemMiscellaneousSubclass.CompanionPet)
 end
 
-local function ReagentCheck(details)
-  return (select(17, C_Item.GetItemInfo(details.itemID)))
+local ReagentCheck
+if Syndicator.Constants.IsClassic then
+  ReagentCheck = function(details)
+    GetClassSubClass(details)
+    -- Trade good that isn't an explosive or device
+    return details.classID == 7 and details.subClassID ~= 2 and details.subClassID ~= 3
+  end
+else
+  ReagentCheck = function(details)
+    return (select(17, C_Item.GetItemInfo(details.itemID)))
+  end
 end
 
 local function SetCheck(details)
