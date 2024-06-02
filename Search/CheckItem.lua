@@ -318,48 +318,7 @@ local function IsTradeableLoot(details)
   return false
 end
 
-local KEYWORDS_TO_CHECK = {
-  [SYNDICATOR_L_KEYWORD_PET] = PetCheck,
-  [SYNDICATOR_L_KEYWORD_BATTLE_PET] = PetCheck,
-  [SYNDICATOR_L_KEYWORD_SOULBOUND] = SoulboundCheck,
-  [SYNDICATOR_L_KEYWORD_BOP] = SoulboundCheck,
-  [SYNDICATOR_L_KEYWORD_BOE] = BindOnEquipCheck,
-  [SYNDICATOR_L_KEYWORD_BOU] = BindOnUseCheck,
-  [SYNDICATOR_L_KEYWORD_EQUIPMENT] = EquipmentCheck,
-  [SYNDICATOR_L_KEYWORD_GEAR] = EquipmentCheck,
-  [SYNDICATOR_L_KEYWORD_AXE] = AxeCheck,
-  [SYNDICATOR_L_KEYWORD_MACE] = MaceCheck,
-  [SYNDICATOR_L_KEYWORD_SWORD] = SwordCheck,
-  [SYNDICATOR_L_KEYWORD_STAFF] = StaffCheck,
-  [SYNDICATOR_L_KEYWORD_REAGENT] = ReagentCheck,
-  [SYNDICATOR_L_KEYWORD_FOOD] = FoodCheck,
-  [SYNDICATOR_L_KEYWORD_DRINK] = FoodCheck,
-  [SYNDICATOR_L_KEYWORD_POTION] = PotionCheck,
-  [SYNDICATOR_L_KEYWORD_SET] = SetCheck,
-  [SYNDICATOR_L_KEYWORD_EQUIPMENT_SET] = SetCheck,
-  [SYNDICATOR_L_KEYWORD_ENGRAVABLE] = EngravableCheck,
-  [SYNDICATOR_L_KEYWORD_ENGRAVED] = EngravedCheck,
-  [SYNDICATOR_L_KEYWORD_SOCKET] = SocketCheck,
-  [SYNDICATOR_L_KEYWORD_JUNK] = JunkCheck,
-  [SYNDICATOR_L_KEYWORD_TRASH] = JunkCheck,
-  --[SYNDICATOR_L_KEYWORD_REPUTATION] = ReputationCheck,
-  [SYNDICATOR_L_KEYWORD_BOA] = BindOnAccountCheck,
-  [SYNDICATOR_L_KEYWORD_ACCOUNT_BOUND] = BindOnAccountCheck,
-  [SYNDICATOR_L_KEYWORD_USE] = UseCheck,
-  [SYNDICATOR_L_KEYWORD_OPEN] = OpenCheck,
-  [MOUNT:lower()] = MountCheck,
-  [SYNDICATOR_L_KEYWORD_TRADEABLE_LOOT] = IsTradeableLoot,
-  [SYNDICATOR_L_KEYWORD_TRADABLE_LOOT] = IsTradeableLoot,
-  [SYNDICATOR_L_KEYWORD_RELIC] = RelicCheck,
-  [SYNDICATOR_L_KEYWORD_STACKS] = StackableCheck,
-  [SYNDICATOR_L_KEYWORD_STACKABLE] = StackableCheck,
-}
-
-if Syndicator.Constants.IsRetail then
-  KEYWORDS_TO_CHECK[SYNDICATOR_L_KEYWORD_COSMETIC] = CosmeticCheck
-  --KEYWORDS_TO_CHECK[SYNDICATOR_L_KEYWORD_MANUSCRIPT] = ManuscriptCheck
-  KEYWORDS_TO_CHECK[TOY:lower()] = ToyCheck
-end
+local KEYWORDS_TO_CHECK = {}
 
 local function AddKeyword(keyword, check)
   local old = KEYWORDS_TO_CHECK[keyword]
@@ -368,6 +327,44 @@ local function AddKeyword(keyword, check)
   else
     KEYWORDS_TO_CHECK[keyword] = check
   end
+end
+
+AddKeyword(SYNDICATOR_L_KEYWORD_PET, PetCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_BATTLE_PET, PetCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_SOULBOUND, SoulboundCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_BOP, SoulboundCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_BOE, BindOnEquipCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_BOU, BindOnUseCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_EQUIPMENT, EquipmentCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_GEAR, EquipmentCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_AXE, AxeCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_MACE, MaceCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_SWORD, SwordCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_STAFF, StaffCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_REAGENT, ReagentCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_FOOD, FoodCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_DRINK, FoodCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_POTION, PotionCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_SET, SetCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_EQUIPMENT_SET, SetCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_ENGRAVABLE, EngravableCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_ENGRAVED, EngravedCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_SOCKET, SocketCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_JUNK, JunkCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_TRASH, JunkCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_BOA, BindOnAccountCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_ACCOUNT_BOUND, BindOnAccountCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_USE, UseCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_OPEN, OpenCheck)
+AddKeyword(MOUNT:lower(), MountCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_TRADEABLE_LOOT, IsTradeableLoot)
+AddKeyword(SYNDICATOR_L_KEYWORD_TRADABLE_LOOT, IsTradeableLoot)
+AddKeyword(SYNDICATOR_L_KEYWORD_RELIC, RelicCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_STACKS, StackableCheck)
+
+if Syndicator.Constants.IsRetail then
+  AddKeyword(SYNDICATOR_L_KEYWORD_COSMETIC, CosmeticCheck)
+  AddKeyword(TOY:lower(), ToyCheck)
 end
 
 local function PetCollectedCheck(details)
