@@ -84,12 +84,10 @@ function SyndicatorMailCacheMixin:OnLoad()
 
   hooksecurefunc("ReturnInboxItem", function(mailIndex)
     local recipient = select(3, GetInboxHeaderInfo(mailIndex))
-    print(recipient)
 
     if not recipient:find("-", nil, true) then
       recipient = recipient .. "-" .. GetNormalizedRealmName()
     end
-    print(recipient)
 
     local mail = {
       recipient = recipient,
@@ -97,7 +95,6 @@ function SyndicatorMailCacheMixin:OnLoad()
     }
 
     if not SYNDICATOR_DATA.Characters[mail.recipient] then
-      print("reject")
       return
     end
 
