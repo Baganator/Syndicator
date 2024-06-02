@@ -82,6 +82,9 @@ local function PotionCheck(details)
 end
 
 local function CosmeticCheck(details)
+  if details.itemID == Syndicator.Constants.BattlePetCageID then
+    return false
+  end
   if not C_Item.IsItemDataCachedByID(details.itemID) then
     C_Item.RequestLoadItemDataByID(details.itemID)
     return nil
