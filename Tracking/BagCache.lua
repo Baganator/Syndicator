@@ -150,8 +150,10 @@ function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
       for bagID in pairs(bagBags) do
         self.pending.bags[bagID] = true
       end
-      for bagID in pairs(bankBags) do
-        self.pending.bank[bagID] = true
+      if self.bankOpen then
+        for bagID in pairs(bankBags) do
+          self.pending.bank[bagID] = true
+        end
       end
       self:QueueCaching()
     end)
