@@ -116,6 +116,13 @@ local function SetupTooltips()
           if newItemLink ~= nil then
             itemLink = newItemLink
           end
+        -- Auction house
+        elseif info and info.getterName == "GetItemKey" then
+          local itemID = info.getterArgs[1]
+          local _, newItemLink = C_Item.GetItemInfo(itemID)
+          if newItemLink ~= nil and itemID ~= C_Item.GetItemInfoInstant(itemLink) then
+            itemLink = newItemLink
+          end
         elseif info and info.getterName == "GetGuildBankItem" then
           local newItemLink = GetGuildBankItemLink(info.getterArgs[1], info.getterArgs[2])
           if newItemLink ~= nil then
