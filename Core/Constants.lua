@@ -82,9 +82,14 @@ Syndicator.Constants.SharedCurrencies = {
   2032, -- Trader's Tender
 }
 
-Syndicator.Constants.AccountBoundTooltipLines = {
+local AccountBoundTooltipLines = {
   ITEM_BIND_TO_BNETACCOUNT,
   ITEM_BNETACCOUNTBOUND,
   ITEM_BIND_TO_ACCOUNT,
   ITEM_ACCOUNTBOUND,
 }
+Syndicator.Constants.AccountBoundTooltipLines = {}
+-- Done this way because not all the lines exist on all clients
+for _, line in pairs(AccountBoundTooltipLines) do
+  table.insert(Syndicator.Constants.AccountBoundTooltipLines, line)
+end
