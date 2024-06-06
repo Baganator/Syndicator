@@ -1,30 +1,3 @@
-local ticker
-local pending = {}
-
-local function RerequestItemData()
-  for info in pairs(pending) do
-    if C_Item.IsItemDataCachedByID(info.itemID) then
-      pending[info] = nil
-    else
-      C_Item.RequestLoadItemDataByID(info.itemID)
-    end
-  end
-  if not next(pending) then
-    ticker:Cancel()
-    ticker = nil
-  end
-end
-
-local function GetExpansion(info, itemInfo)
-  if ItemVersion then
-    local details = ItemVersion.API:getItemVersion(info.itemID, true)
-    if details then
-      return details.major - 1
-    end
-  end
-  return itemInfo[15]
-end
-
 function Syndicator.Search.GetBaseInfo(cacheData)
   local info = {}
 
