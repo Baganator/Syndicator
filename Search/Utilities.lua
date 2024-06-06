@@ -1,7 +1,7 @@
 function Syndicator.Search.GetBaseInfoFromList(cachedItems)
   local results = {}
   for _, item in ipairs(cachedItems) do
-    if item.itemID ~= nil then
+    if item.itemID ~= nil and C_Item.GetItemInfoInstant(item.itemID) ~= nil then
       local info = Syndicator.Search.GetBaseInfo(item)
       table.insert(results, info)
     end
