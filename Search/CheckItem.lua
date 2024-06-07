@@ -237,6 +237,19 @@ local function UseCheck(details)
   end
 end
 
+local function UsableCheck(details)
+  GetTooltipInfoSpell(details)
+
+  if details.tooltipInfoSpell then
+    for _, row in ipairs(details.tooltipInfoSpell.lines) do
+      if row.leftColor.r == 1 and row.leftColor.g < 0.5 and row.leftColor.b < 0.5 then
+        return false
+      end
+    end
+    return true
+  end
+end
+
 local function OpenCheck(details)
   if not details.itemLink:find("item:", nil, true) then
     return false
@@ -359,6 +372,7 @@ AddKeyword(SYNDICATOR_L_KEYWORD_TRASH, JunkCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_BOA, BindOnAccountCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_ACCOUNT_BOUND, BindOnAccountCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_USE, UseCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_USABLE, UsableCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_OPEN, OpenCheck)
 AddKeyword(MOUNT:lower(), MountCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_TRADEABLE_LOOT, IsTradeableLoot)
