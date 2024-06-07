@@ -330,6 +330,7 @@ local function AddKeyword(keyword, check)
   else
     KEYWORDS_TO_CHECK[keyword] = check
   end
+  KEYWORDS_TO_CHECK["_" .. keyword .. "_"] = KEYWORDS_TO_CHECK[keyword]
 end
 
 AddKeyword(SYNDICATOR_L_KEYWORD_PET, PetCheck)
