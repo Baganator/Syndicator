@@ -8,7 +8,6 @@
 ## SavedVariables: SYNDICATOR_CONFIG, SYNDICATOR_DATA, SYNDICATOR_SUMMARIES
 ## IconTexture: Interface\AddOns\Syndicator\Assets\logo.tga
 
-
 Locales.lua
 
 Libs\LibBattlePetTooltipLine\LibStub\LibStub.lua
