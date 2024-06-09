@@ -128,6 +128,15 @@ local function StackableCheck(details)
   return details.isStackable
 end
 
+local function SocketedCheck(details)
+  local gem1, gem2, gem3, gem4 = details.itemLink:match("item:%d+:(%d*):(%d*):(%d*):(%d*):")
+  if tonumber(gem1) or tonumber(gem2) or tonumber(gem3) or tonumber(gem4) then
+    return true
+  else
+    return false
+  end
+end
+
 local function GetTooltipInfoSpell(details)
   if details.tooltipInfoSpell then
     return
@@ -379,6 +388,7 @@ AddKeyword(SYNDICATOR_L_KEYWORD_TRADEABLE_LOOT, IsTradeableLoot)
 AddKeyword(SYNDICATOR_L_KEYWORD_TRADABLE_LOOT, IsTradeableLoot)
 AddKeyword(SYNDICATOR_L_KEYWORD_RELIC, RelicCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_STACKS, StackableCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_SOCKETED, SocketedCheck)
 
 if Syndicator.Constants.IsRetail then
   AddKeyword(SYNDICATOR_L_KEYWORD_COSMETIC, CosmeticCheck)
