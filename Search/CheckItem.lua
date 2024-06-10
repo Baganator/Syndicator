@@ -808,12 +808,72 @@ local function ItemLevelMaxPatternCheck(details, text)
   return details.itemLevel and details.itemLevel >= tonumber(maxText)
 end
 
+local function ExpansionPatternCheck(details, text)
+  if not ItemVersion then
+    return false
+  end
+
+  local major, minor, patch = text:match("(%d+)%.(%d*)%.?(%d*)")
+  major, minor, patch = tonumber(major), tonumber(minor), tonumber(patch)
+
+  local itemVersionDetails = ItemVersion.API:getItemVersion(details.itemID, true)
+
+  if not minor then
+    return major == itemVersionDetails.major
+  elseif not patch then
+    return major == itemVersionDetails.major and minor == itemVersionDetails.minor
+  else
+    return major == itemVersionDetails.major and minor == itemVersionDetails.minor and patch == itemVersionDetails.patch
+  end
+end
+
+local function ExpansionMinPatternCheck(details, text)
+  if not ItemVersion then
+    return false
+  end
+
+  local major, minor, patch = text:match("(%d+)%.(%d*)%.?(%d*)")
+  major, minor, patch = tonumber(major), tonumber(minor), tonumber(patch)
+
+  local itemVersionDetails = ItemVersion.API:getItemVersion(details.itemID, true)
+
+  if not minor then
+    return major <= itemVersionDetails.major
+  elseif not patch then
+    return major <= itemVersionDetails.major and minor <= itemVersionDetails.minor
+  else
+    return major <= itemVersionDetails.major and minor <= itemVersionDetails.minor and patch <= itemVersionDetails.patch
+  end
+end
+
+local function ExpansionMaxPatternCheck(details, text)
+  if not ItemVersion then
+    return false
+  end
+
+  local major, minor, patch = text:match("(%d+)%.(%d*)%.?(%d*)")
+  major, minor, patch = tonumber(major), tonumber(minor), tonumber(patch)
+
+  local itemVersionDetails = ItemVersion.API:getItemVersion(details.itemID, true)
+
+  if not minor then
+    return major >= itemVersionDetails.major
+  elseif not patch then
+    return major >= itemVersionDetails.major and minor >= itemVersionDetails.minor
+  else
+    return major >= itemVersionDetails.major and minor >= itemVersionDetails.minor and patch >= itemVersionDetails.patch
+  end
+end
+
 local patterns = {
   ["^%d+$"] = ItemLevelPatternCheck,
   ["^=%d+$"] = ExactItemLevelPatternCheck,
   ["^%d+%-%d+$"] = ItemLevelRangePatternCheck,
   ["^%>%d+$"] = ItemLevelMaxPatternCheck,
   ["^%<%d+$"] = ItemLevelMinPatternCheck,
+  ["^%d+%.%d*%.?%d*$"] = ExpansionPatternCheck,
+  ["^%>%d+%.%d*%.?%d*$"] = ExpansionMinPatternCheck,
+  ["^%<%d+%.%d*%.?%d*$"] = ExpansionMaxPatternCheck,
 }
 
 -- Used to prevent equipment and use returning results based on partial words in
