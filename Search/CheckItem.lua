@@ -129,7 +129,7 @@ local function StackableCheck(details)
 end
 
 local function SocketedCheck(details)
-  local gem1, gem2, gem3, gem4 = details.itemLink:match("item:%d+:(%d*):(%d*):(%d*):(%d*):")
+  local gem1, gem2, gem3, gem4 = details.itemLink:match("item:%d+:[^:]*:(%d*):(%d*):(%d*):(%d*):")
   if tonumber(gem1) or tonumber(gem2) or tonumber(gem3) or tonumber(gem4) then
     return true
   else
