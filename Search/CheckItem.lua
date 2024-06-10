@@ -238,7 +238,7 @@ local function UseCheck(details)
     for _, row in ipairs(details.tooltipInfoSpell.lines) do
       if row.leftColor.r == 0 and row.leftColor.g == 1 and row.leftColor.b == 0 and row.leftText:match("^" .. USE_COLON) then
         usableSeen = true
-      elseif row.leftColor.r == 1 and row.leftColor.g < 0.5 and row.leftColor.b < 0.5 then
+      elseif row.leftColor.r == 1 and row.leftColor.g < 0.2 and row.leftColor.b < 0.2 then
         return false
       end
     end
@@ -251,10 +251,10 @@ local function UsableCheck(details)
 
   if details.tooltipInfoSpell then
     for _, row in ipairs(details.tooltipInfoSpell.lines) do
-      if row.leftColor.r == 1 and row.leftColor.g < 0.5 and row.leftColor.b < 0.5 then
+      if row.leftColor.r == 1 and row.leftColor.g < 0.2 and row.leftColor.b < 0.2 then
         return false
       end
-      if row.rightColor and row.rightColor.r == 1 and row.rightColor.g < 0.5 and row.rightColor.b < 0.5 then
+      if row.rightColor and row.rightColor.r == 1 and row.rightColor.g < 0.2 and row.rightColor.b < 0.2 then
         return false
       end
     end
