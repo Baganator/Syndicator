@@ -47,3 +47,5 @@ Search\MegaSearch.lua
 Search\Utilities.lua
 
 API\Main.lua
+
+Data\CurrencyItems.lua

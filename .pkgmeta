@@ -2,10 +2,15 @@ ignore:
   - README.md
   - tmp
   - scripts
+  - DB2_Scripts
 plain-copy:
+  - API
   - Core
-  - Tracking
+  - Data
+  - Libs
+  - Options
   - Search
+  - Tracking
 enable-toc-creation: yes
 externals:
   Libs/LibBattlePetTooltipLine: https://github.com/plusmouse/LibBattlePetTooltipLine

@@ -137,6 +137,10 @@ local function SocketedCheck(details)
   end
 end
 
+local function CurrencyCheck(details)
+  return Syndicator.Data.CurrencyItems[details.itemID] == true
+end
+
 local function GetTooltipInfoSpell(details)
   if details.tooltipInfoSpell then
     return
@@ -389,6 +393,7 @@ AddKeyword(SYNDICATOR_L_KEYWORD_TRADABLE_LOOT, IsTradeableLoot)
 AddKeyword(SYNDICATOR_L_KEYWORD_RELIC, RelicCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_STACKS, StackableCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_SOCKETED, SocketedCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_CURRENCY, CurrencyCheck)
 
 if Syndicator.Constants.IsRetail then
   AddKeyword(SYNDICATOR_L_KEYWORD_COSMETIC, CosmeticCheck)

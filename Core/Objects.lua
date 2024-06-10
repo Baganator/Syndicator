@@ -5,4 +5,5 @@ Syndicator = {
   Utilities = {},
   Tracking = {},
   API = {},
+  Data = {},
 }
