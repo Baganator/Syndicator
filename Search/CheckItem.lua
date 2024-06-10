@@ -542,26 +542,24 @@ for key, quality in pairs(Enum.ItemQuality) do
   end
 end
 
-if Syndicator.Constants.IsRetail then
-  function Syndicator.Search.GetExpansion(details)
-    if details.itemID == Syndicator.Constants.BattlePetCageID then
-      return -1
-    end
+function Syndicator.Search.GetExpansion(details)
+  if details.itemID == Syndicator.Constants.BattlePetCageID then
+    return -1
+  end
 
-    if ItemVersion then
-      local itemVersionDetails = ItemVersion.API:getItemVersion(details.itemID, true)
-      if itemVersionDetails then
-        return itemVersionDetails.major - 1
-      end
+  if ItemVersion then
+    local itemVersionDetails = ItemVersion.API:getItemVersion(details.itemID, true)
+    if itemVersionDetails then
+      return itemVersionDetails.major - 1
     end
-    return (select(15, C_Item.GetItemInfo(details.itemID)))
   end
-  for key, expansionID in pairs(TextToExpansion) do
-    AddKeyword(key, function(details)
-      details.expacID = details.expacID or Syndicator.Search.GetExpansion(details)
-      return details.expacID and details.expacID == expansionID
-    end)
-  end
+  return Baganator.Constants.IsRetail and (select(15, C_Item.GetItemInfo(details.itemID)))
+end
+for key, expansionID in pairs(TextToExpansion) do
+  AddKeyword(key, function(details)
+    details.expacID = details.expacID or Syndicator.Search.GetExpansion(details)
+    return details.expacID and details.expacID == expansionID
+  end)
 end
 
 local BAG_TYPES = {
