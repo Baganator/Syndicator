@@ -254,6 +254,9 @@ local function UsableCheck(details)
       if row.leftColor.r == 1 and row.leftColor.g < 0.5 and row.leftColor.b < 0.5 then
         return false
       end
+      if row.rightColor and row.rightColor.r == 1 and row.rightColor.g < 0.5 and row.rightColor.b < 0.5 then
+        return false
+      end
     end
     return true
   end
