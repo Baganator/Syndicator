@@ -931,10 +931,10 @@ local function UseATTInfo(details)
     end
     if #items < 50 then
       for _, itemID in ipairs(items) do
-        if not details.ATTSeenItemNames[itemID] then
+        if details.ATTSeenItemNames[itemID] == nil then
           local itemName = C_Item.GetItemNameByID(itemID)
-          details.ATTSeenItemNames[itemID] = itemName ~= nil
           if itemName ~= nil then
+            details.ATTSeenItemNames[itemID] = true
             table.insert(details.ATTKeywordsTmp, "att:" .. itemName:lower())
           else
             C_Item.RequestLoadItemDataByID(itemID)
