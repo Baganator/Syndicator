@@ -357,6 +357,10 @@ local function IsTradeableLoot(details)
   return false
 end
 
+local function QuestObjectiveCheck(details)
+  return details.isQuestObjectiveItem == true
+end
+
 local KEYWORDS_TO_CHECK = {}
 
 local function AddKeyword(keyword, check)
@@ -404,6 +408,7 @@ AddKeyword(SYNDICATOR_L_KEYWORD_RELIC, RelicCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_STACKS, StackableCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_SOCKETED, SocketedCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_CURRENCY, CurrencyCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_OBJECTIVE, QuestObjectiveCheck)
 
 if Syndicator.Constants.IsRetail then
   AddKeyword(SYNDICATOR_L_KEYWORD_COSMETIC, CosmeticCheck)
@@ -898,7 +903,7 @@ local EXCLUSIVE_KEYWORDS_NO_TOOLTIP_TEXT = {
   [SYNDICATOR_L_KEYWORD_EQUIPMENT] = true,
 }
 
-local function GetATTKeywords(details)
+local function UseATTInfo(details)
   if details.ATTKeywords then
     return
   end
@@ -911,14 +916,29 @@ local function GetATTKeywords(details)
   local missing = false
   details.ATTSearch = details.ATTSearch or ATTC.SearchForField("itemIDAsCost", details.itemID)
   if #details.ATTSearch < 50 then
+    local items = {}
     for _, entry in ipairs(details.ATTSearch) do
-      if entry.itemID and not details.ATTSeenItemNames[entry.itemID] then
-        local itemName = C_Item.GetItemNameByID(entry.itemID)
-        details.ATTSeenItemNames[entry.itemID] = itemName ~= nil
-        if itemName ~= nil and tIndexOf(details.ATTKeywordsTmp, itemName) == nil then
-          table.insert(details.ATTKeywordsTmp, "att:" .. itemName:lower())
-        else
-          missing = true
+      if entry.itemID then
+        table.insert(items, entry.itemID)
+      elseif entry.questID then
+        details.isQuestObjectiveItem = true
+        for _, reward in ipairs(ATTC.SearchForField("questID", entry.questID)[1].g or {}) do
+          if reward.itemID then
+            table.insert(items, reward.itemID)
+          end
+        end
+      end
+    end
+    if #items < 50 then
+      for _, itemID in ipairs(items) do
+        if details.ATTSeenItemNames[itemID] == nil then
+          local itemName = C_Item.GetItemNameByID(itemID)
+          details.ATTSeenItemNames[itemID] = itemName ~= nil
+          if itemName ~= nil then
+            table.insert(details.ATTKeywordsTmp, "att:" .. itemName:lower())
+          else
+            missing = true
+          end
         end
       end
     end
@@ -974,7 +994,7 @@ local function GetTooltipSpecialTerms(details)
   end
 
   if C_AddOns.IsAddOnLoaded("AllTheThings") then
-    GetATTKeywords(details)
+    UseATTInfo(details)
   else
     details.searchKeywords = details.searchKeywordsTmp
     details.searchKeywordsTmp = nil
