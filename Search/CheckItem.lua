@@ -567,11 +567,9 @@ function Syndicator.Search.GetExpansion(details)
     return -1
   end
 
-  if ItemVersion then
-    local itemVersionDetails = ItemVersion.API:getItemVersion(details.itemID, true)
-    if itemVersionDetails then
-      return itemVersionDetails.major - 1
-    end
+  local major = Syndicator.Search.GetExpansionInfo(details.itemID)
+  if major then
+    return major - 1
   end
   return Baganator.Constants.IsRetail and (select(15, C_Item.GetItemInfo(details.itemID)))
 end
@@ -829,59 +827,56 @@ local function ItemLevelMaxPatternCheck(details, text)
 end
 
 local function ExpansionPatternCheck(details, text)
-  if not ItemVersion then
+  local itemMajor, itemMinor, itemPatch = Syndicator.Search.GetExpansionInfo(details.itemID)
+  if not itemMajor then
     return false
   end
 
   local major, minor, patch = text:match("(%d+)%.(%d*)%.?(%d*)")
   major, minor, patch = tonumber(major), tonumber(minor), tonumber(patch)
 
-  local itemVersionDetails = ItemVersion.API:getItemVersion(details.itemID, true)
-
   if not minor then
-    return major == itemVersionDetails.major
+    return major == itemMajor
   elseif not patch then
-    return major == itemVersionDetails.major and minor == itemVersionDetails.minor
+    return major == itemMajor and minor == itemMinor
   else
-    return major == itemVersionDetails.major and minor == itemVersionDetails.minor and patch == itemVersionDetails.patch
+    return major == itemMajor and minor == itemMinor and patch == itemPatch
   end
 end
 
 local function ExpansionMinPatternCheck(details, text)
-  if not ItemVersion then
+  local itemMajor, itemMinor, itemPatch = Syndicator.Search.GetExpansionInfo(details.itemID)
+  if not itemMajor then
     return false
   end
 
   local major, minor, patch = text:match("(%d+)%.(%d*)%.?(%d*)")
   major, minor, patch = tonumber(major), tonumber(minor), tonumber(patch)
 
-  local itemVersionDetails = ItemVersion.API:getItemVersion(details.itemID, true)
-
   if not minor then
-    return major <= itemVersionDetails.major
+    return major <= itemMajor
   elseif not patch then
-    return major <= itemVersionDetails.major and minor <= itemVersionDetails.minor
+    return major <= itemMajor and minor <= itemMinor
   else
-    return major <= itemVersionDetails.major and minor <= itemVersionDetails.minor and patch <= itemVersionDetails.patch
+    return major <= itemMajor and minor <= itemMinor and patch <= itemPatch
   end
 end
 
 local function ExpansionMaxPatternCheck(details, text)
-  if not ItemVersion then
+  local itemMajor, itemMinor, itemPatch = Syndicator.Search.GetExpansionInfo(details.itemID)
+  if not itemMajor then
     return false
   end
 
   local major, minor, patch = text:match("(%d+)%.(%d*)%.?(%d*)")
   major, minor, patch = tonumber(major), tonumber(minor), tonumber(patch)
 
-  local itemVersionDetails = ItemVersion.API:getItemVersion(details.itemID, true)
-
   if not minor then
-    return major >= itemVersionDetails.major
+    return major >= itemMajor
   elseif not patch then
-    return major >= itemVersionDetails.major and minor >= itemVersionDetails.minor
+    return major >= itemMajor and minor >= itemMinor
   else
-    return major >= itemVersionDetails.major and minor >= itemVersionDetails.minor and patch >= itemVersionDetails.patch
+    return major >= itemMajor and minor >= itemMinor and patch >= itemPatch
   end
 end
 

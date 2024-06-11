@@ -9,6 +9,29 @@ function Syndicator.Search.GetBaseInfoFromList(cachedItems)
   return results
 end
 
+function Syndicator.Search.GetExpansionInfo(itemID)
+  if ItemVersion then
+    local itemVersionDetails = ItemVersion.API:getItemVersion(itemID, true)
+    return itemVersionDetails.major, itemVersionDetails.minor, itemVersionDetails.patch
+  elseif ATTC then
+    local attResults = ATTC.SearchForField("itemID", itemID)
+    if #attResults > 0 then
+      local parent = attResults[1]
+      while parent and parent.awp == nil do -- awp: short for added with patch
+        parent = parent.parent
+      end
+      local id = parent and parent.awp
+      if not id then
+        return
+      end
+      local major = math.floor(id / 10000)
+      local minor = math.floor((id % 10000) / 100)
+      local patch = math.floor(id % 100)
+      return major, minor, patch
+    end
+  end
+end
+
 if Syndicator.Constants.IsClassic then
   local tooltip = CreateFrame("GameTooltip", "BaganatorUtilitiesScanTooltip", nil, "GameTooltipTemplate")
   tooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
