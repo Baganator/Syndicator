@@ -124,7 +124,14 @@ local function RelicCheck(details)
 end
 
 local function StackableCheck(details)
-  details.isStackable = details.isStackable or C_Item.GetItemMaxStackSizeByID(details.itemID) > 1
+  if details.isStackable ~= nil then
+    return details.isStackable
+  end
+
+  local stackCount = C_Item.GetItemMaxStackSizeByID(details.itemID)
+  if stackCount ~= nil then
+    details.isStackable = stackCount > 1
+  end
   return details.isStackable
 end
 
