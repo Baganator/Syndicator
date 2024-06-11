@@ -144,6 +144,10 @@ local function SocketedCheck(details)
   end
 end
 
+local function CurrencyCheck(details)
+  return details.isCurrency -- powered by ATT data
+end
+
 local function GetTooltipInfoSpell(details)
   if details.tooltipInfoSpell then
     return
@@ -399,6 +403,7 @@ AddKeyword(SYNDICATOR_L_KEYWORD_TRADABLE_LOOT, IsTradeableLoot)
 AddKeyword(SYNDICATOR_L_KEYWORD_RELIC, RelicCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_STACKS, StackableCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_SOCKETED, SocketedCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_CURRENCY, CurrencyCheck)
 
 if Syndicator.Constants.IsRetail then
   AddKeyword(SYNDICATOR_L_KEYWORD_COSMETIC, CosmeticCheck)
@@ -893,6 +898,42 @@ local EXCLUSIVE_KEYWORDS_NO_TOOLTIP_TEXT = {
   [SYNDICATOR_L_KEYWORD_EQUIPMENT] = true,
 }
 
+local function GetATTKeywords(details)
+  if details.ATTKeywords then
+    return
+  end
+
+  if not details.ATTKeywordsTmp then
+    details.ATTKeywordsTmp = {}
+    details.ATTSeenItemNames = {}
+  end
+
+  local missing = false
+  details.ATTSearch = details.ATTSearch or ATTC.SearchForField("itemIDAsCost", details.itemID)
+  if #details.ATTSearch < 50 then
+    for _, entry in ipairs(details.ATTSearch) do
+      if entry.itemID and not details.ATTSeenItemNames[entry.itemID] then
+        local itemName = C_Item.GetItemNameByID(entry.itemID)
+        details.ATTSeenItemNames[entry.itemID] = itemName ~= nil
+        if itemName ~= nil and tIndexOf(details.ATTKeywordsTmp, itemName) == nil then
+          table.insert(details.ATTKeywordsTmp, "att:" .. itemName:lower())
+        else
+          missing = true
+        end
+      end
+    end
+  end
+  details.isCurrency = #details.ATTSearch > 0
+
+  if not missing then
+    details.ATTKeywords = details.ATTKeywordsTmp
+    details.ATTSearch = nil
+    details.ATTKeywordsTmp = nil
+    details.searchKeywords = details.searchKeywordsTmp
+    tAppendAll(details.searchKeywords, details.ATTKeywords)
+  end
+end
+
 local UPGRADE_PATH_PATTERN = ITEM_UPGRADE_TOOLTIP_FORMAT_STRING and "^" .. ITEM_UPGRADE_TOOLTIP_FORMAT_STRING:gsub("%%s", ".*"):gsub("%%d", ".*")
 
 local function GetTooltipSpecialTerms(details)
@@ -908,26 +949,35 @@ local function GetTooltipSpecialTerms(details)
     return
   end
 
-  details.searchKeywords = {details.itemName:lower()}
+  if not details.searchKeywordsTmp then
+    details.searchKeywordsTmp = {details.itemName:lower()}
 
-  for _, line in ipairs(details.tooltipInfoSpell.lines) do
-    local term = line.leftText:match("^|cFF......(.*)|r$")
-    if term then
-      table.insert(details.searchKeywords, term:lower())
-    else
-      local match = line.leftText:match("^" .. USE_COLON) or line.leftText:match("^" .. ITEM_SPELL_TRIGGER_ONEQUIP) or (UPGRADE_PATH_PATTERN and line.leftText:match(UPGRADE_PATH_PATTERN))
-      if details.classID ~= Enum.ItemClass.Recipe and match then
-        table.insert(details.searchKeywords, line.leftText:lower())
+    for _, line in ipairs(details.tooltipInfoSpell.lines) do
+      local term = line.leftText:match("^|cFF......(.*)|r$")
+      if term then
+        table.insert(details.searchKeywordsTmp, term:lower())
+      else
+        local match = line.leftText:match("^" .. USE_COLON) or line.leftText:match("^" .. ITEM_SPELL_TRIGGER_ONEQUIP) or (UPGRADE_PATH_PATTERN and line.leftText:match(UPGRADE_PATH_PATTERN))
+        if details.classID ~= Enum.ItemClass.Recipe and match then
+          table.insert(details.searchKeywordsTmp, line.leftText:lower())
+        end
+      end
+    end
+
+    if details.setInfo then
+      for _, info in ipairs(details.setInfo) do
+        if type(info.name) == "string" then
+          table.insert(details.searchKeywordsTmp, info.name:lower())
+        end
       end
     end
   end
 
-  if details.setInfo then
-    for _, info in ipairs(details.setInfo) do
-      if type(info.name) == "string" then
-        table.insert(details.searchKeywords, info.name:lower())
-      end
-    end
+  if C_AddOns.IsAddOnLoaded("AllTheThings") then
+    GetATTKeywords(details)
+  else
+    details.searchKeywords = details.searchKeywordsTmp
+    details.searchKeywordsTmp = nil
   end
 end
 

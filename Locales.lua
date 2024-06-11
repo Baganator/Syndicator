@@ -99,6 +99,7 @@ L["KEYWORD_FISHING"] = "fishing"
 L["KEYWORD_COOKING"] = "cooking"
 L["KEYWORD_JEWELCRAFTING"] = "jewelcrafting"
 L["KEYWORD_SOCKETED"] = "socketed"
+L["KEYWORD_CURRENCY"] = "currency"
 
 L["SEARCHED_EVERYWHERE_COLON"] = "Searched Everywhere:"
 L["CANNOT_SEARCH_BY_ITEM_LINK"] = "Cannot search by item link"
