@@ -1073,23 +1073,23 @@ local function ApplyKeyword(searchString)
           return true
         end
         -- Cache results for each keyword to speed up continuing searches
-        if not details.matchInfo then
-          details.matchInfo = {}
+        if not details.keywordMatchInfo then
+          details.keywordMatchInfo = {}
         end
         local miss = false
         for _, k in ipairs(keywords) do
-          if details.matchInfo[k] == nil then
+          if details.keywordMatchInfo[k] == nil then
             -- Keyword results not cached yet
             local result = KEYWORDS_TO_CHECK[k](details, searchString)
             if result then
-              details.matchInfo[k] = true
+              details.keywordMatchInfo[k] = true
               return true
             elseif result ~= nil then
-              details.matchInfo[k] = false
+              details.keywordMatchInfo[k] = false
             else
               miss = true
             end
-          elseif details.matchInfo[k] then
+          elseif details.keywordMatchInfo[k] then
             -- got a positive result cached, we're done
             return true
           end
@@ -1172,10 +1172,10 @@ local function ApplyCombinedTerms(fullSearchString)
 end
 
 function Syndicator.Search.CheckItem(details, searchString)
-  details.matchInfo = details.matchInfo or {}
-  local result = details.matchInfo[searchString]
+  details.fullMatchInfo = details.fullMatchInfo or {}
+  local result = details.fullMatchInfo[searchString]
   if result ~= nil then
-    return details.matchInfo[searchString]
+    return details.fullMatchInfo[searchString]
   end
 
   local check = matches[searchString]
@@ -1185,7 +1185,7 @@ function Syndicator.Search.CheckItem(details, searchString)
   end
 
   result = check(details, searchString)
-  details.matchInfo[searchString] = result
+  details.fullMatchInfo[searchString] = result
   return result
 end
 
