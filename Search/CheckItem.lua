@@ -145,7 +145,7 @@ local function SocketedCheck(details)
 end
 
 local function CurrencyCheck(details)
-  return details.isCurrency -- powered by ATT data
+  return details.isCurrency == true -- powered by ATT data
 end
 
 local function GetTooltipInfoSpell(details)
