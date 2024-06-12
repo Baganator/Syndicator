@@ -910,36 +910,34 @@ local function UseATTInfo(details)
 
   local missing = false
   details.ATTSearch = details.ATTSearch or ATTC.SearchForField("itemIDAsCost", details.itemID)
-  if #details.ATTSearch < 50 then
-    local items = {}
-    for _, entry in ipairs(details.ATTSearch) do
-      if entry.itemID then
-        table.insert(items, entry.itemID)
-      elseif entry.questID then
-        details.isQuestObjectiveItem = true
-        for _, reward in ipairs(ATTC.SearchForField("questID", entry.questID)[1].g or {}) do
-          if reward.itemID then
-            table.insert(items, reward.itemID)
-          end
-        end
-      end
-    end
-    if #items < 50 then
-      for _, itemID in ipairs(items) do
-        if details.ATTSeenItemNames[itemID] == nil then
-          local itemName = C_Item.GetItemNameByID(itemID)
-          if itemName ~= nil then
-            details.ATTSeenItemNames[itemID] = true
-            table.insert(details.ATTKeywordsTmp, "att:" .. itemName:lower())
-          else
-            C_Item.RequestLoadItemDataByID(itemID)
-            missing = true
-          end
+  local items = {}
+  for _, entry in ipairs(details.ATTSearch) do
+    if entry.itemID then
+      table.insert(items, entry.itemID)
+      details.isCurrency = true
+    elseif entry.questID then
+      details.isQuestObjectiveItem = true
+      for _, reward in ipairs(ATTC.SearchForField("questID", entry.questID)[1].g or {}) do
+        if reward.itemID then
+          table.insert(items, reward.itemID)
         end
       end
     end
   end
-  details.isCurrency = #details.ATTSearch > 0
+  if #items < 50 then
+    for _, itemID in ipairs(items) do
+      if details.ATTSeenItemNames[itemID] == nil then
+        local itemName = C_Item.GetItemNameByID(itemID)
+        if itemName ~= nil then
+          details.ATTSeenItemNames[itemID] = true
+          table.insert(details.ATTKeywordsTmp, "att:" .. itemName:lower())
+        else
+          C_Item.RequestLoadItemDataByID(itemID)
+          missing = true
+        end
+      end
+    end
+  end
 
   if not missing then
     details.ATTKeywords = details.ATTKeywordsTmp
