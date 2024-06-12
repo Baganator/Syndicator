@@ -12,8 +12,11 @@ end
 function Syndicator.Search.GetExpansionInfo(itemID)
   if ItemVersion then
     local itemVersionDetails = ItemVersion.API:getItemVersion(itemID, true)
-    return itemVersionDetails.major, itemVersionDetails.minor, itemVersionDetails.patch
-  elseif ATTC then
+    if itemVersionDetails then
+      return itemVersionDetails.major, itemVersionDetails.minor, itemVersionDetails.patch
+    end
+  end
+  if ATTC then
     local attResults = ATTC.SearchForField("itemID", itemID)
     if #attResults > 0 then
       local parent = attResults[1]
