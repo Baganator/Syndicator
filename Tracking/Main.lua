@@ -10,8 +10,8 @@ local function AddCurrencyCheck()
   return Syndicator.Config.Get(Syndicator.Config.Options.SHOW_CURRENCY_TOOLTIPS) and (not Syndicator.Config.Get(Syndicator.Config.Options.SHOW_TOOLTIPS_ON_SHIFT) or IsShiftKeyDown())
 end
 
-local function AddToCurrencyTooltip(tooltip, summaries, itemLink)
-  Syndicator.Tooltips.AddCurrencyLines(tooltip, summaries, itemLink)
+local function AddToCurrencyTooltip(tooltip, currencyID)
+  Syndicator.Tooltips.AddCurrencyLines(tooltip, currencyID)
 end
 
 local function InitializeSavedVariables()
