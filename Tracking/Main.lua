@@ -175,6 +175,8 @@ local function SetupTooltips()
     hooksecurefunc(ItemRefTooltip, "SetCurrencyToken", CurrencyTooltipHandler)
     if GameTooltip.SetCurrencyByID then
       hooksecurefunc(GameTooltip, "SetCurrencyByID", AddToCurrencyTooltip)
+    end
+    if ItemRefTooltip.SetCurrencyByID then -- Doesn't currently exist on classic
       hooksecurefunc(ItemRefTooltip, "SetCurrencyByID", AddToCurrencyTooltip)
     end
   end
