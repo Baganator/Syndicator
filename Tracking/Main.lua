@@ -173,6 +173,10 @@ local function SetupTooltips()
     end
     hooksecurefunc(GameTooltip, "SetCurrencyToken", CurrencyTooltipHandler)
     hooksecurefunc(ItemRefTooltip, "SetCurrencyToken", CurrencyTooltipHandler)
+    if GameTooltip.SetCurrencyByID then
+      hooksecurefunc(GameTooltip, "SetCurrencyByID", AddToCurrencyTooltip)
+      hooksecurefunc(ItemRefTooltip, "SetCurrencyByID", AddToCurrencyTooltip)
+    end
   end
 
   if BattlePetToolTip_Show then
