@@ -179,6 +179,14 @@ local function SetupTooltips()
     if ItemRefTooltip.SetCurrencyByID then -- Doesn't currently exist on classic
       hooksecurefunc(ItemRefTooltip, "SetCurrencyByID", AddToCurrencyTooltip)
     end
+    -- Fix enchant crafting reagent tooltips on Era/SoD
+    if GameTooltip.SetCraftItem then
+      hooksecurefunc(GameTooltip, "SetCraftItem", function(_, recipeIndex, reagentIndex)
+        if AddItemCheck() then
+          AddToItemTooltip(GameTooltip, Syndicator.ItemSummaries, GetCraftReagentItemLink(recipeIndex, reagentIndex))
+        end
+      end)
+    end
   end
 
   if BattlePetToolTip_Show then
