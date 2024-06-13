@@ -906,6 +906,7 @@ local function UseATTInfo(details)
   if not details.ATTKeywordsTmp then
     details.ATTKeywordsTmp = {}
     details.ATTSeenItemNames = {}
+    details.ATTLoadStart = GetTime()
   end
 
   local missing = false
@@ -925,13 +926,14 @@ local function UseATTInfo(details)
     end
   end
   if #items < 50 then
+    local hasTime = GetTime() - details.ATTLoadStart < 0.2
     for _, itemID in ipairs(items) do
       if details.ATTSeenItemNames[itemID] == nil then
         local itemName = C_Item.GetItemNameByID(itemID)
         if itemName ~= nil then
           details.ATTSeenItemNames[itemID] = true
           table.insert(details.ATTKeywordsTmp, "att:" .. itemName:lower())
-        else
+        elseif hasTime then
           C_Item.RequestLoadItemDataByID(itemID)
           missing = true
         end
