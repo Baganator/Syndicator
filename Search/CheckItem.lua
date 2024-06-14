@@ -898,6 +898,21 @@ local EXCLUSIVE_KEYWORDS_NO_TOOLTIP_TEXT = {
   [SYNDICATOR_L_KEYWORD_EQUIPMENT] = true,
 }
 
+local function GetATTItemsFromEntry(entry, details, items)
+  if entry.g then
+    for _, possibility in ipairs(entry.g or {}) do
+      GetATTItemsFromEntry(possibility, details, items)
+    end
+  end
+
+  if entry.itemID then
+    table.insert(items, entry.itemID)
+    details.isCurrency = true
+  elseif entry.questID then
+    details.isQuestObjectiveItem = true
+  end
+end
+
 local function UseATTInfo(details)
   if details.ATTKeywords then
     return
@@ -913,17 +928,7 @@ local function UseATTInfo(details)
   details.ATTSearch = details.ATTSearch or ATTC.SearchForField("itemIDAsCost", details.itemID)
   local items = {}
   for _, entry in ipairs(details.ATTSearch) do
-    if entry.itemID then
-      table.insert(items, entry.itemID)
-      details.isCurrency = true
-    elseif entry.questID then
-      details.isQuestObjectiveItem = true
-      for _, reward in ipairs(ATTC.SearchForField("questID", entry.questID)[1].g or {}) do
-        if reward.itemID then
-          table.insert(items, reward.itemID)
-        end
-      end
-    end
+    GetATTItemsFromEntry(entry, details, items)
   end
   if #items < 50 then
     local hasTime = GetTime() - details.ATTLoadStart < 0.2
