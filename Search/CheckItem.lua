@@ -898,60 +898,24 @@ local EXCLUSIVE_KEYWORDS_NO_TOOLTIP_TEXT = {
   [SYNDICATOR_L_KEYWORD_EQUIPMENT] = true,
 }
 
-local function GetATTItemsFromEntry(entry, details, items)
-  if entry.g then
-    for _, possibility in ipairs(entry.g or {}) do
-      GetATTItemsFromEntry(possibility, details, items)
-    end
-  end
-
-  if entry.itemID then
-    table.insert(items, entry.itemID)
-    details.isCurrency = true
-  elseif entry.questID then
-    details.isQuestObjectiveItem = true
-  end
-end
-
 local function UseATTInfo(details)
-  if details.ATTKeywords then
-    return
+  local ATTSearch = ATTC.SearchForField("itemIDAsCost", details.itemID)
+  if Syndicator.Search.AnyDifferentATTHeaders(ATTSearch) then
+    ATTSearch = {}
   end
-
-  if not details.ATTKeywordsTmp then
-    details.ATTKeywordsTmp = {}
-    details.ATTSeenItemNames = {}
-    details.ATTLoadStart = GetTime()
-  end
-
-  local missing = false
-  details.ATTSearch = details.ATTSearch or ATTC.SearchForField("itemIDAsCost", details.itemID)
   local items = {}
-  for _, entry in ipairs(details.ATTSearch) do
-    GetATTItemsFromEntry(entry, details, items)
-  end
-  if #items < 50 then
-    local hasTime = GetTime() - details.ATTLoadStart < 0.2
-    for _, itemID in ipairs(items) do
-      if details.ATTSeenItemNames[itemID] == nil then
-        local itemName = C_Item.GetItemNameByID(itemID)
-        if itemName ~= nil then
-          details.ATTSeenItemNames[itemID] = true
-          table.insert(details.ATTKeywordsTmp, "att:" .. itemName:lower())
-        elseif hasTime then
-          C_Item.RequestLoadItemDataByID(itemID)
-          missing = true
-        end
-      end
-    end
+  for _, entry in ipairs(ATTSearch) do
+    Syndicator.Search.GetATTItemsFromEntry(entry, details, items)
   end
 
-  if not missing then
-    details.ATTKeywords = details.ATTKeywordsTmp
-    details.ATTSearch = nil
-    details.ATTKeywordsTmp = nil
-    details.searchKeywords = details.searchKeywordsTmp
-    tAppendAll(details.searchKeywords, details.ATTKeywords)
+  local entry = ATTC.SearchForField("itemID", details.itemID)[1]
+  local resultEntry
+  if items[1] then
+    resultEntry = ATTC.SearchForField("itemID", items[1])[1]
+  end
+  local headerText = (resultEntry and Syndicator.Search.GetWantedATTHeader(resultEntry)) or Syndicator.Search.GetWantedATTHeader(entry)
+  if headerText then
+    table.insert(details.searchKeywordsTmp, "att:" .. headerText:lower())
   end
 end
 
@@ -994,12 +958,12 @@ local function GetTooltipSpecialTerms(details)
     end
   end
 
-  if C_AddOns.IsAddOnLoaded("AllTheThings") then
+  if ATTC then -- All The Things
     UseATTInfo(details)
-  else
-    details.searchKeywords = details.searchKeywordsTmp
-    details.searchKeywordsTmp = nil
   end
+
+  details.searchKeywords = details.searchKeywordsTmp
+  details.searchKeywordsTmp = nil
 end
 
 local function MatchesText(details, searchString)
