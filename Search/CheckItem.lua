@@ -207,7 +207,11 @@ local function CollectedCheck(details)
   local result = nil
 
   if C_TransmogCollection and Syndicator.Utilities.IsEquipment(details.itemLink) then
-    result = IsTMogCollectedUnique(details.itemLink)
+    if ATTC and ATTC.Settings:Get("Completionist") then
+      result = IsTMogCollectedCompletionist(details.itemLink)
+    else
+      result = IsTMogCollectedUnique(details.itemLink)
+    end
   end
   if C_PetJournal and details.itemID == Syndicator.Constants.BattlePetCageID then
     result = IsPetCollected(details.itemLink)
@@ -231,7 +235,11 @@ local function UncollectedCheck(details)
   local result = nil
 
   if C_TransmogCollection and Syndicator.Utilities.IsEquipment(details.itemLink) then
-    result = IsTMogCollectedUnique(details.itemLink)
+    if ATTC and ATTC.Settings:Get("Completionist") then
+      result = IsTMogCollectedCompletionist(details.itemLink)
+    else
+      result = IsTMogCollectedUnique(details.itemLink)
+    end
   end
   if C_PetJournal and details.itemID == Syndicator.Constants.BattlePetCageID then
     result = IsPetCollected(details.itemLink)
