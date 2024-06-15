@@ -155,12 +155,24 @@ local function CollectedCheck(details)
   end
 
   if C_TransmogCollection and Syndicator.Utilities.IsEquipment(details.itemLink) then
-    local sourceID, appearanceID = C_TransmogCollection.GetItemInfo(details.itemLink)
+    local _, sourceID = C_TransmogCollection.GetItemInfo(details.itemLink)
     if not sourceID then
       return true
     else
-      local info = C_TransmogCollection.GetAppearanceInfoBySource(appearanceID)
-      return info == nil or info.appearanceIsCollected, info ~= nil and not info.appearanceIsCollected
+      local info = C_TransmogCollection.GetSourceInfo(sourceID)
+      if info then
+        local allSources = C_TransmogCollection.GetAllAppearanceSources(info.visualID)
+        local anyCollected = false
+        for _, alternateSourceID in ipairs(allSources) do
+          if C_TransmogCollection.GetSourceInfo(alternateSourceID).isCollected then
+            anyCollected = true
+            break
+          end
+        end
+        return anyCollected, not anyCollected
+      else
+        return true
+      end
     end
   end
   if C_PetJournal and details.itemID == Syndicator.Constants.BattlePetCageID then
