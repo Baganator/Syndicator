@@ -148,6 +148,38 @@ local function CurrencyCheck(details)
   return details.isCurrency == true -- powered by ATT data
 end
 
+local function CollectedCheck(details)
+  if not C_Item.IsItemDataCachedByID(details.itemID) then
+    C_Item.RequestLoadItemDataByID(details.itemID)
+    return nil
+  end
+
+  if Syndicator.Utilities.IsEquipment(details.itemLink) then
+    local sourceID, appearanceID = C_TransmogCollection.GetItemInfo(details.itemLink)
+    if not sourceID then
+      return true
+    else
+      local info = C_TransmogCollection.GetAppearanceInfoBySource(appearanceID)
+      return info == nil or info.appearanceIsCollected, info ~= nil and not info.appearanceIsCollected
+    end
+  end
+  if details.itemID == Syndicator.Constants.BattlePetCageID then
+    local speciesID = tonumber((details.itemLink:match("battlepet:(%d+)")))
+    local numCollected = C_PetJournal.GetNumCollectedInfo(speciesID)
+    return numCollected > 0, numCollected == 0
+  end
+  if C_ToyBox.GetToyInfo(details.itemID) ~= nil then
+    local hasToy = PlayerHasToy(details.itemID)
+    return hasToy, not hasToy
+  end
+  local mountID = C_MountJournal.GetMountFromItem(details.itemID)
+  if mountID then
+    local isCollected = select(11, C_MountJournal.GetMountInfoByID(mountID))
+    return isCollected , not isCollected
+  end
+  return true
+end
+
 local function GetTooltipInfoSpell(details)
   if details.tooltipInfoSpell then
     return
@@ -409,6 +441,7 @@ AddKeyword(SYNDICATOR_L_KEYWORD_STACKS, StackableCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_SOCKETED, SocketedCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_CURRENCY, CurrencyCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_OBJECTIVE, QuestObjectiveCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_COLLECTED, CollectedCheck)
 
 if Syndicator.Constants.IsRetail then
   AddKeyword(SYNDICATOR_L_KEYWORD_COSMETIC, CosmeticCheck)
@@ -1032,6 +1065,7 @@ local function ApplyKeyword(searchString)
       -- the details match the keyword's criteria
       local check = function(details)
         local matches = matchesTextToUse(details, searchString)
+        local finalDoNotCache = false
         if matches == nil then
           return nil
         elseif matches then
@@ -1045,24 +1079,29 @@ local function ApplyKeyword(searchString)
         for _, k in ipairs(keywords) do
           if details.keywordMatchInfo[k] == nil then
             -- Keyword results not cached yet
-            local result = KEYWORDS_TO_CHECK[k](details, searchString)
+            local result, doNotCache = KEYWORDS_TO_CHECK[k](details, searchString)
+            finalDoNotCache = doNotCache or finalDoNotCache
             if result then
-              details.keywordMatchInfo[k] = true
-              return true
+              if not doNotCache then
+                details.keywordMatchInfo[k] = true
+              end
+              return true, finalDoNotCache
             elseif result ~= nil then
-              details.keywordMatchInfo[k] = false
+              if not doNotCache then
+                details.keywordMatchInfo[k] = false
+              end
             else
               miss = true
             end
           elseif details.keywordMatchInfo[k] then
             -- got a positive result cached, we're done
-            return true
+            return true, finalDoNotCache
           end
         end
         if miss then
           return nil
         else
-          return false
+          return false, finalDoNotCache
         end
       end
       matches[searchString] = check
@@ -1094,14 +1133,16 @@ local function ApplyCombinedTerms(fullSearchString)
     end
     return function(details)
       for index, check in ipairs(checks) do
-        local result = check(details, checkPart[index])
+        local finalDoNotCache = false
+        local result, doNotCache = check(details, checkPart[index])
+        finalDoNotCache = doNotCache or finalDoNotCache
         if result then
-          return true
+          return true, finalDoNotCache
         elseif result == nil then
           return nil
         end
       end
-      return false
+      return false, finalDoNotCache
     end
   elseif fullSearchString:match("[&]") then
     local checks = {}
@@ -1112,11 +1153,13 @@ local function ApplyCombinedTerms(fullSearchString)
     end
     return function(details)
       for index, check in ipairs(checks) do
-        local result = check(details, checkPart[index])
+        local finalDoNotCache = false
+        local result, doNotCache = check(details, checkPart[index])
+        finalDoNotCache = doNotCache or finalDoNotCache
         if result == false then
-          return false
+          return false, finalDoNotCache
         elseif result == nil then
-          return nil
+          return nil, finalDoNotCache
         end
       end
       return true
@@ -1125,9 +1168,9 @@ local function ApplyCombinedTerms(fullSearchString)
     local newSearchString = fullSearchString:sub(2, #fullSearchString)
     local nested = ApplyCombinedTerms(newSearchString)
     return function(details)
-      local result = nested(details, newSearchString)
+      local result, doNotCache = nested(details, newSearchString)
       if result ~= nil then
-        return not result
+        return not result, doNotCache
       end
       return nil
     end
@@ -1149,8 +1192,10 @@ function Syndicator.Search.CheckItem(details, searchString)
     matches[searchString] = check
   end
 
-  result = check(details, searchString)
-  details.fullMatchInfo[searchString] = result
+  result, doNotCache = check(details, searchString)
+  if not doNotCache then
+    details.fullMatchInfo[searchString] = result
+  end
   return result
 end
 
