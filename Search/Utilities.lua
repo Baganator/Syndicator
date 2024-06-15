@@ -113,7 +113,10 @@ if ATTC then
       end
       current, prev = current.parent, current
     end
-    return ATTC.L.HEADER_NAMES[prev.headerID]
+    local deepest = ATTC.GetDeepestRelativeValue(entry, "headerID")
+    if deepest and (deepest > -1000060 or deepest < -1000073) then
+      return ATTC.L.HEADER_NAMES[deepest]
+    end
   end
 
   function Syndicator.Search.GetATTItemsFromEntry(entry, details, items)
