@@ -154,7 +154,7 @@ local function CollectedCheck(details)
     return nil
   end
 
-  if Syndicator.Utilities.IsEquipment(details.itemLink) then
+  if C_TransmogCollection and Syndicator.Utilities.IsEquipment(details.itemLink) then
     local sourceID, appearanceID = C_TransmogCollection.GetItemInfo(details.itemLink)
     if not sourceID then
       return true
@@ -163,19 +163,21 @@ local function CollectedCheck(details)
       return info == nil or info.appearanceIsCollected, info ~= nil and not info.appearanceIsCollected
     end
   end
-  if details.itemID == Syndicator.Constants.BattlePetCageID then
+  if C_PetJournal and details.itemID == Syndicator.Constants.BattlePetCageID then
     local speciesID = tonumber((details.itemLink:match("battlepet:(%d+)")))
     local numCollected = C_PetJournal.GetNumCollectedInfo(speciesID)
     return numCollected > 0, numCollected == 0
   end
-  if C_ToyBox.GetToyInfo(details.itemID) ~= nil then
+  if C_ToyBox and C_ToyBox.GetToyInfo(details.itemID) ~= nil then
     local hasToy = PlayerHasToy(details.itemID)
     return hasToy, not hasToy
   end
-  local mountID = C_MountJournal.GetMountFromItem(details.itemID)
-  if mountID then
-    local isCollected = select(11, C_MountJournal.GetMountInfoByID(mountID))
-    return isCollected , not isCollected
+  if C_MountJournal then
+    local mountID = C_MountJournal.GetMountFromItem(details.itemID)
+    if mountID then
+      local isCollected = select(11, C_MountJournal.GetMountInfoByID(mountID))
+      return isCollected , not isCollected
+    end
   end
   return true
 end
