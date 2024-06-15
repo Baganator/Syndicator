@@ -148,50 +148,106 @@ local function CurrencyCheck(details)
   return details.isCurrency == true -- powered by ATT data
 end
 
+local function IsTMogCollectedCompletionist(itemLink)
+  local _, sourceID = C_TransmogCollection.GetItemInfo(itemLink)
+  if not sourceID then
+    return nil
+  else
+    local info = C_TransmogCollection.GetSourceInfo(sourceID)
+    return info and info.isCollected
+  end
+end
+
+local function IsTMogCollectedUnique(itemLink)
+  local _, sourceID = C_TransmogCollection.GetItemInfo(itemLink)
+  if not sourceID then
+    return nil
+  else
+    local info = C_TransmogCollection.GetSourceInfo(sourceID)
+    if info then
+      local allSources = C_TransmogCollection.GetAllAppearanceSources(info.visualID)
+      local anyCollected = false
+      for _, alternateSourceID in ipairs(allSources) do
+        if C_TransmogCollection.GetSourceInfo(alternateSourceID).isCollected then
+          anyCollected = true
+          break
+        end
+      end
+      return anyCollected
+    else
+      return nil
+    end
+  end
+end
+
+local function IsPetCollected(itemLink)
+  local speciesID = tonumber((itemLink:match("battlepet:(%d+)")))
+  local numCollected = C_PetJournal.GetNumCollectedInfo(speciesID)
+  return numCollected > 0
+end
+
+local function IsToyCollected(itemID)
+  local hasToy = PlayerHasToy(itemID)
+  return hasToy
+end
+
+local function IsMountCollected(itemID)
+  local mountID = C_MountJournal.GetMountFromItem(itemID)
+  if mountID then
+    return (select(11, C_MountJournal.GetMountInfoByID(mountID)))
+  end
+end
+
 local function CollectedCheck(details)
   if not C_Item.IsItemDataCachedByID(details.itemID) then
     C_Item.RequestLoadItemDataByID(details.itemID)
     return nil
   end
 
+  local result = nil
+
   if C_TransmogCollection and Syndicator.Utilities.IsEquipment(details.itemLink) then
-    local _, sourceID = C_TransmogCollection.GetItemInfo(details.itemLink)
-    if not sourceID then
-      return true
-    else
-      local info = C_TransmogCollection.GetSourceInfo(sourceID)
-      if info then
-        local allSources = C_TransmogCollection.GetAllAppearanceSources(info.visualID)
-        local anyCollected = false
-        for _, alternateSourceID in ipairs(allSources) do
-          if C_TransmogCollection.GetSourceInfo(alternateSourceID).isCollected then
-            anyCollected = true
-            break
-          end
-        end
-        return anyCollected, not anyCollected
-      else
-        return true
-      end
-    end
+    result = IsTMogCollectedUnique(details.itemLink)
   end
   if C_PetJournal and details.itemID == Syndicator.Constants.BattlePetCageID then
-    local speciesID = tonumber((details.itemLink:match("battlepet:(%d+)")))
-    local numCollected = C_PetJournal.GetNumCollectedInfo(speciesID)
-    return numCollected > 0, numCollected == 0
+    result = IsPetCollected(details.itemLink)
   end
   if C_ToyBox and C_ToyBox.GetToyInfo(details.itemID) ~= nil then
-    local hasToy = PlayerHasToy(details.itemID)
-    return hasToy, not hasToy
+    result = IsToyCollected(details.itemID)
   end
-  if C_MountJournal then
-    local mountID = C_MountJournal.GetMountFromItem(details.itemID)
-    if mountID then
-      local isCollected = select(11, C_MountJournal.GetMountInfoByID(mountID))
-      return isCollected , not isCollected
-    end
+  if C_MountJournal and C_MountJournal.GetMountFromItem(details.itemID) then
+    result = IsMountCollected(details.itemID)
   end
-  return true
+
+  return result or false, result == false
+end
+
+local function UncollectedCheck(details)
+  if not C_Item.IsItemDataCachedByID(details.itemID) then
+    C_Item.RequestLoadItemDataByID(details.itemID)
+    return nil
+  end
+
+  local result = nil
+
+  if C_TransmogCollection and Syndicator.Utilities.IsEquipment(details.itemLink) then
+    result = IsTMogCollectedUnique(details.itemLink)
+  end
+  if C_PetJournal and details.itemID == Syndicator.Constants.BattlePetCageID then
+    result = IsPetCollected(details.itemLink)
+  end
+  if C_ToyBox and C_ToyBox.GetToyInfo(details.itemID) ~= nil then
+    result = IsToyCollected(details.itemID)
+  end
+  if C_MountJournal and C_MountJournal.GetMountFromItem(details.itemID) then
+    result = IsMountCollected(details.itemID)
+  end
+
+  if result ~= nil then
+    result = not result
+  end
+
+  return result or false, result == true
 end
 
 local function GetTooltipInfoSpell(details)
@@ -456,6 +512,7 @@ AddKeyword(SYNDICATOR_L_KEYWORD_SOCKETED, SocketedCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_CURRENCY, CurrencyCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_OBJECTIVE, QuestObjectiveCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_COLLECTED, CollectedCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_UNCOLLECTED, UncollectedCheck)
 
 if Syndicator.Constants.IsRetail then
   AddKeyword(SYNDICATOR_L_KEYWORD_COSMETIC, CosmeticCheck)
