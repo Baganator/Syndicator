@@ -207,7 +207,7 @@ local function CollectedCheck(details)
   local result = nil
 
   if C_TransmogCollection and Syndicator.Utilities.IsEquipment(details.itemLink) then
-    if ATTC and ATTC.Settings:Get("Completionist") then
+    if ATTC and ATTC.Settings and ATTC.Settings.Get and ATTC.Settings:Get("Completionist") then
       result = IsTMogCollectedCompletionist(details.itemLink)
     else
       result = IsTMogCollectedUnique(details.itemLink)
@@ -235,7 +235,7 @@ local function UncollectedCheck(details)
   local result = nil
 
   if C_TransmogCollection and Syndicator.Utilities.IsEquipment(details.itemLink) then
-    if ATTC and ATTC.Settings:Get("Completionist") then
+    if ATTC and ATTC.Settings and ATTC.Settings.Get and ATTC.Settings:Get("Completionist") then
       result = IsTMogCollectedCompletionist(details.itemLink)
     else
       result = IsTMogCollectedUnique(details.itemLink)
@@ -1056,7 +1056,7 @@ local function GetTooltipSpecialTerms(details)
     end
   end
 
-  if ATTC then -- All The Things
+  if ATTC and ATTC.SearchForField then -- All The Things
     UseATTInfo(details)
   end
 
