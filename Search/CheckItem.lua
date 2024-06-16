@@ -1012,22 +1012,8 @@ local EXCLUSIVE_KEYWORDS_NO_TOOLTIP_TEXT = {
 
 local function UseATTInfo(details)
   local ATTSearch = ATTC.SearchForField("itemIDAsCost", details.itemID)
-  if Syndicator.Search.AnyDifferentATTHeaders(ATTSearch) then
-    ATTSearch = {}
-  end
-  local items = {}
   for _, entry in ipairs(ATTSearch) do
-    Syndicator.Search.GetATTItemsFromEntry(entry, details, items)
-  end
-
-  local entry = ATTC.SearchForField("itemID", details.itemID)[1]
-  local resultEntry
-  if items[1] then
-    resultEntry = ATTC.SearchForField("itemID", items[1])[1]
-  end
-  local headerText = (resultEntry and Syndicator.Search.GetWantedATTHeader(resultEntry)) or Syndicator.Search.GetWantedATTHeader(entry)
-  if headerText then
-    table.insert(details.searchKeywordsTmp, "att:" .. headerText:lower())
+    Syndicator.Search.ScanATTItemsFromEntry(entry, details)
   end
 end
 
