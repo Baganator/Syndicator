@@ -76,25 +76,29 @@ if ATTC then
     [ATTC.HeaderConstants.FACTIONS] = true,
     [ATTC.HeaderConstants.QUESTS] = true,
     [ATTC.HeaderConstants.ZONE_DROPS] = true,
-    [ATTC.HeaderConstants.SCENARIO_COMPLETION] = true,
-    [ATTC.HeaderConstants.BONUS_OBJECTIVES] = true,
-    [ATTC.HeaderConstants.BUILDINGS] = true,
     [ATTC.HeaderConstants.COMMON_BOSS_DROPS] = true,
-    [ATTC.HeaderConstants.EMISSARY_QUESTS] = true,
     [ATTC.HeaderConstants.FLIGHT_PATHS] = "flightPathID",
     [ATTC.HeaderConstants.HOLIDAYS] = "eventID",
     [ATTC.HeaderConstants.PROFESSIONS] = "professionID",
     [ATTC.HeaderConstants.PVP] = true,
     [ATTC.HeaderConstants.RARES] = true,
-    [ATTC.HeaderConstants.SECRETS] = true,
     [ATTC.HeaderConstants.SPECIAL] = true,
     [ATTC.HeaderConstants.TREASURES] = "objectID",
     [ATTC.HeaderConstants.VENDORS] = true,
-    [ATTC.HeaderConstants.WEEKLY_HOLIDAYS] = true,
-    [ATTC.HeaderConstants.WORLD_QUESTS] = true,
-    [ATTC.HeaderConstants.ZONE_REWARDS] = true,
     [ATTC.HeaderConstants.REWARDS] = true,
   }
+  if Syndicator.Constants.IsRetail then
+    tAppendAll(rootATTHeaders, {
+      [ATTC.HeaderConstants.SCENARIO_COMPLETION] = true,
+      [ATTC.HeaderConstants.BONUS_OBJECTIVES] = true,
+      [ATTC.HeaderConstants.BUILDINGS] = true,
+      [ATTC.HeaderConstants.EMISSARY_QUESTS] = true,
+      [ATTC.HeaderConstants.SECRETS] = true,
+      [ATTC.HeaderConstants.WEEKLY_HOLIDAYS] = true,
+      [ATTC.HeaderConstants.WORLD_QUESTS] = true,
+      [ATTC.HeaderConstants.ZONE_REWARDS] = true,
+    })
+  end
 
   function Syndicator.Search.GetWantedATTHeader(entry)
     if not entry then
