@@ -67,24 +67,3 @@ if Syndicator.Constants.IsClassic then
     return {lines = dump}
   end
 end
-
-
-if ATTC then
-  function Syndicator.Search.ScanATTItemsFromEntry(entry, details)
-    if details.isCurrency or details.isQuestObjectiveItem then
-      return
-    end
-
-    if entry.g then
-      for _, possibility in ipairs(entry.g or {}) do
-        Syndicator.Search.ScanATTItemsFromEntry(possibility, details)
-      end
-    end
-
-    if entry.itemID then
-      details.isCurrency = true
-    elseif entry.questID then
-      details.isQuestObjectiveItem = true
-    end
-  end
-end

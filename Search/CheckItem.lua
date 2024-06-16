@@ -144,10 +144,6 @@ local function SocketedCheck(details)
   end
 end
 
-local function CurrencyCheck(details)
-  return details.isCurrency == true -- powered by ATT data
-end
-
 local function IsTMogCollectedCompletionist(itemLink)
   local _, sourceID = C_TransmogCollection.GetItemInfo(itemLink)
   if not sourceID then
@@ -467,7 +463,30 @@ local function IsTradeableLoot(details)
   return false
 end
 
+local function UseATTInfo(details)
+  if details.ATTInfoAcquired or not ATTC or not ATTC.SearchForField then -- All The Things
+    return
+  end
+  local ATTSearch = ATTC.SearchForField("itemIDAsCost", details.itemID)
+  for _, entry in ipairs(ATTSearch) do
+    if entry.itemID then
+      details.isCurrency = true
+      break
+    elseif entry.questID then
+      details.isQuestObjectiveItem = true
+      break
+    end
+  end
+  details.ATTInfoAcquired = true
+end
+
+local function CurrencyCheck(details)
+  UseATTInfo(details)
+  return details.isCurrency == true -- powered by ATT data
+end
+
 local function QuestObjectiveCheck(details)
+  UseATTInfo(details)
   return details.isQuestObjectiveItem == true
 end
 
@@ -1010,13 +1029,6 @@ local EXCLUSIVE_KEYWORDS_NO_TOOLTIP_TEXT = {
   [SYNDICATOR_L_KEYWORD_EQUIPMENT] = true,
 }
 
-local function UseATTInfo(details)
-  local ATTSearch = ATTC.SearchForField("itemIDAsCost", details.itemID)
-  for _, entry in ipairs(ATTSearch) do
-    Syndicator.Search.ScanATTItemsFromEntry(entry, details)
-  end
-end
-
 local UPGRADE_PATH_PATTERN = ITEM_UPGRADE_TOOLTIP_FORMAT_STRING and "^" .. ITEM_UPGRADE_TOOLTIP_FORMAT_STRING:gsub("%%s", ".*"):gsub("%%d", ".*")
 
 local function GetTooltipSpecialTerms(details)
@@ -1054,10 +1066,6 @@ local function GetTooltipSpecialTerms(details)
         end
       end
     end
-  end
-
-  if ATTC and ATTC.SearchForField then -- All The Things
-    UseATTInfo(details)
   end
 
   details.searchKeywords = details.searchKeywordsTmp
