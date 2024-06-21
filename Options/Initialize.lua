@@ -7,50 +7,50 @@ local TOOLTIP_OPTIONS = {
   },
   {
     type = "checkbox",
-    text = SYNDICATOR_L_SHOW_INVENTORY_IN_TOOLTIPS,
+    text = SYNDICATOR_L_SHOW_INVENTORY,
     option = "show_inventory_tooltips",
   },
   {
     type = "checkbox",
-    text = SYNDICATOR_L_SHOW_CHARACTER_RACE_ICONS,
-    option = "show_character_race_icons",
-  },
-  {
-    type = "checkbox",
-    text = SYNDICATOR_L_SHOW_CURRENCY_TOOLTIPS,
-    option = "show_currency_tooltips",
-    check = function() return C_CurrencyInfo ~= nil end,
-  },
-  {
-    type = "checkbox",
-    text = SYNDICATOR_L_PRESS_SHIFT_TO_SHOW_TOOLTIPS,
-    option = "show_tooltips_on_shift",
-  },
-  {
-    type = "checkbox",
-    text = SYNDICATOR_L_SHOW_EQUIPPED_ITEMS_IN_INVENTORY_TOOLTIPS,
+    text = SYNDICATOR_L_SHOW_EQUIPPED,
     option = "show_equipped_items_in_tooltips",
   },
   {
     type = "checkbox",
-    text = SYNDICATOR_L_SHOW_GUILD_BANKS_IN_INVENTORY_TOOLTIPS,
+    text = SYNDICATOR_L_SHOW_GUILD_BANKS,
     option = "show_guild_banks_in_tooltips",
     check = NotIsEraCheck,
   },
   {
     type = "checkbox",
-    text = SYNDICATOR_L_ONLY_USE_SAME_CONNECTED_REALMS,
+    text = SYNDICATOR_L_SHOW_CURRENCY,
+    option = "show_currency_tooltips",
+    check = function() return C_CurrencyInfo ~= nil end,
+  },
+  {
+    type = "checkbox",
+    text = SYNDICATOR_L_SAME_CONNECTED_REALMS,
     option = "tooltips_connected_realms_only",
   },
   {
     type = "checkbox",
-    text = SYNDICATOR_L_ONLY_USE_SAME_FACTION_CHARACTERS,
+    text = SYNDICATOR_L_SAME_FACTION,
     option = "tooltips_faction_only",
   },
   {
     type = "checkbox",
-    text = SYNDICATOR_L_SORT_BY_CHARACTER_NAME,
+    text = SYNDICATOR_L_SHOW_RACE_ICONS,
+    option = "show_character_race_icons",
+  },
+  {
+    type = "checkbox",
+    text = SYNDICATOR_L_SORT_BY_NAME,
     option = "tooltips_sort_by_name",
+  },
+  {
+    type = "checkbox",
+    text = SYNDICATOR_L_HOLD_SHIFT_TO_DISPLAY,
+    option = "show_tooltips_on_shift",
   },
   {
     type = "slider",
