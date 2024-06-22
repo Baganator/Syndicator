@@ -545,7 +545,7 @@ AddKeyword(SYNDICATOR_L_KEYWORD_CURRENCY, CurrencyCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_OBJECTIVE, QuestObjectiveCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_COLLECTED, CollectedCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_UNCOLLECTED, UncollectedCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_RECENT, NewItemCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_NEW_ITEM, NewItemCheck)
 
 if Syndicator.Constants.IsRetail then
   AddKeyword(SYNDICATOR_L_KEYWORD_COSMETIC, CosmeticCheck)
