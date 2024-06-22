@@ -56,9 +56,9 @@ local function SetCheck(details)
   return details.setInfo ~= nil
 end
 
-local function RecentCheck(details)
-  local isRecent = details.isRecent == true
-  return isRecent, isRecent
+local function NewItemCheck(details)
+  local isNewItem = details.isNewItem == true
+  return isNewItem, isNewItem
 end
 
 local function EngravableCheck(details)
@@ -545,7 +545,7 @@ AddKeyword(SYNDICATOR_L_KEYWORD_CURRENCY, CurrencyCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_OBJECTIVE, QuestObjectiveCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_COLLECTED, CollectedCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_UNCOLLECTED, UncollectedCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_RECENT, RecentCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_RECENT, NewItemCheck)
 
 if Syndicator.Constants.IsRetail then
   AddKeyword(SYNDICATOR_L_KEYWORD_COSMETIC, CosmeticCheck)
