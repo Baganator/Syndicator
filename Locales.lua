@@ -31,6 +31,9 @@ L["SHOW_GUILD_BANKS"] = "Show guild banks"
 L["SHOW_EQUIPPED"] = "Show equipped"
 L["SHOW_CURRENCY"] = "Show currency"
 L["SHOW_RACE_ICONS"] = "Show race icons"
+L["HIDE_IN_TOOLTIPS"] = "Hide in tooltips"
+L["DELETE_CHARACTER"] = "Delete Character"
+L["SHOW_IN_TOOLTIPS"] = "Show in tooltips"
 
 L["ALL_CHARACTERS_COLON"] = "All Characters:"
 

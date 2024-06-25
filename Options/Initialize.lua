@@ -63,6 +63,143 @@ local TOOLTIP_OPTIONS = {
   },
 }
 
+local hiddenColor = CreateColor(1, 0, 0)
+local shownColor = CreateColor(0, 1, 0)
+
+local function SetHideButton(frame)
+  frame.HideButton = CreateFrame("Button", nil, frame)
+  frame.HideButton:SetNormalAtlas("socialqueuing-icon-eye")
+  frame.HideButton:SetPoint("TOPLEFT", 28, -2.5)
+  frame.HideButton:SetSize(15, 15)
+  frame.HideButton:SetScript("OnClick", function()
+    Syndicator.API.ToggleCharacterHidden(frame.fullName)
+    GameTooltip:Hide()
+    frame:UpdateHideVisual()
+  end)
+  frame.HideButton:SetScript("OnEnter", function()
+    GameTooltip:SetOwner(frame.HideButton, "ANCHOR_RIGHT")
+    if Syndicator.API.GetCharacter(frame.fullName).details.hidden then
+      GameTooltip:SetText(SYNDICATOR_L_SHOW_IN_TOOLTIPS)
+    else
+      GameTooltip:SetText(SYNDICATOR_L_HIDE_IN_TOOLTIPS)
+    end
+    GameTooltip:Show()
+    frame.HideButton:SetAlpha(0.5)
+  end)
+  frame.HideButton:SetScript("OnLeave", function()
+    GameTooltip:Hide()
+    frame.HideButton:SetAlpha(1)
+  end)
+end
+
+local function SetDeleteButton(frame)
+  frame.DeleteButton = CreateFrame("Button", nil, frame)
+  frame.DeleteButton:SetNormalAtlas("transmog-icon-remove")
+  frame.DeleteButton:SetPoint("TOPLEFT", 8, -2.5)
+  frame.DeleteButton:SetSize(15, 15)
+  frame.DeleteButton:SetScript("OnClick", function()
+    Syndicator.API.DeleteCharacter(frame.fullName)
+  end)
+  frame.DeleteButton:SetScript("OnEnter", function()
+    GameTooltip:SetOwner(frame.DeleteButton, "ANCHOR_RIGHT")
+    GameTooltip:SetText(SYNDICATOR_L_DELETE_CHARACTER)
+    GameTooltip:Show()
+    frame.DeleteButton:SetAlpha(0.5)
+  end)
+  frame.DeleteButton:SetScript("OnLeave", function()
+    GameTooltip:Hide()
+    frame.DeleteButton:SetAlpha(1)
+  end)
+end
+
+local function SetRaceIcon(frame)
+  frame.RaceIcon = frame:CreateFontString(nil, "BACKGROUND", "GameFontHighlight")
+  frame.RaceIcon:SetSize(15, 15)
+  frame.RaceIcon:SetPoint("TOPLEFT", 48, -2.5)
+end
+
+local function MakeCharacterEditor(parent)
+  local container = CreateFrame("Frame", nil, parent, "InsetFrameTemplate")
+
+  local scrollBar = CreateFrame("EventFrame", nil, container, "MinimalScrollBar")
+  scrollBar:SetPoint("TOPRIGHT", -10, -5)
+  scrollBar:SetPoint("BOTTOMRIGHT", -10, 5)
+  local scrollBox = CreateFrame("Frame", nil, container, "WowScrollBoxList")
+  scrollBox:SetPoint("TOPLEFT", 2, -2)
+  scrollBox:SetPoint("BOTTOMRIGHT", scrollBar, "BOTTOMLEFT", -3, 0)
+
+  local function UpdateList()
+    local allCharacters = {}
+    for _, character in ipairs(Syndicator.API.GetAllCharacters()) do
+      local info = Syndicator.API.GetCharacter(character)
+      table.insert(allCharacters, {
+        fullName = character,
+        className = info.details.className,
+        race = info.details.race,
+        sex = info.details.sex,
+        realm = info.details.realm,
+      })
+    end
+    table.sort(allCharacters, function(a, b)
+      if a.realm == b.realm then
+        return a.fullName < b.fullName
+      else
+        return a.realm < b.realm
+      end
+    end)
+    scrollBox:SetDataProvider(CreateDataProvider(allCharacters), true)
+  end
+
+  container:SetScript("OnShow", function()
+    UpdateList()
+  end)
+
+  Syndicator.CallbackRegistry:RegisterCallback("CharacterDeleted", function()
+    UpdateList()
+  end)
+
+  local view = CreateScrollBoxListLinearView()
+  view:SetElementExtent(20)
+  view:SetElementInitializer("Button", function(frame, elementData)
+    frame:SetPushedTextOffset(0, 0)
+    frame:SetHighlightAtlas("search-highlight")
+    frame:SetNormalFontObject(GameFontHighlight)
+    frame.fullName = elementData.fullName
+    if not frame.RaceIcon then
+      SetRaceIcon(frame)
+    end
+    if elementData.race then
+      frame.RaceIcon:SetText(Syndicator.Utilities.GetCharacterIcon(elementData.race, elementData.sex))
+    end
+    frame:SetText(frame.fullName)
+    frame:GetFontString():SetPoint("LEFT", 68, 0)
+    frame:GetFontString():SetPoint("RIGHT", -15, 0)
+    frame:GetFontString():SetJustifyH("LEFT")
+    if elementData.className then
+      local classColor = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[elementData.className]
+      frame:GetFontString():SetTextColor(classColor.r, classColor.g, classColor.b)
+    else
+      frame:GetFontString():SetTextColor(1, 1, 1)
+    end
+    frame.UpdateHideVisual = function()
+      if Syndicator.API.GetCharacter(frame.fullName).details.hidden then
+        frame.HideButton:GetNormalTexture():SetVertexColor(hiddenColor.r, hiddenColor.g, hiddenColor.b)
+      else
+        frame.HideButton:GetNormalTexture():SetVertexColor(shownColor.r, shownColor.g, shownColor.b)
+      end
+    end
+    if not frame.HideButton then
+      SetHideButton(frame)
+      SetDeleteButton(frame)
+    end
+    frame.DeleteButton:SetShown(frame.fullName ~= Syndicator.API.GetCurrentCharacter())
+    frame:UpdateHideVisual()
+  end)
+  ScrollUtil.InitScrollBoxListWithScrollBar(scrollBox, scrollBar, view)
+
+  return container
+end
+
 function Syndicator.Options.Initialize()
   local optionsFrame = CreateFrame("Frame")
   optionsFrame:Hide()
@@ -143,6 +280,10 @@ function Syndicator.Options.Initialize()
   optionsFrame.OnCommit = function() end
   optionsFrame.OnDefault = function() end
   optionsFrame.OnRefresh = function() end
+
+  local characterEditor = MakeCharacterEditor(optionsFrame)
+  characterEditor:SetPoint("TOPRIGHT", optionsFrame, -15, -60)
+  characterEditor:SetSize(320, 340)
 
   local category = Settings.RegisterCanvasLayoutCategory(optionsFrame, SYNDICATOR_L_SYNDICATOR)
   category.ID = SYNDICATOR_L_SYNDICATOR
