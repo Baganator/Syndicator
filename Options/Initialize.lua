@@ -69,7 +69,7 @@ local shownColor = CreateColor(0, 1, 0)
 local function SetHideButton(frame)
   frame.HideButton = CreateFrame("Button", nil, frame)
   frame.HideButton:SetNormalAtlas("socialqueuing-icon-eye")
-  frame.HideButton:SetPoint("TOPLEFT", 28, -2.5)
+  frame.HideButton:SetPoint("TOPLEFT", 8, -2.5)
   frame.HideButton:SetSize(15, 15)
   frame.HideButton:SetScript("OnClick", function()
     Syndicator.API.ToggleCharacterHidden(frame.fullName)
@@ -95,7 +95,7 @@ end
 local function SetDeleteButton(frame)
   frame.DeleteButton = CreateFrame("Button", nil, frame)
   frame.DeleteButton:SetNormalAtlas("transmog-icon-remove")
-  frame.DeleteButton:SetPoint("TOPLEFT", 8, -2.5)
+  frame.DeleteButton:SetPoint("TOPRIGHT", -5, -2.5)
   frame.DeleteButton:SetSize(15, 15)
   frame.DeleteButton:SetScript("OnClick", function()
     Syndicator.API.DeleteCharacter(frame.fullName)
@@ -115,7 +115,7 @@ end
 local function SetRaceIcon(frame)
   frame.RaceIcon = frame:CreateFontString(nil, "BACKGROUND", "GameFontHighlight")
   frame.RaceIcon:SetSize(15, 15)
-  frame.RaceIcon:SetPoint("TOPLEFT", 48, -2.5)
+  frame.RaceIcon:SetPoint("TOPLEFT", 35, -2.5)
 end
 
 local function MakeCharacterEditor(parent)
@@ -172,8 +172,8 @@ local function MakeCharacterEditor(parent)
       frame.RaceIcon:SetText(Syndicator.Utilities.GetCharacterIcon(elementData.race, elementData.sex))
     end
     frame:SetText(frame.fullName)
-    frame:GetFontString():SetPoint("LEFT", 68, 0)
-    frame:GetFontString():SetPoint("RIGHT", -15, 0)
+    frame:GetFontString():SetPoint("LEFT", 52, 0)
+    frame:GetFontString():SetPoint("RIGHT", -20, 0)
     frame:GetFontString():SetJustifyH("LEFT")
     if elementData.className then
       local classColor = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[elementData.className]
