@@ -89,7 +89,7 @@ local function CosmeticCheck(details)
     C_Item.RequestLoadItemDataByID(details.itemID)
     return nil
   end
-  details.isCosmetic = IsCosmeticItem(details.itemLink)
+  details.isCosmetic = C_Item.IsCosmeticItem(details.itemLink)
   return details.isCosmetic
 end
 
