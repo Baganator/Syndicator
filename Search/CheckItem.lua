@@ -463,6 +463,21 @@ local function IsTradeableLoot(details)
   return false
 end
 
+local function UniqueCheck(details)
+  GetTooltipInfoSpell(details)
+
+  if not details.tooltipInfoSpell then
+    return
+  end
+
+  for _, row in ipairs(details.tooltipInfoSpell.lines) do
+    if row.leftText == ITEM_UNIQUE then
+      return true
+    end
+  end
+  return false
+end
+
 local function UseATTInfo(details)
   if details.ATTInfoAcquired or not ATTC or not ATTC.SearchForField then -- All The Things
     return
@@ -540,6 +555,7 @@ AddKeyword(SYNDICATOR_L_KEYWORD_CURRENCY, CurrencyCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_OBJECTIVE, QuestObjectiveCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_COLLECTED, CollectedCheck)
 AddKeyword(SYNDICATOR_L_KEYWORD_UNCOLLECTED, UncollectedCheck)
+AddKeyword(ITEM_UNIQUE:lower(), UniqueCheck)
 
 if Syndicator.Constants.IsRetail then
   AddKeyword(SYNDICATOR_L_KEYWORD_COSMETIC, CosmeticCheck)
