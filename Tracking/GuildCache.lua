@@ -67,6 +67,7 @@ function SyndicatorGuildCacheMixin:OnLoad()
   })
 
   self.currentGuild = GetGuildKey()
+  Syndicator.CallbackRegistry:TriggerEvent("GuildNameSet", self.currentGuild)
   self.lastTabPickups = {}
 
   local function UpdateForPickup(tabIndex, slotID)
