@@ -153,3 +153,7 @@ end
 function Syndicator.API.IsGuildEventPending()
   return not Syndicator.GuildCache or Syndicator.GuildCache.isUpdatePending
 end
+
+function Syndicator.API.GetSearchKeywords()
+  return CopyTable(Syndicator.Search.GetKeywords())
+end

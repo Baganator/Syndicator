@@ -506,8 +506,9 @@ local function QuestObjectiveCheck(details)
 end
 
 local KEYWORDS_TO_CHECK = {}
+local KEYWORD_AND_CATEGORY = {}
 
-local function AddKeyword(keyword, check)
+local function AddKeyword(keyword, check, group)
   local old = KEYWORDS_TO_CHECK[keyword]
   if old then
     KEYWORDS_TO_CHECK[keyword] = function(...) return old(...) or check(...) end
@@ -515,51 +516,53 @@ local function AddKeyword(keyword, check)
     KEYWORDS_TO_CHECK[keyword] = check
   end
   KEYWORDS_TO_CHECK["_" .. keyword .. "_"] = KEYWORDS_TO_CHECK[keyword]
+
+  table.insert(KEYWORD_AND_CATEGORY, {keyword = keyword, group = group or ""})
 end
 
-AddKeyword(SYNDICATOR_L_KEYWORD_PET, PetCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_BATTLE_PET, PetCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_SOULBOUND, SoulboundCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_BOP, SoulboundCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_BOE, BindOnEquipCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_BOU, BindOnUseCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_EQUIPMENT, EquipmentCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_GEAR, EquipmentCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_AXE, AxeCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_MACE, MaceCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_SWORD, SwordCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_STAFF, StaffCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_REAGENT, ReagentCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_FOOD, FoodCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_DRINK, FoodCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_POTION, PotionCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_SET, SetCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_EQUIPMENT_SET, SetCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_ENGRAVABLE, EngravableCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_ENGRAVED, EngravedCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_SOCKET, SocketCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_JUNK, JunkCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_TRASH, JunkCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_BOA, BindOnAccountCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_ACCOUNT_BOUND, BindOnAccountCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_USE, UseCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_USABLE, UsableCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_OPEN, OpenCheck)
-AddKeyword(MOUNT:lower(), MountCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_TRADEABLE_LOOT, IsTradeableLoot)
-AddKeyword(SYNDICATOR_L_KEYWORD_TRADABLE_LOOT, IsTradeableLoot)
-AddKeyword(SYNDICATOR_L_KEYWORD_RELIC, RelicCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_STACKS, StackableCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_SOCKETED, SocketedCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_CURRENCY, CurrencyCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_OBJECTIVE, QuestObjectiveCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_COLLECTED, CollectedCheck)
-AddKeyword(SYNDICATOR_L_KEYWORD_UNCOLLECTED, UncollectedCheck)
-AddKeyword(ITEM_UNIQUE:lower(), UniqueCheck)
+AddKeyword(SYNDICATOR_L_KEYWORD_PET, PetCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
+AddKeyword(SYNDICATOR_L_KEYWORD_BATTLE_PET, PetCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
+AddKeyword(SYNDICATOR_L_KEYWORD_SOULBOUND, SoulboundCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeyword(SYNDICATOR_L_KEYWORD_BOP, SoulboundCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeyword(SYNDICATOR_L_KEYWORD_BOE, BindOnEquipCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeyword(SYNDICATOR_L_KEYWORD_BOU, BindOnUseCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeyword(SYNDICATOR_L_KEYWORD_EQUIPMENT, EquipmentCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
+AddKeyword(SYNDICATOR_L_KEYWORD_GEAR, EquipmentCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
+AddKeyword(SYNDICATOR_L_KEYWORD_AXE, AxeCheck, SYNDICATOR_L_GROUP_WEAPON_TYPE)
+AddKeyword(SYNDICATOR_L_KEYWORD_MACE, MaceCheck, SYNDICATOR_L_GROUP_WEAPON_TYPE)
+AddKeyword(SYNDICATOR_L_KEYWORD_SWORD, SwordCheck, SYNDICATOR_L_GROUP_WEAPON_TYPE)
+AddKeyword(SYNDICATOR_L_KEYWORD_STAFF, StaffCheck, SYNDICATOR_L_GROUP_WEAPON_TYPE)
+AddKeyword(SYNDICATOR_L_KEYWORD_REAGENT, ReagentCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
+AddKeyword(SYNDICATOR_L_KEYWORD_FOOD, FoodCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
+AddKeyword(SYNDICATOR_L_KEYWORD_DRINK, FoodCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
+AddKeyword(SYNDICATOR_L_KEYWORD_POTION, PotionCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
+AddKeyword(SYNDICATOR_L_KEYWORD_SET, SetCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeyword(SYNDICATOR_L_KEYWORD_EQUIPMENT_SET, SetCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeyword(SYNDICATOR_L_KEYWORD_ENGRAVABLE, EngravableCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeyword(SYNDICATOR_L_KEYWORD_ENGRAVED, EngravedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeyword(SYNDICATOR_L_KEYWORD_SOCKET, SocketCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeyword(SYNDICATOR_L_KEYWORD_JUNK, JunkCheck, SYNDICATOR_L_GROUP_QUALITY)
+AddKeyword(SYNDICATOR_L_KEYWORD_TRASH, JunkCheck, SYNDICATOR_L_GROUP_QUALITY)
+AddKeyword(SYNDICATOR_L_KEYWORD_BOA, BindOnAccountCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeyword(SYNDICATOR_L_KEYWORD_ACCOUNT_BOUND, BindOnAccountCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeyword(SYNDICATOR_L_KEYWORD_USE, UseCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeyword(SYNDICATOR_L_KEYWORD_USABLE, UsableCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeyword(SYNDICATOR_L_KEYWORD_OPEN, OpenCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeyword(MOUNT:lower(), MountCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
+AddKeyword(SYNDICATOR_L_KEYWORD_TRADEABLE_LOOT, IsTradeableLoot, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeyword(SYNDICATOR_L_KEYWORD_TRADABLE_LOOT, IsTradeableLoot, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeyword(SYNDICATOR_L_KEYWORD_RELIC, RelicCheck, SYNDICATOR_L_GROUP_ARMOR_TYPE)
+AddKeyword(SYNDICATOR_L_KEYWORD_STACKS, StackableCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeyword(SYNDICATOR_L_KEYWORD_SOCKETED, SocketedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeyword(SYNDICATOR_L_KEYWORD_CURRENCY, CurrencyCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeyword(SYNDICATOR_L_KEYWORD_OBJECTIVE, QuestObjectiveCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeyword(SYNDICATOR_L_KEYWORD_COLLECTED, CollectedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeyword(SYNDICATOR_L_KEYWORD_UNCOLLECTED, UncollectedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeyword(ITEM_UNIQUE:lower(), UniqueCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 
 if Syndicator.Constants.IsRetail then
-  AddKeyword(SYNDICATOR_L_KEYWORD_COSMETIC, CosmeticCheck)
-  AddKeyword(TOY:lower(), ToyCheck)
+  AddKeyword(SYNDICATOR_L_KEYWORD_COSMETIC, CosmeticCheck, SYNDICATOR_L_GROUP_QUALITY)
+  AddKeyword(TOY:lower(), ToyCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
 end
 
 local function PetCollectedCheck(details)
@@ -603,7 +606,7 @@ for _, key in ipairs(sockets) do
         return details.itemStats[key] ~= nil
       end
       return nil
-    end)
+    end, SYNDICATOR_L_GROUP_SOCKET)
   end
 end
 
@@ -650,7 +653,7 @@ end
 for _, slot in ipairs(inventorySlots) do
   local text = _G[slot]
   if text ~= nil then
-    AddKeyword(text:lower(),  function(details) GetInvType(details) return details.invType == slot end)
+    AddKeyword(text:lower(),  function(details) GetInvType(details) return details.invType == slot end, SYNDICATOR_L_GROUP_SLOT)
   end
 end
 
@@ -658,7 +661,7 @@ do
   AddKeyword(SYNDICATOR_L_KEYWORD_OFF_HAND, function(details)
     GetInvType(details)
     return details.invType == "INVTYPE_HOLDABLE" or details.invType == "INVTYPE_SHIELD"
-  end)
+  end, SYNDICATOR_L_GROUP_SLOT)
 end
 
 local moreSlotMappings = {
@@ -671,13 +674,13 @@ local moreSlotMappings = {
 }
 
 for keyword, slot in pairs(moreSlotMappings) do
-  AddKeyword(keyword, function(details) GetInvType(details) return details.invType == slot end)
+  AddKeyword(keyword, function(details) GetInvType(details) return details.invType == slot end, SYNDICATOR_L_GROUP_SLOT)
 end
 
 if Syndicator.Constants.IsRetail then
   AddKeyword(SYNDICATOR_L_KEYWORD_AZERITE, function(details)
     return C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItemByID(details.itemID)
-  end)
+  end, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 end
 
 local TextToExpansion = {
@@ -705,7 +708,7 @@ local TextToExpansion = {
 for key, quality in pairs(Enum.ItemQuality) do
   local term = _G["ITEM_QUALITY" .. quality .. "_DESC"]
   if term then
-    AddKeyword(term:lower(), function(details) return details.quality == quality end)
+    AddKeyword(term:lower(), function(details) return details.quality == quality end, SYNDICATOR_L_GROUP_QUALITY)
   end
 end
 
@@ -724,7 +727,7 @@ for key, expansionID in pairs(TextToExpansion) do
   AddKeyword(key, function(details)
     details.expacID = details.expacID or Syndicator.Search.GetExpansion(details)
     return details.expacID and details.expacID == expansionID
-  end)
+  end, SYNDICATOR_L_GROUP_EXPANSION)
 end
 
 local BAG_TYPES = {
@@ -748,7 +751,7 @@ for keyword, bagBit in pairs(BAG_TYPES) do
     else
       return bit.band(bagFamily, itemFamily) ~= 0
     end
-  end)
+  end, SYNDICATOR_L_GROUP_BAG_TYPE)
 end
 
 local function GetGearStatCheck(statKey)
@@ -844,11 +847,11 @@ local stats = {
 for _, s in ipairs(stats) do
   local keyword = _G["ITEM_MOD_" .. s .. "_SHORT"] or _G["ITEM_MOD_" .. s]
   if keyword ~= nil then
-    AddKeyword(keyword:lower(), GetGearStatCheck(s))
-    AddKeyword(keyword:lower(), GetGemStatCheck(keyword))
+    AddKeyword(keyword:lower(), GetGearStatCheck(s), SYNDICATOR_L_GROUP_STAT)
+    AddKeyword(keyword:lower(), GetGemStatCheck(keyword), SYNDICATOR_L_GROUP_STAT)
   end
 end
-AddKeyword(STAT_ARMOR:lower(), GetGemStatCheck(STAT_ARMOR))
+AddKeyword(STAT_ARMOR:lower(), GetGemStatCheck(STAT_ARMOR), SYNDICATOR_L_GROUP_STAT)
 
 -- Sorted in initialize function later
 local sortedKeywords = {}
@@ -1306,7 +1309,7 @@ function Syndicator.Search.InitializeSearchEngine()
       local classID = i
       AddKeyword(name:lower(), function(details)
         return details.classID == classID
-      end)
+      end, SYNDICATOR_L_GROUP_ITEM_TYPE)
     end
   end
 
@@ -1324,7 +1327,7 @@ function Syndicator.Search.InitializeSearchEngine()
     if keyword ~= nil then
       AddKeyword(keyword:lower(), function(details)
         return details.classID == 7 and details.subClassID == subClass
-      end)
+      end, SYNDICATOR_L_GROUP_TRADE_GOODS)
     end
   end
 
@@ -1345,7 +1348,7 @@ function Syndicator.Search.InitializeSearchEngine()
     if keyword ~= nil then
       AddKeyword(keyword:lower(), function(details)
         return details.classID == Enum.ItemClass.Armor and details.subClassID == subClass
-      end)
+      end, SYNDICATOR_L_GROUP_ARMOR_TYPE)
     end
   end
 
@@ -1355,7 +1358,7 @@ function Syndicator.Search.InitializeSearchEngine()
     if keyword ~= nil then
       AddKeyword(keyword:lower(), function(details)
         return details.classID == Enum.ItemClass.Weapon and details.subClassID == subClass
-      end)
+      end, SYNDICATOR_L_GROUP_WEAPON_TYPE)
     end
   end
 
@@ -1365,7 +1368,7 @@ function Syndicator.Search.InitializeSearchEngine()
       if keyword ~= nil then
         AddKeyword(keyword:lower(), function(details)
           return details.classID == Enum.ItemClass.Battlepet and details.subClassID == subClass
-        end)
+        end, SYNDICATOR_L_GROUP_BATTLE_PET)
       end
     end
   end
@@ -1375,7 +1378,7 @@ function Syndicator.Search.InitializeSearchEngine()
     if keyword ~= nil then
       AddKeyword(keyword:lower(), function(details)
         return details.classID == Enum.ItemClass.Glyph and details.subClassID == subClass
-      end)
+      end, SYNDICATOR_L_GROUP_GLYPH)
     end
   end
 
@@ -1387,4 +1390,8 @@ function Syndicator.Search.RebuildKeywordList()
     table.insert(sortedKeywords, key)
   end
   table.sort(sortedKeywords)
+end
+
+function Syndicator.Search.GetKeywords()
+  return KEYWORD_AND_CATEGORY
 end
