@@ -1027,6 +1027,11 @@ local function ExpansionMaxPatternCheck(details, text)
   end
 end
 
+local function ExactKeywordCheck(details, text)
+  local keyword = text:match("^#(.*)$")
+  return KEYWORDS_TO_CHECK[keyword] ~= nil and KEYWORDS_TO_CHECK[keyword](details)
+end
+
 local patterns = {
   ["^%d+$"] = ItemLevelPatternCheck,
   ["^=%d+$"] = ExactItemLevelPatternCheck,
@@ -1036,6 +1041,7 @@ local patterns = {
   ["^%d+%.%d*%.?%d*$"] = ExpansionPatternCheck,
   ["^%>%d+%.%d*%.?%d*$"] = ExpansionMinPatternCheck,
   ["^%<%d+%.%d*%.?%d*$"] = ExpansionMaxPatternCheck,
+  ["^%#.*$"] = ExactKeywordCheck,
 }
 
 -- Used to prevent equipment and use returning results based on partial words in
