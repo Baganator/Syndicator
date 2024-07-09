@@ -732,14 +732,10 @@ end
 
 local BAG_TYPES = {
   [SYNDICATOR_L_KEYWORD_SOUL] = 12,
-  [SYNDICATOR_L_KEYWORD_ENCHANTING] = 7,
   [SYNDICATOR_L_KEYWORD_ENGINEERING] = 8,
   [SYNDICATOR_L_KEYWORD_KEYRING] = 9,
   [SYNDICATOR_L_KEYWORD_MINING] = 11,
-  [SYNDICATOR_L_KEYWORD_INSCRIPTION] = 5,
   [SYNDICATOR_L_KEYWORD_FISHING] = 16,
-  [SYNDICATOR_L_KEYWORD_COOKING] = 17,
-  [SYNDICATOR_L_KEYWORD_JEWELCRAFTING] = 25,
 }
 
 for keyword, bagBit in pairs(BAG_TYPES) do
@@ -1315,12 +1311,16 @@ function Syndicator.Search.InitializeSearchEngine()
 
   local tradeGoodsToCheck = {
     1, -- parts
+    4, -- jewelcrafting
     5, -- cloth
     6, -- leather
     7, -- metal and stone
     8, -- cooking
     9, -- herb
     10, -- elemental
+    12, -- enchanting
+    16, -- inscription
+    18, -- optional reagents
   }
   for _, subClass in ipairs(tradeGoodsToCheck) do
     local keyword = C_Item.GetItemSubClassInfo(7, subClass)
