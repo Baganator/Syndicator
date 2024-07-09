@@ -1362,6 +1362,16 @@ function Syndicator.Search.InitializeSearchEngine()
     end
   end
 
+  -- All weapons + fishingpole
+  for subClass = 1, 11 do
+    local keyword = C_Item.GetItemSubClassInfo(Enum.ItemClass.Recipe, subClass)
+    if keyword ~= nil then
+      AddKeyword(keyword:lower(), function(details)
+        return details.classID == Enum.ItemClass.Recipe and details.subClassID == subClass
+      end, SYNDICATOR_L_GROUP_RECIPE_PROFESSION)
+    end
+  end
+
   if C_PetJournal then
     for subClass = 0, 9 do
       local keyword = C_Item.GetItemSubClassInfo(Enum.ItemClass.Battlepet, subClass)

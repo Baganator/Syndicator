@@ -116,6 +116,7 @@ L["GROUP_SOCKET"] = "Socket"
 L["GROUP_STAT"] = "Stat"
 L["GROUP_TRADE_GOODS"] = "Trade Goods"
 L["GROUP_WEAPON_TYPE"] = "Weapon Type"
+L["GROUP_RECIPE_PROFESSION"] = "Recipe Profession"
 
 L["SEARCHED_EVERYWHERE_COLON"] = "Searched Everywhere:"
 L["CANNOT_SEARCH_BY_ITEM_LINK"] = "Cannot search by item link"
