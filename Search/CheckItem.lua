@@ -1368,7 +1368,7 @@ function Syndicator.Search.InitializeSearchEngine()
     if keyword ~= nil then
       AddKeyword(keyword:lower(), function(details)
         return details.classID == Enum.ItemClass.Recipe and details.subClassID == subClass
-      end, SYNDICATOR_L_GROUP_RECIPE_PROFESSION)
+      end, SYNDICATOR_L_GROUP_RECIPE)
     end
   end
 
