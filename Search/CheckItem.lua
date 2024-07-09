@@ -1217,17 +1217,11 @@ local function ApplyKeyword(searchString)
   return MatchesText
 end
 
-local function ApplyCombinedTerms(fullSearchString)
-  if fullSearchString:match("[|]") then
-    local checks = {}
-    local checkPart = {}
-    for part in fullSearchString:gmatch("[^|]+") do
-      table.insert(checks, ApplyCombinedTerms(part))
-      table.insert(checkPart, part)
-    end
+local function BlendOperations(checks, checkPart, operator)
+  if operator == "|" and #checks > 1 then
     return function(details)
+      local finalDoNotCache = false
       for index, check in ipairs(checks) do
-        local finalDoNotCache = false
         local result, doNotCache = check(details, checkPart[index])
         finalDoNotCache = doNotCache or finalDoNotCache
         if result then
@@ -1238,16 +1232,10 @@ local function ApplyCombinedTerms(fullSearchString)
       end
       return false, finalDoNotCache
     end
-  elseif fullSearchString:match("[&]") then
-    local checks = {}
-    local checkPart = {}
-    for part in fullSearchString:gmatch("[^&]+") do
-      table.insert(checks, ApplyCombinedTerms(part))
-      table.insert(checkPart, part)
-    end
+  elseif operator == "&" and #checks > 1 then
     return function(details)
+      local finalDoNotCache = false
       for index, check in ipairs(checks) do
-        local finalDoNotCache = false
         local result, doNotCache = check(details, checkPart[index])
         finalDoNotCache = doNotCache or finalDoNotCache
         if result == false then
@@ -1256,20 +1244,127 @@ local function ApplyCombinedTerms(fullSearchString)
           return nil, finalDoNotCache
         end
       end
-      return true
+      return true, finalDoNotCache
     end
-  elseif fullSearchString:match("^[~!]") then
-    local newSearchString = fullSearchString:sub(2, #fullSearchString)
-    local nested = ApplyCombinedTerms(newSearchString)
+  elseif operator == "~" and #checks > 0 then
     return function(details)
-      local result, doNotCache = nested(details, newSearchString)
+      local result, doNotCache = checks[1](details, checkPart[1])
       if result ~= nil then
         return not result, doNotCache
+      else
+        return nil
       end
-      return nil
+    end
+  elseif #checks == 1 then
+    return function(details)
+      return checks[1](details, checkPart[1])
     end
   else
-    return ApplyKeyword(fullSearchString)
+    return function() return true end
+  end
+end
+
+local levelToOp = {
+  [0] = "|",
+  [1] = "&",
+  [2] = "~",
+}
+
+local function ApplyTokens(tokens, startIndex)
+  local checks = {}
+  local level = 0
+  local checkLevel = {}
+  local checkPart = {}
+  -- Get the items part of the current group caused by an & or ~
+  local function ScanBack(newLevel)
+    while level > newLevel do
+      local oldLevel = level
+      level = level - 1
+      local scanIndex = #checks
+      while scanIndex > 0 and checkLevel[scanIndex] > level do
+        scanIndex = scanIndex - 1
+      end
+      local checksTmp = {}
+      local checkPartTmp = {}
+      for i = #checks, scanIndex + 1, -1 do
+        local c = checks[i]
+        local cPart = checkPart[i]
+        checks[i] = nil
+        checkLevel[i] = nil
+        checkPart[i] = nil
+        table.insert(checksTmp, c)
+        checkPartTmp[#checksTmp] = cPart
+      end
+      table.insert(checks, BlendOperations(checksTmp, checkPartTmp, levelToOp[oldLevel]))
+      table.insert(checkLevel, level)
+    end
+    level = newLevel
+  end
+  local index = startIndex
+  while index < #tokens do
+    index = index + 1
+    local t = tokens[index]
+    if t == "~" then
+      level = 2
+    elseif t == "&" then
+      ScanBack(1)
+      checkLevel[#checkLevel] = level
+    elseif t == "|" then
+      ScanBack(0)
+    elseif t == "(" then
+      local newCheck, endIndex = ApplyTokens(tokens, index)
+      table.insert(checks, newCheck)
+      table.insert(checkLevel, level)
+      index = endIndex
+    elseif t == ")" then
+      break
+    else
+      table.insert(checks, ApplyKeyword(t))
+      checkPart[#checks] = t
+      table.insert(checkLevel, level)
+    end
+  end
+
+  ScanBack(0)
+
+  return BlendOperations(checks, checkPart, levelToOp[level]), index
+end
+
+local function ProcessTerms(text)
+  local index = text:find("[~&|()]")
+  if index == nil then
+    return ApplyKeyword(text)
+  else
+    local tokens = {}
+
+    local index = 1
+    text = text:gsub("||", "|")
+    while index < #text do
+      local opIndex = text:find("[~&|()]", index)
+      if opIndex then
+        local lead = text:sub(index, opIndex - 1)
+        local op = text:sub(opIndex, opIndex)
+        if lead ~= "" then
+          table.insert(tokens, lead)
+        end
+        table.insert(tokens, op)
+        index = opIndex + 1
+      else
+        break
+      end
+    end
+    local tail = text:sub(index, #text)
+    if tail ~= "" then
+      table.insert(tokens, tail)
+    end
+
+    local result = ApplyTokens(tokens, 0)
+
+    if not result then
+      return function() return true end
+    else
+      return result
+    end
   end
 end
 
@@ -1282,7 +1377,7 @@ function Syndicator.Search.CheckItem(details, searchString)
 
   local check = matches[searchString]
   if not check then
-    check = ApplyCombinedTerms(searchString)
+    check = ProcessTerms(searchString)
     matches[searchString] = check
   end
 
