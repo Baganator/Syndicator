@@ -509,6 +509,7 @@ local KEYWORDS_TO_CHECK = {}
 local KEYWORD_AND_CATEGORY = {}
 
 local function AddKeyword(keyword, check, group)
+  keyword = keyword:gsub("[()&|~!]", " "):gsub("%s+", " ")
   local old = KEYWORDS_TO_CHECK[keyword]
   if old then
     KEYWORDS_TO_CHECK[keyword] = function(...) return old(...) or check(...) end
