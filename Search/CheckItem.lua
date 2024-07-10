@@ -731,25 +731,26 @@ for key, expansionID in pairs(TextToExpansion) do
   end, SYNDICATOR_L_GROUP_EXPANSION)
 end
 
-local BAG_TYPES = {
-  [SYNDICATOR_L_KEYWORD_SOUL] = 12,
-  [SYNDICATOR_L_KEYWORD_ENGINEERING] = 8,
-  [SYNDICATOR_L_KEYWORD_KEYRING] = 9,
-  [SYNDICATOR_L_KEYWORD_MINING] = 11,
-  [SYNDICATOR_L_KEYWORD_FISHING] = 16,
-}
+local keyringBagFamily = bit.lshift(1, 9 - 1)
+AddKeyword(SYNDICATOR_L_KEYWORD_KEY, function(details)
+  local itemFamily = C_Item.GetItemFamily(details.itemID)
+  if itemFamily == nil then
+    return
+  else
+    return bit.band(keyringBagFamily, itemFamily) ~= 0
+  end
+end, SYNDICATOR_L_GROUP_ITEM_TYPE)
 
-for keyword, bagBit in pairs(BAG_TYPES) do
-  local bagFamily = bit.lshift(1, bagBit - 1)
-  AddKeyword(keyword, function(details)
-    local itemFamily = C_Item.GetItemFamily(details.itemID)
-    if itemFamily == nil then
-      return
-    else
-      return bit.band(bagFamily, itemFamily) ~= 0
-    end
-  end, SYNDICATOR_L_GROUP_BAG_TYPE)
-end
+local fishingBagFamily = bit.lshift(1, 16 - 1)
+AddKeyword(SYNDICATOR_L_KEYWORD_FISH, function(details)
+  GetClassSubClass(details)
+  local itemFamily = C_Item.GetItemFamily(details.itemID)
+  if itemFamily == nil then
+    return
+  else
+    return bit.band(fishingBagFamily, itemFamily) ~= 0 and details.classID == 7 and details.subClassID == 8
+  end
+end, SYNDICATOR_L_GROUP_TRADE_GOODS)
 
 local function GetGearStatCheck(statKey)
   return function(details)
