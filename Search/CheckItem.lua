@@ -1251,7 +1251,7 @@ local function BlendOperations(checks, checkPart, operator)
       end
       return true, finalDoNotCache
     end
-  elseif operator == "~" and #checks > 0 then
+  elseif operator == "~" or operator == "!" and #checks > 0 then
     return function(details)
       local result, doNotCache = checks[1](details, checkPart[1])
       if result ~= nil then
@@ -1309,7 +1309,7 @@ local function ApplyTokens(tokens, startIndex)
   while index < #tokens do
     index = index + 1
     local t = tokens[index]
-    if t == "~" then
+    if t == "~" or t == "!" then
       level = 2
     elseif t == "&" then
       ScanBack(1)
@@ -1336,7 +1336,7 @@ local function ApplyTokens(tokens, startIndex)
 end
 
 local function ProcessTerms(text)
-  local index = text:find("[~&|()]")
+  local index = text:find("[~&|()!]")
   if index == nil then
     return ApplyKeyword(text)
   else
@@ -1345,7 +1345,7 @@ local function ProcessTerms(text)
     local index = 1
     text = text:gsub("||", "|")
     while index < #text do
-      local opIndex = text:find("[~&|()]", index)
+      local opIndex = text:find("[~&|()!]", index)
       if opIndex then
         local lead = text:sub(index, opIndex - 1)
         local op = text:sub(opIndex, opIndex)
