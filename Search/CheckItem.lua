@@ -564,7 +564,7 @@ AddKeyword(ITEM_UNIQUE:lower(), UniqueCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 if Syndicator.Constants.IsRetail then
   AddKeyword(SYNDICATOR_L_KEYWORD_COSMETIC, CosmeticCheck, SYNDICATOR_L_GROUP_QUALITY)
   AddKeyword(TOY:lower(), ToyCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
-  if select(4, GetBuildInfo()) >= 110000 then
+  if Syndicator.Constants.WarbandBankActive then
     AddKeyword(ITEM_ACCOUNTBOUND:lower(), BindOnAccountCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
   end
 end
