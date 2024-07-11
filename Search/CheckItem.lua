@@ -1251,7 +1251,7 @@ local function BlendOperations(checks, checkPart, operator)
       end
       return true, finalDoNotCache
     end
-  elseif operator == "~" or operator == "!" and #checks > 0 then
+  elseif (operator == "~" or operator == "!") and #checks > 0 then
     return function(details)
       local result, doNotCache = checks[1](details, checkPart[1])
       if result ~= nil then
