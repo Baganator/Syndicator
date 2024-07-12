@@ -87,6 +87,7 @@ local AccountBoundTooltipLines = {
   ITEM_BNETACCOUNTBOUND,
   ITEM_BIND_TO_ACCOUNT,
   ITEM_ACCOUNTBOUND,
+  ITEM_ACCOUNTBOUND_UNTIL_EQUIP,
 }
 Syndicator.Constants.AccountBoundTooltipLines = {}
 -- Done this way because not all the lines exist on all clients
