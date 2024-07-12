@@ -693,6 +693,7 @@ local TextToExpansion = {
   ["bc"] = 1,
   ["burning crusade"] = 1,
   ["tbc"] = 1,
+  ["the burning crusade"] = 1,
   ["wrath"] = 2,
   ["wotlk"] = 2,
   ["cataclysm"] = 3,
@@ -707,6 +708,9 @@ local TextToExpansion = {
   ["shadowlands"] = 8,
   ["df"] = 9,
   ["dragonflight"] = 9,
+  ["tww"] = 10,
+  ["war within"] = 10,
+  ["the war within"] = 10,
 }
 
 for key, quality in pairs(Enum.ItemQuality) do
