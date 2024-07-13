@@ -509,7 +509,7 @@ local KEYWORDS_TO_CHECK = {}
 local KEYWORD_AND_CATEGORY = {}
 
 function Syndicator.Search.CleanKeyword(keyword)
-  return keyword:gsub("[()&|~!]", " "):gsub("%s+", " ")
+  return keyword:gsub("[()&|~!]", " "):gsub("%s+", " "):gsub(" $", "")
 end
 local function AddKeyword(keyword, check, group)
   keyword = Syndicator.Search.CleanKeyword(keyword)
@@ -1429,6 +1429,12 @@ function Syndicator.Search.InitializeSearchEngine()
     16, -- inscription
     18, -- optional reagents
   }
+  if Syndicator.Constants.IsClassic then
+    tAppendAll(tradeGoodsToCheck, {
+      2, -- explosive
+      3, -- device
+    })
+  end
   for _, subClass in ipairs(tradeGoodsToCheck) do
     local keyword = C_Item.GetItemSubClassInfo(7, subClass)
     if keyword ~= nil then
@@ -1496,6 +1502,15 @@ function Syndicator.Search.InitializeSearchEngine()
       AddKeyword(keyword:lower(), function(details)
         return details.classID == Enum.ItemClass.Glyph and details.subClassID == subClass
       end, SYNDICATOR_L_GROUP_GLYPH)
+    end
+  end
+
+  for subClass = 0, 9 do
+    local keyword = C_Item.GetItemSubClassInfo(Enum.ItemClass.Consumable, subClass)
+    if keyword ~= nil then
+      AddKeyword(keyword:lower(), function(details)
+        return details.classID == Enum.ItemClass.Consumable and details.subClassID == subClass
+      end, SYNDICATOR_L_GROUP_CONSUMABLE)
     end
   end
 
