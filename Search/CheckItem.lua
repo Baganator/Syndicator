@@ -508,8 +508,11 @@ end
 local KEYWORDS_TO_CHECK = {}
 local KEYWORD_AND_CATEGORY = {}
 
+function Syndicator.Search.CleanKeyword(keyword)
+  return keyword:gsub("[()&|~!]", " "):gsub("%s+", " ")
+end
 local function AddKeyword(keyword, check, group)
-  keyword = keyword:gsub("[()&|~!]", " "):gsub("%s+", " ")
+  keyword = Syndicator.Search.CleanKeyword(keyword)
   local old = KEYWORDS_TO_CHECK[keyword]
   if old then
     KEYWORDS_TO_CHECK[keyword] = function(...) return old(...) or check(...) end
