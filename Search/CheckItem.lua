@@ -1411,6 +1411,7 @@ function Syndicator.Search.InitializeSearchEngine()
     if name then
       local classID = i
       AddKeyword(name:lower(), function(details)
+        GetClassSubClass(details)
         return details.classID == classID
       end, SYNDICATOR_L_GROUP_ITEM_TYPE)
     end
@@ -1439,6 +1440,7 @@ function Syndicator.Search.InitializeSearchEngine()
     local keyword = C_Item.GetItemSubClassInfo(7, subClass)
     if keyword ~= nil then
       AddKeyword(keyword:lower(), function(details)
+        GetClassSubClass(details)
         return details.classID == 7 and details.subClassID == subClass
       end, SYNDICATOR_L_GROUP_TRADE_GOODS)
     end
@@ -1460,6 +1462,7 @@ function Syndicator.Search.InitializeSearchEngine()
     local keyword = C_Item.GetItemSubClassInfo(Enum.ItemClass.Armor, subClass)
     if keyword ~= nil then
       AddKeyword(keyword:lower(), function(details)
+        GetClassSubClass(details)
         return details.classID == Enum.ItemClass.Armor and details.subClassID == subClass
       end, SYNDICATOR_L_GROUP_ARMOR_TYPE)
     end
@@ -1470,6 +1473,7 @@ function Syndicator.Search.InitializeSearchEngine()
     local keyword = C_Item.GetItemSubClassInfo(Enum.ItemClass.Weapon, subClass)
     if keyword ~= nil then
       AddKeyword(keyword:lower(), function(details)
+        GetClassSubClass(details)
         return details.classID == Enum.ItemClass.Weapon and details.subClassID == subClass
       end, SYNDICATOR_L_GROUP_WEAPON_TYPE)
     end
@@ -1480,6 +1484,7 @@ function Syndicator.Search.InitializeSearchEngine()
     local keyword = C_Item.GetItemSubClassInfo(Enum.ItemClass.Recipe, subClass)
     if keyword ~= nil then
       AddKeyword(keyword:lower(), function(details)
+        GetClassSubClass(details)
         return details.classID == Enum.ItemClass.Recipe and details.subClassID == subClass
       end, SYNDICATOR_L_GROUP_RECIPE)
     end
@@ -1490,6 +1495,7 @@ function Syndicator.Search.InitializeSearchEngine()
       local keyword = C_Item.GetItemSubClassInfo(Enum.ItemClass.Battlepet, subClass)
       if keyword ~= nil then
         AddKeyword(keyword:lower(), function(details)
+        GetClassSubClass(details)
           return details.classID == Enum.ItemClass.Battlepet and details.subClassID == subClass
         end, SYNDICATOR_L_GROUP_BATTLE_PET)
       end
@@ -1500,6 +1506,7 @@ function Syndicator.Search.InitializeSearchEngine()
     local keyword = C_Item.GetItemSubClassInfo(Enum.ItemClass.Glyph, subClass)
     if keyword ~= nil then
       AddKeyword(keyword:lower(), function(details)
+        GetClassSubClass(details)
         return details.classID == Enum.ItemClass.Glyph and details.subClassID == subClass
       end, SYNDICATOR_L_GROUP_GLYPH)
     end
@@ -1509,6 +1516,7 @@ function Syndicator.Search.InitializeSearchEngine()
     local keyword = C_Item.GetItemSubClassInfo(Enum.ItemClass.Consumable, subClass)
     if keyword ~= nil then
       AddKeyword(keyword:lower(), function(details)
+        GetClassSubClass(details)
         return details.classID == Enum.ItemClass.Consumable and details.subClassID == subClass
       end, SYNDICATOR_L_GROUP_CONSUMABLE)
     end
