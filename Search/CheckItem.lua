@@ -520,6 +520,7 @@ local function AddKeyword(keyword, check, group)
     KEYWORDS_TO_CHECK[keyword] = check
   end
   KEYWORDS_TO_CHECK["_" .. keyword .. "_"] = KEYWORDS_TO_CHECK[keyword]
+  KEYWORDS_TO_CHECK[keyword:gsub(" ", "-")] = KEYWORDS_TO_CHECK[keyword]
 
   table.insert(KEYWORD_AND_CATEGORY, {keyword = keyword, group = group or ""})
 end
