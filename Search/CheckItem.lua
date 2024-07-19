@@ -1343,6 +1343,7 @@ local function ApplyTokens(tokens, startIndex)
 end
 
 local function ProcessTerms(text)
+  text = text:gsub("^%s*(.-)%s*$", "%1") -- remove surrounding whitespace
   local index = text:find("[~&|()!]")
   if index == nil then
     return ApplyKeyword(text)
@@ -1352,15 +1353,15 @@ local function ProcessTerms(text)
     local index = 1
     text = text:gsub("||", "|")
     while index < #text do
-      local opIndex = text:find("[~&|()!]", index)
-      if opIndex then
-        local lead = text:sub(index, opIndex - 1)
-        local op = text:sub(opIndex, opIndex)
+      -- Find operators and any surrounding whitespace
+      local opIndexStart, opIndexEnd, op = text:find("%s*([%~%&%|%(%)%!])%s*", index)
+      if op then
+        local lead = text:sub(index, opIndexStart - 1)
         if lead ~= "" then
           table.insert(tokens, lead)
         end
         table.insert(tokens, op)
-        index = opIndex + 1
+        index = opIndexEnd + 1
       else
         break
       end
