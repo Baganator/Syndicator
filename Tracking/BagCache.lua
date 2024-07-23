@@ -53,6 +53,7 @@ function SyndicatorBagCacheMixin:OnLoad()
     if Syndicator.Constants.WarbandBankActive then
       self:RegisterEvent("BANK_TABS_CHANGED")
       self:RegisterEvent("BANK_TAB_SETTINGS_UPDATED")
+      self:RegisterEvent("PLAYER_ACCOUNT_BANK_TAB_SLOTS_CHANGED")
     end
   end
 
@@ -120,8 +121,8 @@ function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
       self:QueueCaching()
     end
 
-  -- Guessing that this is fired when a new warband tab is purchased
-  elseif eventName == "BANK_TABS_CHANGED" then
+  -- Guessing that these events may be fired when a new warband tab is purchased
+  elseif eventName == "BANK_TABS_CHANGED" or eventName == "PLAYER_ACCOUNT_BANK_TAB_SLOTS_CHANGED" then
     if self.bankOpen then
       self:ScanWarbandSlots()
       for bagID in pairs(warbandBags) do
