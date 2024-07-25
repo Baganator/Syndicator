@@ -1449,7 +1449,6 @@ function Syndicator.Search.InitializeSearchEngine()
   end
 
   local armorTypesToCheck = {
-    1, -- cloth
     2, -- leather
     3, -- mail
     4, -- plate
@@ -1469,6 +1468,12 @@ function Syndicator.Search.InitializeSearchEngine()
       end, SYNDICATOR_L_GROUP_ARMOR_TYPE)
     end
   end
+  -- cloth armor, but excluding cloaks
+  AddKeyword(C_Item.GetItemSubClassInfo(Enum.ItemClass.Armor, 1):lower(), function(details)
+    GetClassSubClass(details)
+    GetInvType(details)
+    return details.classID == Enum.ItemClass.Armor and details.subClassID == 1 and details.invType ~= "INVTYPE_CLOAK"
+  end, SYNDICATOR_L_GROUP_ARMOR_TYPE)
 
   -- All weapons + fishingpole
   for subClass = 0, 20 do
