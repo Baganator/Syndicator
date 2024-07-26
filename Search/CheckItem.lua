@@ -78,7 +78,7 @@ local function FoodCheck(details)
 end
 
 local function PotionCheck(details)
-  return details.classID == Enum.ItemClass.Consumable and (details.subClassID == 1 or details.subClassID == 2)
+  return details.classID == Enum.ItemClass.Consumable and (details.subClassID == 1 or details.subClassID == 2 or details.subClassID == 3)
 end
 
 local function CosmeticCheck(details)
