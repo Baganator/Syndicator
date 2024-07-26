@@ -26,10 +26,7 @@ local function GetClassSubClass(details)
     details.classID = Enum.ItemClass.Battlepet
     details.subClassID = petType - 1
   else
-    local classID, subClassID = select(6, C_Item.GetItemInfoInstant(details.itemLink))
-    if not classID then
-      classID, subClassID = C_Item.GetItemInfoInstant(details.itemID)
-    end
+    local classID, subClassID = select(6, C_Item.GetItemInfoInstant(details.itemID))
     details.classID = classID
     details.subClassID = subClassID
   end
