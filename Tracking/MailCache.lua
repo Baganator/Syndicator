@@ -104,6 +104,7 @@ function SyndicatorMailCacheMixin:OnLoad()
     end
 
     local waiting = 0
+    local loopComplete = false
     for attachmentIndex = 1, ATTACHMENTS_MAX do
       local _, itemID = GetInboxItem(mailIndex, attachmentIndex)
       if itemID ~= nil then
@@ -115,15 +116,15 @@ function SyndicatorMailCacheMixin:OnLoad()
           item:ContinueOnItemLoad(function()
             DoAttachment(mail.items, mailIndex, attachmentIndex)
             waiting = waiting - 1
-            if loopsComplete and waiting == 0 then
-              OnComplete(attachments)
+            if loopComplete and waiting == 0 then
+              OnComplete()
             end
           end)
         end
       end
     end
 
-    loopsComplete = true
+    loopComplete = true
     if waiting == 0 then
       OnComplete()
     end

@@ -291,7 +291,7 @@ function Syndicator.Search.CombineMegaSearchResults(results, callback)
       elseif source.warband then
         local warbandData = SYNDICATOR_DATA.Warband[source.warband]
         if seenWarband[key][source.warband] then
-          local entry = items[key].sources[seenWarbands[key][source.warband]]
+          local entry = items[key].sources[seenWarband[key][source.warband]]
           entry.itemCount = entry.itemCount + source.itemCount
         else
           table.insert(items[key].sources, source)

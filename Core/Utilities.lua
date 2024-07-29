@@ -15,11 +15,9 @@ do
     end
   end)
 
-  local AddOnLoaded = C_AddOns and C_AddOns.IsAddOnLoaded or IsAddOnLoaded
-
   -- Necessary because cannot nest EventUtil.ContinueOnAddOnLoaded
   function Syndicator.Utilities.OnAddonLoaded(addonName, callback)
-    if select(2, AddOnLoaded(addonName)) then
+    if select(2, C_AddOns.IsAddOnLoaded(addonName)) then
       callback()
     else
       callbacksPending[addonName] = callbacksPending[addonName] or {}

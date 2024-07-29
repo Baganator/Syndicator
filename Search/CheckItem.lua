@@ -90,12 +90,6 @@ local function CosmeticCheck(details)
   return details.isCosmetic
 end
 
-local function GetQualityCheck(quality)
-  return function(details)
-    return details.quality == quality
-  end
-end
-
 local function AxeCheck(details)
   return details.classID == Enum.ItemClass.Weapon and (details.subClassID == Enum.ItemWeaponSubclass.Axe2H or details.subClassID == Enum.ItemWeaponSubclass.Axe1H)
 end
@@ -414,7 +408,7 @@ local function SaveGearStats(details)
     return
   end
 
-  details.itemStats = GetItemStats(details.itemLink)
+  details.itemStats = C_Item.GetItemStats(details.itemLink)
 end
 
 local function SocketCheck(details)
@@ -567,20 +561,6 @@ if Syndicator.Constants.IsRetail then
   AddKeyword(TOY:lower(), ToyCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
   if Syndicator.Constants.WarbandBankActive then
     AddKeyword(ITEM_ACCOUNTBOUND:lower(), BindOnAccountCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-  end
-end
-
-local function PetCollectedCheck(details)
-  local speciesID
-  if details.itemID == Syndicator.Constants.BattlePetCageID then
-    speciesID = tonumber((details.itemLink:match("battlepet:(%d+)")))
-  elseif C_PetJournal.GetPetInfoByItemID(details.itemID) ~= nil then
-    speciesID = select(13, C_PetJournal.GetPetInfoByItemID(details.itemID))
-  end
-  if speciesID then
-    return C_PetJournal.GetNumCollectedInfo(speciesID) == 0
-  else
-    return false
   end
 end
 
@@ -1392,6 +1372,7 @@ function Syndicator.Search.CheckItem(details, searchString)
     matches[searchString] = check
   end
 
+  local doNotCache
   result, doNotCache = check(details, searchString)
   if not doNotCache then
     details.fullMatchInfo[searchString] = result

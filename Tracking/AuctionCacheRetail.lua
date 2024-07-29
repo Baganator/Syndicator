@@ -226,7 +226,7 @@ function SyndicatorAuctionCacheMixin:ProcessPostedItemsQueue(itemKey)
       local function DoItem()
         local itemInfo = {C_Item.GetItemInfo(itemLink)}
         local item = {
-          itemID = itemID,
+          itemID = details.itemID,
           itemCount = 1,
           iconTexture = itemInfo[10],
           itemLink = itemLink,
@@ -319,7 +319,7 @@ function SyndicatorAuctionCacheMixin:ProcessAuctionCreated(auctionID)
     local itemID = self.postedCommodity.itemID
 
     local function DoItem()
-      local itemInfo = {C_Item.GetItemInfo(itemLink or itemID)}
+      local itemInfo = {C_Item.GetItemInfo(itemID)}
       local item = {
         itemID = itemID,
         itemCount = itemCount,
