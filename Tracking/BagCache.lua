@@ -43,8 +43,8 @@ function SyndicatorBagCacheMixin:OnLoad()
   })
   if Syndicator.Constants.IsRetail then
     -- Bank items reagent bank updating
-    self:RegisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED")
     self:RegisterEvent("REAGENTBANK_UPDATE")
+    self:RegisterEvent("PLAYER_ENTERING_WORLD")
     -- Keystone level changing due to start/end of an M+ dungeon
     self:RegisterEvent("ITEM_CHANGED")
     self:RegisterEvent("CHALLENGE_MODE_START")
@@ -157,6 +157,11 @@ function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
         end
       end
       self:QueueCaching()
+    end)
+  elseif eventName == "PLAYER_ENTERING_WORLD" then
+    C_Timer.After(1, function()
+      -- Registered here to avoid PEW refresh to blank reagent bank
+      self:RegisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED")
     end)
   end
 end
