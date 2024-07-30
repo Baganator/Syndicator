@@ -20,6 +20,7 @@ Syndicator.Constants = {
 
   IsRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE,
   IsClassic = WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE,
+  IsEra = WOW_PROJECT_ID == WOW_PROJECT_CLASSIC,
 
   BattlePetCageID = 82800,
 
@@ -49,6 +50,9 @@ end
 
 if Syndicator.Constants.IsEra or KeyRingButtonIDToInvSlotID then
   table.insert(Syndicator.Constants.AllBagIndexes, Enum.BagIndex.Keyring)
+end
+if Syndicator.Constants.IsEra then
+  Syndicator.Constants.BankBagSlotsCount = 6
 end
 if Syndicator.Constants.IsClassic then
   -- Workaround for the enum containing the wrong values for the bank bag slots
