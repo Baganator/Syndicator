@@ -408,7 +408,7 @@ local function SaveGearStats(details)
     return
   end
 
-  details.itemStats = C_Item.GetItemStats(details.itemLink)
+  details.itemStats = GetItemStats(details.itemLink)
 end
 
 local function SocketCheck(details)
