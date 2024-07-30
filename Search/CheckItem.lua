@@ -61,10 +61,6 @@ local function EngravedCheck(details)
   return details.engravingInfo ~= nil
 end
 
-local function BindOnEquipCheck(details)
-  return not details.isBound and (Syndicator.Utilities.IsEquipment(details.itemLink) or details.classID == Enum.ItemClass.Container)
-end
-
 local function EquipmentCheck(details)
   GetClassSubClass(details)
   return details.classID == Enum.ItemClass.Armor or details.classID == Enum.ItemClass.Weapon
@@ -286,11 +282,24 @@ local function JunkCheck(details)
   end
 end
 
-local function BindOnAccountCheck(details)
-  if not details.isBound then
+local function BindOnEquipCheck(details)
+  if details.isBound or (not Syndicator.Utilities.IsEquipment(details.itemLink) and details.classID ~= Enum.ItemClass.Container) then
     return false
   end
 
+  GetTooltipInfoSpell(details)
+
+  if details.tooltipInfoSpell then
+    for _, row in ipairs(details.tooltipInfoSpell.lines) do
+      if row.leftText == ITEM_BIND_ON_EQUIP then
+        return true
+      end
+    end
+    return false
+  end
+end
+
+local function BindOnAccountCheck(details)
   GetTooltipInfoSpell(details)
 
   if details.tooltipInfoSpell then
