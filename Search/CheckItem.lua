@@ -733,7 +733,7 @@ function Syndicator.Search.GetExpansion(details)
   if major then
     return major - 1
   end
-  return Baganator.Constants.IsRetail and (select(15, C_Item.GetItemInfo(details.itemID)))
+  return Syndicator.Constants.IsRetail and (select(15, C_Item.GetItemInfo(details.itemID)))
 end
 for key, expansionID in pairs(TextToExpansion) do
   AddKeyword(key, function(details)
