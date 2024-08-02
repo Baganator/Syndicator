@@ -17,6 +17,9 @@ function SyndicatorCurrencyCacheMixin:OnLoad()
     self:RegisterEvent("CURRENCY_DISPLAY_UPDATE")
     self:ScanAllCurrencies()
   end
+  if Syndicator.Constants.IsRetail then
+    self:RegisterEvent("CURRENCY_TRANSFER_LOG_UPDATE")
+  end
 end
 
 function SyndicatorCurrencyCacheMixin:OnEvent(eventName, ...)
@@ -38,6 +41,24 @@ function SyndicatorCurrencyCacheMixin:OnEvent(eventName, ...)
   elseif eventName == "ACCOUNT_MONEY" or eventName == "BANKFRAME_OPENED" then
     SYNDICATOR_DATA.Warband[1].money = C_Bank.FetchDepositedMoney(Enum.BankType.Account)
     Syndicator.CallbackRegistry:TriggerEvent("WarbandCurrencyCacheUpdate", 1)
+  elseif eventName == "CURRENCY_TRANSFER_LOG_UPDATE" then
+    local allTransfers = C_CurrencyInfo.FetchCurrencyTransferTransactions()
+    local lastTransfer = allTransfers[#allTransfers]
+    local sourceCharacter
+    if lastTransfer.sourceCharacterGUID then
+      local name, realm = select(6, GetPlayerInfoByGUID(lastTransfer.sourceCharacterGUID))
+      sourceCharacter = name .. "-" .. realm
+    else
+      sourceCharacter = lastTransfer.sourceCharacterName .. "-" .. GetNormalizedRealmName()
+    end
+    if SYNDICATOR_DATA.Characters[sourceCharacter] then
+      local oldValue = SYNDICATOR_DATA.Characters[sourceCharacter].currencies[lastTransfer.currencyType]
+      if oldValue ~= nil then
+        SYNDICATOR_DATA.Characters[sourceCharacter].currencies[lastTransfer.currencyType] = oldValue - lastTransfer.quantityTransferred
+
+        self:SetScript("OnUpdate", self.OnUpdate)
+      end
+    end
   end
 end
 
