@@ -33,9 +33,9 @@ function SyndicatorCurrencyCacheMixin:OnEvent(eventName, ...)
     if currencyID ~= nil then
       local info = C_CurrencyInfo.GetCurrencyInfo(currencyID)
       SYNDICATOR_DATA.Characters[self.currentCharacter].currencies[currencyID] = info.quantity
-
       self:SetScript("OnUpdate", self.OnUpdate)
-    else
+    elseif not self.scannedLate then
+      self.scannedLate = true
       self:ScanAllCurrencies()
     end
   elseif eventName == "PLAYER_MONEY" then
@@ -57,6 +57,7 @@ function SyndicatorCurrencyCacheMixin:OnEvent(eventName, ...)
           self:SetScript("OnUpdate", self.OnUpdate)
         end
       end
+      self:UnregisterEvent("CURRENCY_TRANSFER_LOG_UPDATE")
     end
     if lastTransfer.sourceCharacterGUID then
       local ticker
