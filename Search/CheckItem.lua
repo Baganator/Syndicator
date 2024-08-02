@@ -802,6 +802,25 @@ local function GetGemStatCheck(statKey)
   end
 end
 
+local function GetResistanceStatCheck(stat)
+  return function(details)
+    if not Syndicator.Utilities.IsEquipment(details.itemLink) then
+      return false
+    end
+
+    GetTooltipInfoSpell(details)
+
+    if details.tooltipInfoSpell then
+      for _, line in ipairs(details.tooltipInfoSpell.lines) do
+        if line.leftText:find(stat) then
+          return true
+        end
+      end
+      return false
+    end
+  end
+end
+
 -- Based off of GlobalStrings.db2
 local stats = {
   "AGILITY",
@@ -861,6 +880,14 @@ for _, s in ipairs(stats) do
   end
 end
 AddKeyword(STAT_ARMOR:lower(), GetGemStatCheck(STAT_ARMOR), SYNDICATOR_L_GROUP_STAT)
+if Syndicator.Constants.IsEra then
+  for i = 0, 6 do
+    local keyword = _G["RESISTANCE" .. i .. "_NAME"]
+    if keyword ~= nil then
+      AddKeyword(keyword:lower(), GetResistanceStatCheck(keyword), SYNDICATOR_L_GROUP_STAT)
+    end
+  end
+end
 
 -- Sorted in initialize function later
 local sortedKeywords = {}
