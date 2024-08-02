@@ -18,7 +18,10 @@ function SyndicatorCurrencyCacheMixin:OnLoad()
     self:ScanAllCurrencies()
   end
   if Syndicator.Constants.IsRetail then
-    self:RegisterEvent("CURRENCY_TRANSFER_LOG_UPDATE")
+    self:RegisterEvent("CURRENCY_TRANSFER_FAILED")
+    hooksecurefunc(C_CurrencyInfo, "RequestCurrencyFromAccountCharacter", function()
+      self:RegisterEvent("CURRENCY_TRANSFER_LOG_UPDATE")
+    end)
   end
 end
 
@@ -56,7 +59,8 @@ function SyndicatorCurrencyCacheMixin:OnEvent(eventName, ...)
       end
     end
     if lastTransfer.sourceCharacterGUID then
-      local ticker = C_Timer.NewTicker(0.2, function()
+      local ticker
+      ticker = C_Timer.NewTicker(0.2, function()
         local name, realm = select(6, GetPlayerInfoByGUID(lastTransfer.sourceCharacterGUID))
         if realm ~= "" then
           ticker:Cancel()
@@ -73,6 +77,8 @@ function SyndicatorCurrencyCacheMixin:OnEvent(eventName, ...)
       sourceCharacter = lastTransfer.sourceCharacterName .. "-" .. GetNormalizedRealmName()
       Finish()
     end
+  elseif eventName == "CURRENCY_TRANSFER_FAILED" then
+    self:UnregisterEvent("CURRENCY_TRANSFER_LOG_UPDATE")
   end
 end
 
