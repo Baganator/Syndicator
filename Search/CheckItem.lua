@@ -312,6 +312,19 @@ local function BindOnAccountCheck(details)
   end
 end
 
+local function WarboundUntilEquippedCheck(details)
+  GetTooltipInfoSpell(details)
+
+  if details.tooltipInfoSpell then
+    for _, row in ipairs(details.tooltipInfoSpell.lines) do
+      if row.leftText == ITEM_ACCOUNTBOUND_UNTIL_EQUIP then
+        return true
+      end
+    end
+    return false
+  end
+end
+
 local function BindOnUseCheck(details)
   if details.isBound then
     return false
@@ -570,6 +583,7 @@ if Syndicator.Constants.IsRetail then
   AddKeyword(TOY:lower(), ToyCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
   if Syndicator.Constants.WarbandBankActive then
     AddKeyword(ITEM_ACCOUNTBOUND:lower(), BindOnAccountCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+    AddKeyword(ITEM_ACCOUNTBOUND_UNTIL_EQUIP:lower(), WarboundUntilEquippedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
   end
 end
 
