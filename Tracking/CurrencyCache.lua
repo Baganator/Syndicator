@@ -45,19 +45,33 @@ function SyndicatorCurrencyCacheMixin:OnEvent(eventName, ...)
     local allTransfers = C_CurrencyInfo.FetchCurrencyTransferTransactions()
     local lastTransfer = allTransfers[#allTransfers]
     local sourceCharacter
+    local function Finish()
+      if SYNDICATOR_DATA.Characters[sourceCharacter] then
+        local oldValue = SYNDICATOR_DATA.Characters[sourceCharacter].currencies[lastTransfer.currencyType]
+        if oldValue ~= nil then
+          SYNDICATOR_DATA.Characters[sourceCharacter].currencies[lastTransfer.currencyType] = oldValue - lastTransfer.quantityTransferred
+
+          self:SetScript("OnUpdate", self.OnUpdate)
+        end
+      end
+    end
     if lastTransfer.sourceCharacterGUID then
-      local name, realm = select(6, GetPlayerInfoByGUID(lastTransfer.sourceCharacterGUID))
-      sourceCharacter = name .. "-" .. realm
+      local ticker = C_Timer.NewTicker(0.2, function()
+        local name, realm = select(6, GetPlayerInfoByGUID(lastTransfer.sourceCharacterGUID))
+        if realm ~= "" then
+          ticker:Cancel()
+          sourceCharacter = name .. "-" .. realm
+          Finish()
+        elseif GetTime() - ticker.startTime > 5 then
+          ticker:Cancel()
+          sourceCharacter = lastTransfer.sourceCharacterName .. "-" .. GetNormalizedRealmName()
+          Finish()
+        end
+      end)
+      ticker.startTime = GetTime()
     else
       sourceCharacter = lastTransfer.sourceCharacterName .. "-" .. GetNormalizedRealmName()
-    end
-    if SYNDICATOR_DATA.Characters[sourceCharacter] then
-      local oldValue = SYNDICATOR_DATA.Characters[sourceCharacter].currencies[lastTransfer.currencyType]
-      if oldValue ~= nil then
-        SYNDICATOR_DATA.Characters[sourceCharacter].currencies[lastTransfer.currencyType] = oldValue - lastTransfer.quantityTransferred
-
-        self:SetScript("OnUpdate", self.OnUpdate)
-      end
+      Finish()
     end
   end
 end
