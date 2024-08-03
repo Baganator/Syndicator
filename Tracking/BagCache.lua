@@ -161,8 +161,18 @@ function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
   elseif eventName == "PLAYER_ENTERING_WORLD" then
     C_Timer.After(1, function()
       -- Registered here to avoid PEW refresh to blank reagent bank
-      self:RegisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED")
+      FrameUtil.RegisterFrameForEvents(self, {
+        "PLAYERREAGENTBANKSLOTS_CHANGED",
+        "LOADING_SCREEN_ENABLED",
+        "LOADING_SCREEN_DISABLED",
+      })
     end)
+  -- Switch reagent bank updating off on loading screens as events fire
+  -- erroneously
+  elseif eventName == "LOADING_SCREEN_ENABLED" then
+    self:UnregisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED")
+  elseif eventName == "LOADING_SCREEN_DISABLED" then
+    self:RegisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED")
   end
 end
 
