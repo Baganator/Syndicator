@@ -54,7 +54,7 @@ local function SetCheck(details)
 end
 
 local function EngravableCheck(details)
-  return details.isEngravable
+  return details.isEngravable == true
 end
 
 local function EngravedCheck(details)
