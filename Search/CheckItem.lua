@@ -1105,17 +1105,17 @@ local function GetTooltipSpecialTerms(details)
     return
   end
 
-  if not details.searchKeywordsTmp then
-    details.searchKeywordsTmp = {details.itemName:lower()}
+  if not details.searchKeywords then
+    details.searchKeywords = {details.itemName:lower()}
 
     for _, line in ipairs(details.tooltipInfoSpell.lines) do
       local term = line.leftText:match("^|cFF......(.*)|r$")
       if term then
-        table.insert(details.searchKeywordsTmp, term:lower())
+        table.insert(details.searchKeywords, term:lower())
       else
         local match = line.leftText:match("^" .. ITEM_SPELL_TRIGGER_ONUSE) or line.leftText:match("^" .. ITEM_SPELL_TRIGGER_ONEQUIP) or (UPGRADE_PATH_PATTERN and line.leftText:match(UPGRADE_PATH_PATTERN))
         if details.classID ~= Enum.ItemClass.Recipe and match then
-          table.insert(details.searchKeywordsTmp, line.leftText:lower())
+          table.insert(details.searchKeywords, line.leftText:lower())
         end
       end
     end
@@ -1123,14 +1123,11 @@ local function GetTooltipSpecialTerms(details)
     if details.setInfo then
       for _, info in ipairs(details.setInfo) do
         if type(info.name) == "string" then
-          table.insert(details.searchKeywordsTmp, info.name:lower())
+          table.insert(details.searchKeywords, info.name:lower())
         end
       end
     end
   end
-
-  details.searchKeywords = details.searchKeywordsTmp
-  details.searchKeywordsTmp = nil
 end
 
 local function MatchesText(details, searchString)
