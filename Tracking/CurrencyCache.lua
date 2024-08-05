@@ -107,7 +107,7 @@ function SyndicatorCurrencyCacheMixin:ScanAllCurrencies()
     end
 
     if #toCollapse > 0 then
-      for index = #toCollapse, 1 do
+      for index = #toCollapse, 1, -1 do
         C_CurrencyInfo.ExpandCurrencyList(toCollapse[index], false)
       end
     end
@@ -134,7 +134,7 @@ function SyndicatorCurrencyCacheMixin:ScanAllCurrencies()
     end
 
     if #toCollapse > 0 then
-      for index = #toCollapse, 1 do
+      for index = #toCollapse, 1, -1 do
         ExpandCurrencyList(toCollapse[index], 0)
       end
     end
