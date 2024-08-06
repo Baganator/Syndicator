@@ -136,29 +136,28 @@ local function IsTMogCollectedCompletionist(itemLink)
   if not sourceID then
     return nil
   else
-    local info = C_TransmogCollection.GetSourceInfo(sourceID)
-    return info and info.isCollected
+    return (select(5, C_TransmogCollection.GetAppearanceSourceInfo(sourceID)))
   end
 end
 
 local function IsTMogCollectedUnique(itemLink)
   local _, sourceID = C_TransmogCollection.GetItemInfo(itemLink)
   if not sourceID then
-    return nil
+    return
   else
-    local info = C_TransmogCollection.GetSourceInfo(sourceID)
-    if info then
-      local allSources = C_TransmogCollection.GetAllAppearanceSources(info.visualID)
+    local _, visualID = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)
+    if visualID then
+      local allSources = C_TransmogCollection.GetAllAppearanceSources(visualID)
       local anyCollected = false
       for _, alternateSourceID in ipairs(allSources) do
-        if C_TransmogCollection.GetSourceInfo(alternateSourceID).isCollected then
+        if (select(5, C_TransmogCollection.GetAppearanceSourceInfo(alternateSourceID))) then
           anyCollected = true
           break
         end
       end
       return anyCollected
     else
-      return nil
+      return
     end
   end
 end
