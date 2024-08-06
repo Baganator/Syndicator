@@ -574,7 +574,6 @@ AddKeyword(SYNDICATOR_L_KEYWORD_ACCOUNT_BOUND, BindOnAccountCheck, SYNDICATOR_L_
 AddKeyword(SYNDICATOR_L_KEYWORD_USE, UseCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeyword(SYNDICATOR_L_KEYWORD_USABLE, UsableCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeyword(SYNDICATOR_L_KEYWORD_OPEN, OpenCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(MOUNT:lower(), MountCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
 AddKeyword(SYNDICATOR_L_KEYWORD_TRADEABLE_LOOT, IsTradeableLoot, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeyword(SYNDICATOR_L_KEYWORD_TRADABLE_LOOT, IsTradeableLoot, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeyword(SYNDICATOR_L_KEYWORD_RELIC, RelicCheck, SYNDICATOR_L_GROUP_ARMOR_TYPE)
@@ -1560,6 +1559,11 @@ function Syndicator.Search.InitializeSearchEngine()
         return details.classID == Enum.ItemClass.Consumable and details.subClassID == subClass
       end, SYNDICATOR_L_GROUP_CONSUMABLE)
     end
+  end
+
+  local mount = C_Item.GetItemSubClassInfo(Enum.ItemClass.Miscellaneous, Enum.ItemMiscellaneousSubclass.Mount)
+  if mount ~= nil then
+    AddKeyword(mount:lower(), MountCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
   end
 
   Syndicator.Search.RebuildKeywordList()
