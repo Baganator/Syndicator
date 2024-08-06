@@ -28,6 +28,9 @@ local TOOLTIP_OPTIONS = {
     check = function() return C_CurrencyInfo ~= nil end,
   },
   {
+    type = "spacing",
+  },
+  {
     type = "checkbox",
     text = SYNDICATOR_L_SAME_CONNECTED_REALMS,
     option = "tooltips_connected_realms_only",
@@ -36,6 +39,9 @@ local TOOLTIP_OPTIONS = {
     type = "checkbox",
     text = SYNDICATOR_L_SAME_FACTION,
     option = "tooltips_faction_only",
+  },
+  {
+    type = "spacing",
   },
   {
     type = "checkbox",
@@ -215,16 +221,17 @@ function Syndicator.Options.Initialize()
 
   local lastItem = versionText
 
+  local yOffset = 0
   for _, entry in ipairs(TOOLTIP_OPTIONS) do
     if entry.check == nil or entry.check() then
       if entry.type == "header" then
         local header = optionsFrame:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
-        header:SetPoint("TOPLEFT", lastItem, "BOTTOMLEFT", 0, -10)
+        header:SetPoint("TOPLEFT", lastItem, "BOTTOMLEFT", 0, -10 + yOffset)
         header:SetText(entry.text)
         lastItem = header
       elseif entry.type == "checkbox" then
         local checkButton = CreateFrame("CheckButton", nil, optionsFrame, "UICheckButtonTemplate")
-        checkButton:SetPoint("TOPLEFT", lastItem, "BOTTOMLEFT", 0, -5)
+        checkButton:SetPoint("TOPLEFT", lastItem, "BOTTOMLEFT", 0, -5 + yOffset)
         checkButton:SetScript("OnClick", function(self)
           Syndicator.Config.Set(entry.option, self:GetChecked())
         end)
@@ -249,7 +256,7 @@ function Syndicator.Options.Initialize()
         lastItem = checkButton
       elseif entry.type == "slider" then
         local sliderWrapper = CreateFrame("Frame", nil, optionsFrame)
-        sliderWrapper:SetPoint("TOPLEFT", lastItem, "BOTTOMLEFT", -5)
+        sliderWrapper:SetPoint("TOPLEFT", lastItem, "BOTTOMLEFT", -5 + yOffset)
         sliderWrapper:SetPoint("RIGHT", optionsFrame)
         sliderWrapper:SetHeight(60)
         local slider = CreateFrame("Slider", nil, sliderWrapper, "OptionsSliderTemplate")
@@ -273,6 +280,10 @@ function Syndicator.Options.Initialize()
           self:SetValue(Syndicator.Config.Get(entry.option) * (entry.scale or 1))
         end)
         lastItem = sliderWrapper
+      end
+      yOffset = 0
+      if entry.type == "spacing" then
+        yOffset = -20
       end
     end
   end
