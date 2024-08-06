@@ -33,6 +33,7 @@ local function GetClassSubClass(details)
 end
 
 local function PetCheck(details)
+  GetClassSubClass(details)
   return details.classID == Enum.ItemClass.Battlepet or (details.classID == Enum.ItemClass.Miscellaneous and details.subClassID == Enum.ItemMiscellaneousSubclass.CompanionPet)
 end
 
@@ -67,10 +68,12 @@ local function EquipmentCheck(details)
 end
 
 local function FoodCheck(details)
+  GetClassSubClass(details)
   return details.classID == Enum.ItemClass.Consumable and details.subClassID == 5
 end
 
 local function PotionCheck(details)
+  GetClassSubClass(details)
   return details.classID == Enum.ItemClass.Consumable and (details.subClassID == 1 or details.subClassID == 2 or details.subClassID == 3)
 end
 
@@ -87,26 +90,32 @@ local function CosmeticCheck(details)
 end
 
 local function AxeCheck(details)
+  GetClassSubClass(details)
   return details.classID == Enum.ItemClass.Weapon and (details.subClassID == Enum.ItemWeaponSubclass.Axe2H or details.subClassID == Enum.ItemWeaponSubclass.Axe1H)
 end
 
 local function MaceCheck(details)
+  GetClassSubClass(details)
   return details.classID == Enum.ItemClass.Weapon and (details.subClassID == Enum.ItemWeaponSubclass.Mace2H or details.subClassID == Enum.ItemWeaponSubclass.Mace1H)
 end
 
 local function SwordCheck(details)
+  GetClassSubClass(details)
   return details.classID == Enum.ItemClass.Weapon and (details.subClassID == Enum.ItemWeaponSubclass.Sword2H or details.subClassID == Enum.ItemWeaponSubclass.Sword1H)
 end
 
 local function StaffCheck(details)
+  GetClassSubClass(details)
   return details.classID == Enum.ItemClass.Weapon and (details.subClassID == Enum.ItemWeaponSubclass.Stave)
 end
 
 local function MountCheck(details)
+  GetClassSubClass(details)
   return details.classID == Enum.ItemClass.Miscellaneous and details.subClassID == Enum.ItemMiscellaneousSubclass.Mount
 end
 
 local function RelicCheck(details)
+  GetClassSubClass(details)
   return details.classID == Enum.ItemClass.Gem and details.subClassID == Enum.ItemGemSubclass.Artifactrelic
 end
 
