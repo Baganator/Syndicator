@@ -1,5 +1,6 @@
 SyndicatorBagCacheMixin = {}
 
+local craftingItemUpdateDelay = 2
 local bankBags = {}
 local bagBags = {}
 local warbandBags = {}
@@ -44,7 +45,8 @@ function SyndicatorBagCacheMixin:OnLoad()
   if Syndicator.Constants.IsRetail then
     -- Bank items reagent bank updating
     self:RegisterEvent("REAGENTBANK_UPDATE")
-    self:RegisterEvent("PLAYER_ENTERING_WORLD")
+    self:RegisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED")
+    self:RegisterEvent("TRADE_SKILL_ITEM_CRAFTED_RESULT")
     -- Keystone level changing due to start/end of an M+ dungeon
     self:RegisterEvent("ITEM_CHANGED")
     self:RegisterEvent("CHALLENGE_MODE_START")
@@ -56,6 +58,8 @@ function SyndicatorBagCacheMixin:OnLoad()
       self:RegisterEvent("PLAYER_ACCOUNT_BANK_TAB_SLOTS_CHANGED")
     end
   end
+
+  self.craftingTime = 0
 
   self.currentCharacter = Syndicator.Utilities.GetCharacterFullName()
 
@@ -97,11 +101,13 @@ function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
     end
 
   elseif eventName == "PLAYERREAGENTBANKSLOTS_CHANGED" then
-    self.pending.bank[Enum.BagIndex.Reagentbank] = true
-    if not self.bankOpen then -- can only scan changed slots when bank is closed
-      self.pending.reagentBankSlots[...] = true
+    if self.bankOpen or time() - self.craftingTime < craftingItemUpdateDelay then
+      self.pending.bank[Enum.BagIndex.Reagentbank] = true
+      if not self.bankOpen then -- can only scan changed slots when bank is closed
+        self.pending.reagentBankSlots[...] = true
+      end
+      self:QueueCaching()
     end
-    self:QueueCaching()
 
   elseif eventName == "REAGENTBANK_UPDATE" then
     self.pending.bank[Enum.BagIndex.Reagentbank] = true
@@ -123,7 +129,7 @@ function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
 
   -- Guessing that these events may be fired when a new warband tab is purchased
   elseif eventName == "BANK_TABS_CHANGED" or eventName == "PLAYER_ACCOUNT_BANK_TAB_SLOTS_CHANGED" then
-    if self.bankOpen then
+    if self.bankOpen or time() - self.craftingTime < craftingItemUpdateDelay then
       self:ScanWarbandSlots()
       for bagID in pairs(warbandBags) do
         self.pending.warband[bagID] = true
@@ -158,21 +164,10 @@ function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
       end
       self:QueueCaching()
     end)
-  elseif eventName == "PLAYER_ENTERING_WORLD" then
-    C_Timer.After(1, function()
-      -- Registered here to avoid PEW refresh to blank reagent bank
-      FrameUtil.RegisterFrameForEvents(self, {
-        "PLAYERREAGENTBANKSLOTS_CHANGED",
-        "LOADING_SCREEN_ENABLED",
-        "LOADING_SCREEN_DISABLED",
-      })
-    end)
-  -- Switch reagent bank updating off on loading screens as events fire
-  -- erroneously
-  elseif eventName == "LOADING_SCREEN_ENABLED" then
-    self:UnregisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED")
-  elseif eventName == "LOADING_SCREEN_DISABLED" then
-    self:RegisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED")
+  -- We keep the time of the last crafted item to avoid processing spurious bank
+  -- update events during and shortly after loading screens.
+  elseif eventName == "TRADE_SKILL_ITEM_CRAFTED_RESULT" then
+    self.craftingTime = time()
   end
 end
 
@@ -388,7 +383,7 @@ function SyndicatorBagCacheMixin:OnUpdate()
         end
       end
     end
-  elseif self.pending.bank[Enum.BagIndex.Reagentbank] and bank[bankBags[Enum.BagIndex.Reagentbank]] then
+  elseif self.pending.bank[Enum.BagIndex.Reagentbank] and bank[bankBags[Enum.BagIndex.Reagentbank]] and IsReagentBankUnlocked() then
     local reagentBankData = bank[bankBags[Enum.BagIndex.Reagentbank]]
     for slotID in pairs(self.pending.reagentBankSlots) do
       if #reagentBankData >= slotID then
