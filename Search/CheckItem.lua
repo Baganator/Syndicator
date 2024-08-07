@@ -145,7 +145,7 @@ local function IsTMogCollectedCompletionist(itemLink)
   if not sourceID then
     return nil
   else
-    return (select(5, C_TransmogCollection.GetAppearanceSourceInfo(sourceID)))
+    return C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(sourceID)
   end
 end
 
@@ -159,7 +159,7 @@ local function IsTMogCollectedUnique(itemLink)
       local allSources = C_TransmogCollection.GetAllAppearanceSources(visualID)
       local anyCollected = false
       for _, alternateSourceID in ipairs(allSources) do
-        if (select(5, C_TransmogCollection.GetAppearanceSourceInfo(alternateSourceID))) then
+        if C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(alternateSourceID) then
           anyCollected = true
           break
         end
