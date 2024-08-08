@@ -140,8 +140,17 @@ local function SocketedCheck(details)
   end
 end
 
-local function IsTMogCollectedCompletionist(itemLink)
+local function GetSourceID(itemLink)
   local _, sourceID = C_TransmogCollection.GetItemInfo(itemLink)
+  if sourceID then
+    return sourceID
+  end
+  local _, sourceID = C_TransmogCollection.GetItemInfo((C_Item.GetItemInfoInstant(itemLink)))
+  return sourceID
+end
+
+local function IsTMogCollectedCompletionist(itemLink)
+  local sourceID = GetSourceID(itemLink)
   if not sourceID then
     return nil
   else
@@ -150,7 +159,7 @@ local function IsTMogCollectedCompletionist(itemLink)
 end
 
 local function IsTMogCollectedUnique(itemLink)
-  local _, sourceID = C_TransmogCollection.GetItemInfo(itemLink)
+  local sourceID = GetSourceID(itemLink)
   if not sourceID then
     return
   else
