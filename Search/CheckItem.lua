@@ -889,7 +889,7 @@ for _, s in ipairs(stats) do
   end
 end
 AddKeyword(STAT_ARMOR:lower(), GetGemStatCheck(STAT_ARMOR), SYNDICATOR_L_GROUP_STAT)
-if Syndicator.Constants.IsEra then
+if Syndicator.Constants.IsClassic then
   for i = 0, 6 do
     local keyword = _G["RESISTANCE" .. i .. "_NAME"]
     if keyword ~= nil then
