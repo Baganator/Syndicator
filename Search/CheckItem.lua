@@ -557,6 +557,22 @@ local function AddKeyword(keyword, check, group)
   table.insert(KEYWORD_AND_CATEGORY, {keyword = keyword, group = group or ""})
 end
 
+function Syndicator.Search.AddKeyword(keyword, check, group, force)
+  if force then
+    keyword = Syndicator.Search.CleanKeyword(keyword)
+    KEYWORDS_TO_CHECK[keyword] = nil
+    local i = 1
+    while i <= #KEYWORD_AND_CATEGORY do
+      if KEYWORD_AND_CATEGORY[i].keyword == keyword then
+        table.remove(KEYWORD_AND_CATEGORY, i)
+      else
+        i = i + 1
+      end
+    end
+  end
+  AddKeyword(keyword, check, group)
+end
+
 AddKeyword(SYNDICATOR_L_KEYWORD_PET, PetCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
 AddKeyword(SYNDICATOR_L_KEYWORD_BATTLE_PET, PetCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
 AddKeyword(SYNDICATOR_L_KEYWORD_SOULBOUND, SoulboundCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)

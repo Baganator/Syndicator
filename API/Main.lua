@@ -157,3 +157,15 @@ end
 function Syndicator.API.GetSearchKeywords()
   return CopyTable(Syndicator.Search.GetKeywords())
 end
+
+-- Adds the given keyword with the given check function to the search system.
+--   keyword: string, The keyword to add.
+--   check: function(details: table) -> boolean, The function that will be called for each item.
+--                                               Return true to match, false to not match, nil to skip the item.
+--                                               The true/false value is cached.
+--   group: string, The group to add the keyword to.
+--   force: boolean, If true the keyword will overwrite the existing keyword,
+--                   otherwise it will be connected with or logical operator.
+function Syndicator.API.AddKeyword(keyword, check, group, force)
+    return Syndicator.Search.AddKeyword(keyword, check, group, force)
+end
