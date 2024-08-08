@@ -154,20 +154,22 @@ local function IsTMogCollectedUnique(itemLink)
   if not sourceID then
     return
   else
-    local _, visualID = C_TransmogCollection.GetAppearanceSourceInfo(sourceID)
-    if visualID then
-      local allSources = C_TransmogCollection.GetAllAppearanceSources(visualID)
-      local anyCollected = false
-      for _, alternateSourceID in ipairs(allSources) do
-        if C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(alternateSourceID) then
-          anyCollected = true
-          break
-        end
-      end
-      return anyCollected
-    else
-      return
+    local subClass = select(7, C_Item.GetItemInfoInstant(itemLink))
+    local sourceInfo = C_TransmogCollection.GetSourceInfo(sourceID)
+    local allSources = C_TransmogCollection.GetAllAppearanceSources(sourceInfo.visualID)
+    if #allSources == 0 then
+      allSources = {sourceID}
     end
+    local anyCollected = false
+    for _, alternateSourceID in ipairs(allSources) do
+      local altInfo = C_TransmogCollection.GetSourceInfo(alternateSourceID)
+      local altSubClass = select(7, C_Item.GetItemInfoInstant(altInfo.itemID))
+      if altInfo.isCollected and altSubClass == subClass then
+        anyCollected = true
+        break
+      end
+    end
+    return anyCollected
   end
 end
 
