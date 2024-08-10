@@ -15,30 +15,65 @@ local AUCTIONS_UPDATED_EVENTS = {
   "COMMODITY_PURCHASE_SUCCEEDED",
 }
 
+local function FindMatchingKeys(originalLocation)
+  local bags = Syndicator.API.GetCharacter(Syndicator.API.GetCurrentCharacter()).bags
+  local queue = {}
+
+  local startingKey = C_AuctionHouse.GetItemKeyFromItem(originalLocation)
+  local startingData = bags[tIndexOf(Syndicator.Constants.AllBagIndexes, originalLocation.bagID)][originalLocation.slotIndex]
+
+  if not startingData or not startingData.itemLink then
+    return
+  end
+
+  table.insert(queue, {
+    itemID = startingData.itemID,
+    itemCount = 1,
+    itemLink = startingData.itemLink,
+    iconTexture = startingData.iconTexture,
+    quality = startingData.quality,
+    isBound = false,
+  })
+
+  for index, bagID in ipairs(Syndicator.Constants.AllBagIndexes) do
+    for slotID = 1, C_Container.GetContainerNumSlots(bagID) do
+      local location = {bagID = bagID, slotIndex = slotID}
+      if (location.bagID ~= originalLocation.bagID or location.slotIndex ~= originalLocation.slotIndex) and
+          C_Item.DoesItemExist(location) then
+        local itemKey = C_AuctionHouse.GetItemKeyFromItem(location)
+        if itemKey.itemID == startingKey.itemID and itemKey.itemSuffix == startingKey.itemSuffix and itemKey.itemLevel == itemKey.itemLevel and itemKey.battlePetSpeciesID == startingKey.battlePetSpeciesID then
+          local data = bags[index][slotID]
+
+          if data and data.itemLink then
+            table.insert(queue, {
+              itemID = data.itemID,
+              itemCount = 1,
+              itemLink = data.itemLink,
+              iconTexture = data.iconTexture,
+              quality = data.quality,
+              isBound = false,
+            })
+          end
+        end
+      end
+    end
+  end
+  DevTools_Dump(startingKey)
+  print("queued", #queue)
+
+  return queue
+end
+
 function SyndicatorAuctionCacheMixin:OnLoad()
   FrameUtil.RegisterFrameForEvents(self, AUCTIONS_UPDATED_EVENTS)
   self.currentCharacter = Syndicator.Utilities.GetCharacterFullName()
 
-  self.postedItemsQueue = {}
-  self.lastPostedItem = {}
   hooksecurefunc(C_AuctionHouse, "PostItem", function(itemLocation)
-    local itemLink = C_Item.GetItemLink(itemLocation)
-    self.lastPostedItem = {
-      itemLink = C_Item.GetItemLink(itemLocation),
-      itemID = C_Item.GetItemID(itemLocation),
-    }
-    if not C_Item.IsItemDataCached(itemLocation) then
-      local item = Item:CreateFromItemLocation(itemLocation)
-      item:ContinueOnItemLoad(function()
-        if C_Item.DoesItemExist(itemLocation) then
-          self.lastPostedItem.itemLink = C_Item.GetItemLink(itemLocation)
-        else
-          self.lastPostedItem.itemLink = select(2, C_Item.GetItemInfo(self.lastPostedItem.itemLink))
-        end
-      end)
-    end
+    self:ClearAuctionPending()
+    self.lastPostedItem = FindMatchingKeys(itemLocation)
   end)
   hooksecurefunc(C_AuctionHouse, "PostCommodity", function(itemLocation, _, itemCount)
+    self:ClearAuctionPending()
     self.postedCommodity = {
       itemID = C_Item.GetItemID(itemLocation),
       itemCount = itemCount,
@@ -200,62 +235,6 @@ function SyndicatorAuctionCacheMixin:OnEvent(eventName, ...)
   end
 end
 
-function SyndicatorAuctionCacheMixin:ProcessPostedItemsQueue(itemKey)
-  for auctionID, details in pairs(self.postedItemsQueue) do
-    local auctionInfo = C_AuctionHouse.GetAuctionInfoByID(auctionID)
-    if auctionInfo ~= nil then
-      -- Always works when posting just one item, or when using the Auctionator
-      -- UI
-      self.postedItemsQueue[auctionID] = nil
-      if C_Item.IsItemDataCachedByID(auctionInfo.itemKey.itemID) then
-        self:AddAuction(auctionInfo, 1)
-      else
-        local item = Item:CreateFromItemID(auctionInfo.itemKey.itemID)
-        item:ContinueOnItemLoad(function()
-          local auctionInfo = C_AuctionHouse.GetAuctionInfoByID(auctionID)
-          if auctionInfo ~= nil then
-            self:AddAuction(auctionInfo, 1)
-          end
-        end)
-      end
-    elseif itemKey.itemID == details.itemID then
-      -- The Blizzard UI doesn't request all the auctions separately so we have
-      -- to guess when the auction has been created
-      self.postedItemsQueue[auctionID] = nil
-      local itemLink = details.itemLink
-      local function DoItem()
-        local itemInfo = {C_Item.GetItemInfo(itemLink)}
-        local item = {
-          itemID = details.itemID,
-          itemCount = 1,
-          iconTexture = itemInfo[10],
-          itemLink = itemLink,
-          quality = itemInfo[3],
-          isBound = false,
-        }
-        item.auctionID = details.auctionID
-        table.insert(
-          SYNDICATOR_DATA.Characters[self.currentCharacter].auctions,
-          item
-        )
-        Syndicator.CallbackRegistry:TriggerEvent("AuctionsCacheUpdate", self.currentCharacter)
-      end
-      if C_Item.IsItemDataCachedByID(details.itemID) then
-        DoItem()
-      else
-        local item = Item:CreateFromItemID(details.itemID)
-        item:ContinueOnItemLoad(function()
-          DoItem()
-        end)
-      end
-    end
-  end
-
-  if next(self.postedItemsQueue) == nil then
-    self:UnregisterEvent("AUCTION_HOUSE_NEW_RESULTS_RECEIVED")
-  end
-end
-
 function SyndicatorAuctionCacheMixin:ProcessItemPurchase(auctionID)
   if not self.purchasedItem or not self.purchasedItem.auctionInfo or self.purchasedItem.auctionInfo.auctionID ~= auctionID then
     return
@@ -346,15 +325,20 @@ function SyndicatorAuctionCacheMixin:ProcessAuctionCreated(auctionID)
     end
     self.postedCommodity = nil
   elseif self.lastPostedItem then
-    self:RegisterEvent("AUCTION_HOUSE_NEW_RESULTS_RECEIVED")
-    self.postedItemsQueue[auctionID] = {itemID = self.lastPostedItem.itemID, itemLink = self.lastPostedItem.itemLink}
+    local item = table.remove(self.lastPostedItem, 1)
+    item.auctionID = auctionID
+    table.insert(
+      SYNDICATOR_DATA.Characters[self.currentCharacter].auctions,
+      item
+    )
+    if #self.lastPostedItem == 0 then
+      self.lastPostedItem = nil
+    end
+    Syndicator.CallbackRegistry:TriggerEvent("AuctionsCacheUpdate", self.currentCharacter)
   end
 end
 
 function SyndicatorAuctionCacheMixin:ClearAuctionPending()
-  self.postedItemsQueue = {}
   self.postedCommodity = nil
   self.lastPostedItem = nil
-
-  self:UnregisterEvent("AUCTION_HOUSE_NEW_RESULTS_RECEIVED")
 end
