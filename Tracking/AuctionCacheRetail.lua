@@ -58,8 +58,6 @@ local function FindMatchingKeys(originalLocation)
       end
     end
   end
-  DevTools_Dump(startingKey)
-  print("queued", #queue)
 
   return queue
 end
