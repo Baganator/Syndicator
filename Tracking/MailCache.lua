@@ -85,6 +85,10 @@ function SyndicatorMailCacheMixin:OnLoad()
   hooksecurefunc("ReturnInboxItem", function(mailIndex)
     local recipient = select(3, GetInboxHeaderInfo(mailIndex))
 
+    if type(recipient) ~= "string" then -- Hooked function called mistakenly
+      return
+    end
+
     if not recipient:find("-", nil, true) then
       recipient = recipient .. "-" .. GetNormalizedRealmName()
     end
