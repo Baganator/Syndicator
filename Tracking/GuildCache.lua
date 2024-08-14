@@ -49,9 +49,10 @@ local function GetGuildKey()
   end
 
   local _, gmRealm = strsplit("-", gm)
-  local gmKey = guildName .. "-" .. gmRealm
 
   local connectedRealms = Syndicator.Utilities.GetConnectedRealms()
+
+  local gmKey = guildName .. "-" .. (gmRealm or connectedRealms[1])
 
   for _, r in ipairs(connectedRealms) do
     local key = guildName .. "-" .. r
@@ -65,7 +66,7 @@ local function GetGuildKey()
   end
 
   -- No guild found cached, create it
-  InitGuild(gmKey, guildName, gmRealm)
+  InitGuild(gmKey, guildName, gmRealm or connectedRealms[1])
   seenGuilds[guildName] = gmKey
 
   return gmKey

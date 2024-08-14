@@ -351,17 +351,20 @@ function SyndicatorItemSummariesMixin:GetTooltipInfo(key, sameConnectedRealm, sa
     end
   end
 
-  local currentGuildDetails = SYNDICATOR_DATA.Guilds[Syndicator.API.GetCurrentGuild()].details
-  if not FindInTableIf(result.guilds, function(a) return a.guild == currentGuildDetails.guild and a.realmNormalized == currentGuildDetails.realm end) and self.SV.Guilds.ByRealm[currentGuildDetails.realm] then
-    local summary = self.SV.Guilds.ByRealm[currentGuildDetails.realm][currentGuildDetails.guild]
-    if summary then
-      local byKey = summary[key]
-      if byKey ~= nil and not currentGuildDetails.hidden and (not sameFaction or currentGuildDetails.faction == currentFaction) then
-        table.insert(result.guilds, {
-          guild = currentGuildDetails.guild,
-          realmNormalized = currentGuildDetails.realm,
-          bank = byKey.bank or 0
-        })
+  local currentGuild = Syndicator.API.GetCurrentGuild()
+  if currentGuild then
+    local currentGuildDetails = SYNDICATOR_DATA.Guilds[currentGuild].details
+    if not FindInTableIf(result.guilds, function(a) return a.guild == currentGuildDetails.guild and a.realmNormalized == currentGuildDetails.realm end) and self.SV.Guilds.ByRealm[currentGuildDetails.realm] then
+      local summary = self.SV.Guilds.ByRealm[currentGuildDetails.realm][currentGuildDetails.guild]
+      if summary then
+        local byKey = summary[key]
+        if byKey ~= nil and not currentGuildDetails.hidden and (not sameFaction or currentGuildDetails.faction == currentFaction) then
+          table.insert(result.guilds, {
+            guild = currentGuildDetails.guild,
+            realmNormalized = currentGuildDetails.realm,
+            bank = byKey.bank or 0
+          })
+        end
       end
     end
   end
