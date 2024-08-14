@@ -213,10 +213,10 @@ function SyndicatorItemSummariesMixin:GenerateGuildSummary(guildName)
     end
   end
 
-  if not self.SV.Guilds.ByRealm[details.details.realms[1]] then
-    self.SV.Guilds.ByRealm[details.details.realms[1]] = {}
+  if not self.SV.Guilds.ByRealm[details.details.realm] then
+    self.SV.Guilds.ByRealm[details.details.realm] = {}
   end
-  self.SV.Guilds.ByRealm[details.details.realms[1]][details.details.guild] = summary
+  self.SV.Guilds.ByRealm[details.details.realm][details.details.guild] = summary
 end
 
 function SyndicatorItemSummariesMixin:GenerateWarbandSummary()

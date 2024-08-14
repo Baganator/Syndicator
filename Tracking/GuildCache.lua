@@ -1,6 +1,6 @@
 SyndicatorGuildCacheMixin = {}
 
-local function InitGuild(key, guild, realms)
+local function InitGuild(key, guild, realm)
   if not SYNDICATOR_DATA.Guilds[key] then
     SYNDICATOR_DATA.Guilds[key] = {
       bank = {},
@@ -10,10 +10,12 @@ local function InitGuild(key, guild, realms)
         faction = UnitFactionGroup("player"),
         hidden = false,
         visited = false,
+        realm = realm,
       },
     }
   end
-  SYNDICATOR_DATA.Guilds[key].details.realms = realms
+  SYNDICATOR_DATA.Guilds[key].details.realms = nil
+  SYNDICATOR_DATA.Guilds[key].details.realm = realm
 end
 
 local seenGuilds = {}
@@ -33,23 +35,40 @@ local function GetGuildKey()
     return seenGuilds[guildName]
   end
 
-  local realms = Syndicator.Utilities.GetConnectedRealms()
-
-  for _, realm in ipairs(realms) do
-    local key = guildName .. "-" .. realm
-    if SYNDICATOR_DATA.Guilds[key] then
-      InitGuild(key, guildName, realms)
-      seenGuilds[guildName] = key
-      return key
+  local gm
+  for i = 1, GetNumGuildMembers() do
+    local name, _, rankIndex = GetGuildRosterInfo(i)
+    if rankIndex == 0 then
+      gm = name
     end
   end
 
-  local key = guildName .. "-" .. realms[1]
-  -- No guild found cached, create it
-  InitGuild(key, guildName, realms)
-  seenGuilds[guildName] = key
+  if not gm then
+    C_GuildInfo.GuildRoster()
+    return
+  end
 
-  return key
+  local _, gmRealm = strsplit("-", gm)
+  local gmKey = guildName .. "-" .. gmRealm
+
+  local connectedRealms = Syndicator.Utilities.GetConnectedRealms()
+
+  for _, r in ipairs(connectedRealms) do
+    local key = guildName .. "-" .. r
+    if key ~= gmKey and SYNDICATOR_DATA.Guilds[key] then
+      if not SYNDICATOR_DATA.Guilds[gmKey] then
+        SYNDICATOR_DATA.Guilds[gmKey] = SYNDICATOR_DATA.Guilds[key]
+      end
+      SYNDICATOR_DATA.Guilds[key] = nil
+      break
+    end
+  end
+
+  -- No guild found cached, create it
+  InitGuild(gmKey, guildName, gmRealm)
+  seenGuilds[guildName] = gmKey
+
+  return gmKey
 end
 
 local GUILD_OPEN_EVENTS = {

@@ -33,7 +33,7 @@ local TOOLTIP_OPTIONS = {
   {
     type = "checkbox",
     text = SYNDICATOR_L_SAME_CONNECTED_REALMS,
-    option = "tooltips_connected_realms_only",
+    option = "tooltips_connected_realms_only_2",
   },
   {
     type = "checkbox",

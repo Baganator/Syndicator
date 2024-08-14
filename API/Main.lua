@@ -67,16 +67,6 @@ function Syndicator.API.GetByGuildFullName(guildFullName)
   if SYNDICATOR_DATA.Guilds[guildFullName] then
     return SYNDICATOR_DATA.Guilds[guildFullName], guildFullName
   end
-
-  local guildName, realmName = strsplit("-", guildFullName)
-
-  -- The guild isn't stored in Syndicator against this realmName, so it must be
-  -- stored against another connected realm's name, try to find it.
-  for guild, data in pairs(SYNDICATOR_DATA.Guilds) do
-    if data.details.guildName == guildName and tIndexOf(data.details.realms, realmName) ~= nil then
-      return data, guild
-    end
-  end
 end
 
 Syndicator.API.GetGuild = Syndicator.API.GetByGuildFullName
