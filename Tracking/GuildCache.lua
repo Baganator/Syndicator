@@ -59,7 +59,7 @@ local function GetGuildKey()
       if not SYNDICATOR_DATA.Guilds[gmKey] then
         SYNDICATOR_DATA.Guilds[gmKey] = SYNDICATOR_DATA.Guilds[key]
       end
-      SYNDICATOR_DATA.Guilds[key] = nil
+      Syndicator.API.DeleteGuild(key)
       break
     end
   end

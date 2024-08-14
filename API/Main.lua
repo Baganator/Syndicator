@@ -103,7 +103,7 @@ end
 
 function Syndicator.API.DeleteGuild(guildFullName)
   local guildData, guildFullName = Syndicator.API.GetByGuildFullName(guildFullName)
-  assert(Syndicator.GuildCache and guildFullName ~= Syndicator.GuildCache.currentGuild, "Cannot delete current guild")
+  assert(guildFullName == nil or not Syndicator.GuildCache or guildFullName ~= Syndicator.GuildCache.currentGuild, "Cannot delete current guild")
 
   if not guildData then
     error("Guild does not exist")
@@ -112,7 +112,7 @@ function Syndicator.API.DeleteGuild(guildFullName)
 
   SYNDICATOR_DATA.Guilds[guildFullName] = nil
 
-  local realmSummary = SYNDICATOR_SUMMARIES.Guilds.ByRealm[guildData.details.realms[1]]
+  local realmSummary = SYNDICATOR_SUMMARIES.Guilds.ByRealm[guildData.details.realm or guildData.details.realms[1]] -- legacy guild format used realms
   if realmSummary and realmSummary[guildData.details.guild] then
     realmSummary[guildData.details.guild] = nil
   end

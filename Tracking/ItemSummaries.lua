@@ -54,6 +54,27 @@ function SyndicatorItemSummariesMixin:OnLoad()
   Syndicator.CallbackRegistry:RegisterCallback("EquippedCacheUpdate", self.CharacterCacheUpdate, self)
   Syndicator.CallbackRegistry:RegisterCallback("VoidCacheUpdate", self.CharacterCacheUpdate, self)
   Syndicator.CallbackRegistry:RegisterCallback("AuctionsCacheUpdate", self.CharacterCacheUpdate, self)
+
+  self:Cleanup()
+end
+
+-- Tidy up summaries from removed characters and guilds (work around unknown
+-- deletion bug)
+function SyndicatorItemSummariesMixin:Cleanup()
+  for realm, realmData in pairs(self.SV.Characters.ByRealm) do
+    for character in pairs(realmData) do
+      if not SYNDICATOR_DATA.Characters[character .. "-" .. realm] then
+        realmData[character] = nil
+      end
+    end
+  end
+  for realm, realmData in pairs(self.SV.Guilds.ByRealm) do
+    for guild in pairs(realmData) do
+      if not SYNDICATOR_DATA.Guilds[guild .. "-" .. realm] then
+        realmData[guild] = nil
+      end
+    end
+  end
 end
 
 function SyndicatorItemSummariesMixin:CharacterCacheUpdate(characterName)
