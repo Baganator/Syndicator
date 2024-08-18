@@ -99,6 +99,7 @@ L["KEYWORD_CURRENCY"] = "currency"
 L["KEYWORD_OBJECTIVE"] = "objective"
 L["KEYWORD_COLLECTED"] = "collected"
 L["KEYWORD_UNCOLLECTED"] = "uncollected"
+L["KEYWORD_RX"] = "r%s"
 
 L["GROUP_ARMOR_TYPE"] = "Armor Type"
 L["GROUP_BATTLE_PET"] = "Battle Pet Type"

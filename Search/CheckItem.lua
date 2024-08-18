@@ -797,6 +797,19 @@ local function GetGearStatCheck(statKey)
   end
 end
 
+if C_TradeSkillUI and C_TradeSkillUI.GetItemReagentQualityByItemInfo then
+  for tier = 1, 5 do
+    AddKeyword(SYNDICATOR_L_KEYWORD_RX:format(tier), function(details)
+      if not C_Item.IsItemDataCachedByID(details.itemID) then
+        C_Item.RequestLoadItemDataByID(details.itemID)
+        return nil
+      end
+      local craftedQuality = C_TradeSkillUI.GetItemReagentQualityByItemInfo(details.itemID) or C_TradeSkillUI.GetItemCraftedQualityByItemInfo(details.itemLink)
+      return craftedQuality == tier
+    end, SYNDICATOR_L_GROUP_QUALITY)
+  end
+end
+
 local function GetGemStatCheck(statKey)
   local PATTERN1 = "%+" .. statKey -- Retail remix gems
   local PATTERN2 = "%+%d+ " .. statKey -- Normal gems
