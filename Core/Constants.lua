@@ -92,10 +92,16 @@ local AccountBoundTooltipLines = {
   ITEM_BIND_TO_ACCOUNT,
   ITEM_ACCOUNTBOUND,
   ITEM_ACCOUNTBOUND_UNTIL_EQUIP,
+}
+local AccountBoundTooltipLinesNotBound = {
   ITEM_BIND_TO_ACCOUNT_UNTIL_EQUIP,
 }
 Syndicator.Constants.AccountBoundTooltipLines = {}
+Syndicator.Constants.AccountBoundTooltipLinesNotBound = {}
 -- Done this way because not all the lines exist on all clients
 for _, line in pairs(AccountBoundTooltipLines) do
   table.insert(Syndicator.Constants.AccountBoundTooltipLines, line)
+end
+for _, line in pairs(AccountBoundTooltipLinesNotBound) do
+  table.insert(Syndicator.Constants.AccountBoundTooltipLinesNotBound, line)
 end

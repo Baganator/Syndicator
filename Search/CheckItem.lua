@@ -319,15 +319,12 @@ local function BindOnEquipCheck(details)
 end
 
 local function BindOnAccountCheck(details)
-  if Syndicator.Constants.IsRetail and details.isBound then
-    return false
-  end
-
   GetTooltipInfoSpell(details)
 
   if details.tooltipInfoSpell then
     for _, row in ipairs(details.tooltipInfoSpell.lines) do
-      if tIndexOf(Syndicator.Constants.AccountBoundTooltipLines, row.leftText) ~= nil then
+      if tIndexOf(Syndicator.Constants.AccountBoundTooltipLines, row.leftText) ~= nil or
+          (not details.isBound and tIndexOf(Syndicator.Constants.AccountBoundTooltipLinesNotBound, row.leftText) ~= nil) then
         return true
       end
     end
@@ -336,15 +333,11 @@ local function BindOnAccountCheck(details)
 end
 
 local function WarboundUntilEquippedCheck(details)
-  if Syndicator.Constants.IsRetail and details.isBound then
-    return false
-  end
-
   GetTooltipInfoSpell(details)
 
   if details.tooltipInfoSpell then
     for _, row in ipairs(details.tooltipInfoSpell.lines) do
-      if row.leftText == ITEM_ACCOUNTBOUND_UNTIL_EQUIP or row.leftText == ITEM_BIND_TO_ACCOUNT_UNTIL_EQUIP then
+      if row.leftText == ITEM_ACCOUNTBOUND_UNTIL_EQUIP or (not details.isBound and row.leftText == ITEM_BIND_TO_ACCOUNT_UNTIL_EQUIP) then
         return true
       end
     end
