@@ -319,6 +319,10 @@ local function BindOnEquipCheck(details)
 end
 
 local function BindOnAccountCheck(details)
+  if Syndicator.Constants.IsRetail and details.isBound then
+    return false
+  end
+
   GetTooltipInfoSpell(details)
 
   if details.tooltipInfoSpell then
@@ -332,11 +336,15 @@ local function BindOnAccountCheck(details)
 end
 
 local function WarboundUntilEquippedCheck(details)
+  if Syndicator.Constants.IsRetail and details.isBound then
+    return false
+  end
+
   GetTooltipInfoSpell(details)
 
   if details.tooltipInfoSpell then
     for _, row in ipairs(details.tooltipInfoSpell.lines) do
-      if row.leftText == ITEM_ACCOUNTBOUND_UNTIL_EQUIP then
+      if row.leftText == ITEM_ACCOUNTBOUND_UNTIL_EQUIP or row.leftText == ITEM_BIND_TO_ACCOUNT_UNTIL_EQUIP then
         return true
       end
     end
@@ -562,6 +570,7 @@ AddKeyword(SYNDICATOR_L_KEYWORD_BATTLE_PET, PetCheck, SYNDICATOR_L_GROUP_ITEM_TY
 AddKeyword(SYNDICATOR_L_KEYWORD_SOULBOUND, SoulboundCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeyword(SYNDICATOR_L_KEYWORD_BOP, SoulboundCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeyword(SYNDICATOR_L_KEYWORD_BOE, BindOnEquipCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeyword(SYNDICATOR_L_KEYWORD_BWE, BindOnEquipCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeyword(SYNDICATOR_L_KEYWORD_BOU, BindOnUseCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeyword(SYNDICATOR_L_KEYWORD_EQUIPMENT, EquipmentCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
 AddKeyword(SYNDICATOR_L_KEYWORD_GEAR, EquipmentCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
@@ -602,6 +611,7 @@ if Syndicator.Constants.IsRetail then
   if Syndicator.Constants.WarbandBankActive then
     AddKeyword(ITEM_ACCOUNTBOUND:lower(), BindOnAccountCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
     AddKeyword(ITEM_ACCOUNTBOUND_UNTIL_EQUIP:lower(), WarboundUntilEquippedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+    AddKeyword(SYNDICATOR_L_KEYWORD_WUE, WarboundUntilEquippedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
   end
 end
 
