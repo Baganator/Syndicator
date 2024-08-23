@@ -1155,6 +1155,11 @@ local function GetTooltipSpecialTerms(details)
       end
     end
 
+    local color = details.tooltipInfoSpell.lines[2].leftColor
+    if math.floor(color.r * 100) == 52 and math.floor(color.g * 100) == 67 and color.b == 1 then
+      table.insert(details.searchKeywords, details.tooltipInfoSpell.lines[2].leftText:lower())
+    end
+
     if details.setInfo then
       for _, info in ipairs(details.setInfo) do
         if type(info.name) == "string" then

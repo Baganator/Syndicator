@@ -80,6 +80,11 @@ function SyndicatorAuctionCacheMixin:OnLoad()
 
   hooksecurefunc(C_AuctionHouse, "PlaceBid", function(auctionID)
     local auctionInfo = C_AuctionHouse.GetAuctionInfoByID(auctionID)
+
+    if auctionInfo == nil then -- Already sold
+      return
+    end
+
     auctionInfo.auctionID = auctionID
     self.purchasedItem = {
       auctionInfo = auctionInfo,
