@@ -1412,8 +1412,18 @@ local function ApplyTokens(tokens, startIndex)
   return BlendOperations(checks, checkPart, levelToOp[level]), index
 end
 
+local andPattern = " " .. SYNDICATOR_L_SEARCH_AND .. " "
+local orPattern = " " .. SYNDICATOR_L_SEARCH_OR .. " "
+local notPattern1 = " " .. SYNDICATOR_L_SEARCH_NOT .. " "
+local notPattern2 = "^" .. SYNDICATOR_L_SEARCH_NOT .. " "
+
 local function ProcessTerms(text)
   text = text:gsub("^%s*(.-)%s*$", "%1") -- remove surrounding whitespace
+    :gsub(" or ", "|"):gsub(orPattern, "|")
+    :gsub(" and ", "&"):gsub(andPattern, "&")
+    :gsub("^not ", "!"):gsub(notPattern1, "!")
+    :gsub(" not ", "!"):gsub(notPattern2, "|")
+
   local index = text:find("[~&|()!]")
   if index == nil then
     return ApplyKeyword(text)
