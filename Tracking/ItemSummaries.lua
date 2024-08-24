@@ -92,6 +92,12 @@ end
 function SyndicatorItemSummariesMixin:GenerateCharacterSummary(characterName, state)
   local details = SYNDICATOR_DATA.Characters[characterName]
 
+  -- Edge case sometimes removed characters are leftover in the queue, so check
+  -- details exist
+  if details == nil then
+    return
+  end
+
   if not self.SV.Characters.ByRealm[details.details.realmNormalized] then
     self.SV.Characters.ByRealm[details.details.realmNormalized] = {}
   end
