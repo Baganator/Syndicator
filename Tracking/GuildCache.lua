@@ -326,8 +326,7 @@ function SyndicatorGuildCacheMixin:ExamineBankTab(tabIndex, callback)
           DoSlot(slotIndex, itemID)
         else
           waiting = waiting + 1
-          local item = Item:CreateFromItemID(itemID)
-          item:ContinueOnItemLoad(function()
+          Syndicator.Utilities.LoadItemData(itemID, function()
             DoSlot(slotIndex, itemID)
             waiting = waiting - 1
             if loopComplete and waiting == 0 then

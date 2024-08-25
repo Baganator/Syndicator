@@ -44,8 +44,7 @@ function SyndicatorAuctionCacheMixin:OnEvent(eventName, ...)
       if C_Item.IsItemDataCachedByID(itemID) then
         self:AddAuction(auctionInfo, GetAuctionItemLink("owner", index))
       else
-        local item = Item:CreateFromItemID(itemID)
-        item:ContinueOnItemLoad(function()
+        Syndicator.Utilities.LoadItemData(itemID, function()
           auctionInfo = { GetAuctionItemInfo("owner", index) }
           self:AddAuction(auctionInfo, GetAuctionItemLink("owner", index))
         end)

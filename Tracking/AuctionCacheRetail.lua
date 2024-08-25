@@ -92,8 +92,7 @@ function SyndicatorAuctionCacheMixin:OnLoad()
     }
     -- Ensure we have a perfect item link
     if not C_Item.IsItemDataCachedByID(auctionInfo.itemKey.itemID) then
-      local item = Item:CreateFromItemID(auctionInfo.itemKey.itemID)
-      item:ContinueOnItemLoad(function()
+      Syndicator.Utilities.LoadItemData(auctionInfo.itemKey.itemID, function()
         local auctionInfo = C_AuctionHouse.GetAuctionInfoByID(auctionID)
         if not auctionInfo then
           if self.purchasedItem.auctionInfo.itemLink then
@@ -190,8 +189,7 @@ function SyndicatorAuctionCacheMixin:OnEvent(eventName, ...)
         if C_Item.IsItemDataCachedByID(auctionInfo.itemKey.itemID) then
           self:AddAuction(auctionInfo, auctionInfo.quantity)
         else
-          local item = Item:CreateFromItemID(auctionInfo.itemKey.itemID)
-          item:ContinueOnItemLoad(function()
+          Syndicator.Utilities.LoadItemData(auctionInfo.itemKey.itemID, function()
             local auctionInfo = C_AuctionHouse.GetOwnedAuctionInfo(index)
             if not auctionInfo then
               return
@@ -251,8 +249,7 @@ function SyndicatorAuctionCacheMixin:ProcessItemPurchase(auctionID)
     local item = ConvertAuctionInfoToItem(auctionInfo, itemCount)
     self:AddToMail(item)
   else
-    local item = Item:CreateFromItemID(auctionInfo.itemKey.itemID)
-    item:ContinueOnItemLoad(function()
+    Syndicator.Utilities.LoadItemData(auctionInfo.itemKey.itemID, function()
       local item = ConvertAuctionInfoToItem(auctionInfo, itemCount)
       self:AddToMail(item)
     end)
@@ -285,8 +282,7 @@ function SyndicatorAuctionCacheMixin:ProcessCommodityPurchase()
     local item = GetItem()
     self:AddToMail(item)
   else
-    local item = Item:CreateFromItemID(itemID)
-    item:ContinueOnItemLoad(function()
+    Syndicator.Utilities.LoadItemData(itemID, function()
       local item = GetItem()
       self:AddToMail(item)
     end)
@@ -321,8 +317,7 @@ function SyndicatorAuctionCacheMixin:ProcessAuctionCreated(auctionID)
     if C_Item.IsItemDataCachedByID(itemID) then
       DoItem()
     else
-      local item = Item:CreateFromItemID(itemID)
-      item:ContinueOnItemLoad(function()
+    Syndicator.Utilities.LoadItemData(itemID, function()
         DoItem()
       end)
     end

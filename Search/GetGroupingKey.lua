@@ -25,7 +25,7 @@ function Syndicator.Search.GetGroupingKey(item, callback)
   if stackable[item.itemID] ~= nil then
     Result()
   else
-    Item:CreateFromItemID(item.itemID):ContinueOnItemLoad(function()
+    Syndicator.Utilities.LoadItemData(item.itemID, function()
       stackable[item.itemID] = C_Item.GetItemMaxStackSizeByID(item.itemID) > 1
       Result()
     end)

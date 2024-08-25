@@ -250,8 +250,7 @@ function SyndicatorBagCacheMixin:ScanContainerBagSlots()
         if C_Item.IsItemDataCachedByID(itemID) then
           containerInfo.bags[index] = DoBagSlot(inventorySlot)
         else
-          local item = Item:CreateFromItemID(itemID)
-          item:ContinueOnItemLoad(function()
+          Syndicator.Utilities.LoadItemData(itemID, function()
             containerInfo.bags[index] = DoBagSlot(inventorySlot)
           end)
         end
@@ -271,8 +270,7 @@ function SyndicatorBagCacheMixin:ScanContainerBagSlots()
         if C_Item.IsItemDataCachedByID(itemID) then
           containerInfo.bank[index] = DoBagSlot(inventorySlot)
         else
-          local item = Item:CreateFromItemID(itemID)
-          item:ContinueOnItemLoad(function()
+          Syndicator.Utilities.LoadItemData(itemID, function()
             containerInfo.bank[index] = DoBagSlot(inventorySlot)
           end)
         end
@@ -345,7 +343,7 @@ function SyndicatorBagCacheMixin:OnUpdate()
       else
         waiting = waiting + 1
         local item = Item:CreateFromItemID(itemID)
-        item:ContinueOnItemLoad(function()
+        Syndicator.Utilities.LoadItemData(itemID, function()
           local slotInfo = C_Container.GetContainerItemInfo(bagID, slotID)
           if slotInfo and slotInfo.itemID == itemID then
             bag[slotID] = GetInfo(slotInfo)

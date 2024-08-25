@@ -63,8 +63,7 @@ function SyndicatorVoidCacheMixin:ScanVoidStorage()
         if not C_Item.IsItemDataCachedByID(itemID) then
           DoSlot(page, slot)
         else
-          local item = Item:CreateFromItemID(itemID)
-          item:ContinueOnItemLoad(function()
+          Syndicator.Utilities.LoadItemData(itemID, function()
             DoSlot(page, slot)
 
             if loopsFinished and waiting == 0 then

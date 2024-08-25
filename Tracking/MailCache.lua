@@ -116,8 +116,7 @@ function SyndicatorMailCacheMixin:OnLoad()
           DoAttachment(mail.items, mailIndex, attachmentIndex)
         else
           waiting = waiting + 1
-          local item = Item:CreateFromItemID(itemID)
-          item:ContinueOnItemLoad(function()
+          Syndicator.Utilities.LoadItemData(itemID, function()
             DoAttachment(mail.items, mailIndex, attachmentIndex)
             waiting = waiting - 1
             if loopComplete and waiting == 0 then
@@ -183,8 +182,7 @@ function SyndicatorMailCacheMixin:ScanMail()
           DoAttachment(attachments, mailIndex, attachmentIndex)
         else
           waiting = waiting + 1
-          local item = Item:CreateFromItemID(itemID)
-          item:ContinueOnItemLoad(function()
+          Syndicator.Utilities.LoadItemData(itemID, function()
             DoAttachment(attachments, mailIndex, attachmentIndex)
             waiting = waiting - 1
             if loopsComplete and waiting == 0 then

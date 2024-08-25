@@ -44,8 +44,7 @@ function SyndicatorEquippedCacheMixin:OnEvent(eventName, ...)
       if C_Item.IsItemDataCachedByID(itemID) then
         equipped[storedOffset] = GetSlotInfo(slot)
       else
-        local item = Item:CreateFromItemID(itemID)
-        item:ContinueOnItemLoad(function()
+        Syndicator.Utilities.LoadItemData(itemID, function()
           equipped[storedOffset] = GetSlotInfo(slot)
         end)
       end
@@ -90,9 +89,8 @@ function SyndicatorEquippedCacheMixin:ScanEquipped()
         waiting = waiting - 1
         DoSlot(slot, storedOffset, itemID)
       else
-        local item = Item:CreateFromItemID(itemID)
-        if not item:IsItemEmpty() then
-          item:ContinueOnItemLoad(function()
+        if C_Item.GetItemInfoInstant(itemID) ~= nil then
+          Syndicator.Utilities.LoadItemData(itemID, function()
             waiting = waiting - 1
             DoSlot(slot, storedOffset, itemID)
           end)
