@@ -86,13 +86,16 @@ itemFrame.OnUpdate = function(self, elapsed)
   end
 
   if next(pendingItems) == nil then
+    itemFrame.elapsed = 0
     self:SetScript("OnUpdate", nil)
+    self:UnregisterEvent("ITEM_DATA_LOAD_RESULT")
   end
 end
 
 function Syndicator.Utilities.LoadItemData(itemID, callback)
   pendingItems[itemID] = pendingItems[itemID] or {}
   table.insert(pendingItems[itemID], callback)
-  C_Item.RequestLoadItemDataByID(itemID)
+  itemFrame:RegisterEvent("ITEM_DATA_LOAD_RESULT")
   itemFrame:SetScript("OnUpdate", itemFrame.OnUpdate)
+  C_Item.RequestLoadItemDataByID(itemID)
 end
