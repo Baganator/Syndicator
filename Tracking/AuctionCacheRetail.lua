@@ -317,7 +317,7 @@ function SyndicatorAuctionCacheMixin:ProcessAuctionCreated(auctionID)
     if C_Item.IsItemDataCachedByID(itemID) then
       DoItem()
     else
-    Syndicator.Utilities.LoadItemData(itemID, function()
+      Syndicator.Utilities.LoadItemData(itemID, function()
         DoItem()
       end)
     end
