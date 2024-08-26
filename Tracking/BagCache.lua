@@ -342,7 +342,6 @@ function SyndicatorBagCacheMixin:OnUpdate()
         end
       else
         waiting = waiting + 1
-        local item = Item:CreateFromItemID(itemID)
         Syndicator.Utilities.LoadItemData(itemID, function()
           local slotInfo = C_Container.GetContainerItemInfo(bagID, slotID)
           if slotInfo and slotInfo.itemID == itemID then

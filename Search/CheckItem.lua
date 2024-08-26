@@ -429,19 +429,6 @@ local function OpenCheck(details)
   end
 end
 
---[[local function ManuscriptCheck(details)
-  GetTooltipInfoSpell(details)
-
-  if details.tooltipInfoSpell then
-    for _, row in ipairs(details.tooltipInfoSpell.lines) do
-      if row.leftText:lower():find(SYNDICATOR_L_KEYWORD_MANUSCRIPT, nil, true) then
-        return true
-      end
-    end
-    return false
-  end
-end]]
-
 local GetItemStats = C_Item.GetItemStats or GetItemStats
 
 local function SaveGearStats(details)
