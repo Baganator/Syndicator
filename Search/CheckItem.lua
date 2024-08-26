@@ -1,3 +1,6 @@
+-- Creates all the search keyword functions and binds them to locale dependent
+-- keywords and the English equivalent
+
 local function GetItemName(details)
   if details.itemName then
     return
@@ -527,11 +530,12 @@ end
 
 local KEYWORDS_TO_CHECK = {}
 local KEYWORD_AND_CATEGORY = {}
+local KEYWORD_AND_CATEGORY_ENGLISH = {}
 
 function Syndicator.Search.CleanKeyword(keyword)
   return keyword:gsub("[()&|~!]", " "):gsub("%s+", " "):gsub(" $", "")
 end
-local function AddKeyword(keyword, check, group)
+local function AddKeywordInternal(keyword, check)
   keyword = Syndicator.Search.CleanKeyword(keyword)
   local old = KEYWORDS_TO_CHECK[keyword]
   if old then
@@ -542,81 +546,112 @@ local function AddKeyword(keyword, check, group)
   KEYWORDS_TO_CHECK["_" .. keyword .. "_"] = KEYWORDS_TO_CHECK[keyword]
   KEYWORDS_TO_CHECK[keyword:gsub(" ", "-")] = KEYWORDS_TO_CHECK[keyword]
 
+  return keyword
+end
+
+local function AddKeywordDirect(keyword, check, group)
+  keyword = AddKeywordInternal(keyword, check)
+  table.insert(KEYWORD_AND_CATEGORY, {keyword = keyword, group = group or ""})
+  table.insert(KEYWORD_AND_CATEGORY_ENGLISH, {keyword = keyword, group = group or ""})
+end
+
+local function AddKeywordLocalised(key, check, group)
+  local keyword = AddKeywordInternal(_G["SYNDICATOR_L_" .. key], check)
+  if keyword ~= SYNDICATOR_LOCALES.enUS[key] then
+    local englishKeyword = AddKeywordInternal(SYNDICATOR_LOCALES.enUS[key], check)
+    table.insert(KEYWORD_AND_CATEGORY_ENGLISH, {keyword = englishKeyword, group = group or ""})
+  end
+
   table.insert(KEYWORD_AND_CATEGORY, {keyword = keyword, group = group or ""})
 end
 
-AddKeyword(SYNDICATOR_L_KEYWORD_PET, PetCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
-AddKeyword(SYNDICATOR_L_KEYWORD_BATTLE_PET, PetCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
-AddKeyword(SYNDICATOR_L_KEYWORD_SOULBOUND, SoulboundCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(SYNDICATOR_L_KEYWORD_BOP, SoulboundCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(SYNDICATOR_L_KEYWORD_BOE, BindOnEquipCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(SYNDICATOR_L_KEYWORD_BWE, BindOnEquipCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(SYNDICATOR_L_KEYWORD_BOU, BindOnUseCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(SYNDICATOR_L_KEYWORD_EQUIPMENT, EquipmentCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
-AddKeyword(SYNDICATOR_L_KEYWORD_GEAR, EquipmentCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
-AddKeyword(SYNDICATOR_L_KEYWORD_AXE, AxeCheck, SYNDICATOR_L_GROUP_WEAPON_TYPE)
-AddKeyword(SYNDICATOR_L_KEYWORD_MACE, MaceCheck, SYNDICATOR_L_GROUP_WEAPON_TYPE)
-AddKeyword(SYNDICATOR_L_KEYWORD_SWORD, SwordCheck, SYNDICATOR_L_GROUP_WEAPON_TYPE)
-AddKeyword(SYNDICATOR_L_KEYWORD_STAFF, StaffCheck, SYNDICATOR_L_GROUP_WEAPON_TYPE)
-AddKeyword(SYNDICATOR_L_KEYWORD_REAGENT, ReagentCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
-AddKeyword(SYNDICATOR_L_KEYWORD_FOOD, FoodCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
-AddKeyword(SYNDICATOR_L_KEYWORD_DRINK, FoodCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
-AddKeyword(SYNDICATOR_L_KEYWORD_POTION, PotionCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
-AddKeyword(SYNDICATOR_L_KEYWORD_SET, SetCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(SYNDICATOR_L_KEYWORD_EQUIPMENT_SET, SetCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(SYNDICATOR_L_KEYWORD_ENGRAVABLE, EngravableCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(SYNDICATOR_L_KEYWORD_ENGRAVED, EngravedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(SYNDICATOR_L_KEYWORD_SOCKET, SocketCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(SYNDICATOR_L_KEYWORD_JUNK, JunkCheck, SYNDICATOR_L_GROUP_QUALITY)
-AddKeyword(SYNDICATOR_L_KEYWORD_TRASH, JunkCheck, SYNDICATOR_L_GROUP_QUALITY)
-AddKeyword(SYNDICATOR_L_KEYWORD_BOA, BindOnAccountCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(SYNDICATOR_L_KEYWORD_ACCOUNT_BOUND, BindOnAccountCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(SYNDICATOR_L_KEYWORD_USE, UseCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(SYNDICATOR_L_KEYWORD_USABLE, UsableCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(SYNDICATOR_L_KEYWORD_OPEN, OpenCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(SYNDICATOR_L_KEYWORD_TRADEABLE_LOOT, IsTradeableLoot, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(SYNDICATOR_L_KEYWORD_TRADABLE_LOOT, IsTradeableLoot, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(SYNDICATOR_L_KEYWORD_RELIC, RelicCheck, SYNDICATOR_L_GROUP_ARMOR_TYPE)
-AddKeyword(SYNDICATOR_L_KEYWORD_STACKS, StackableCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(SYNDICATOR_L_KEYWORD_SOCKETED, SocketedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(SYNDICATOR_L_KEYWORD_CURRENCY, CurrencyCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(SYNDICATOR_L_KEYWORD_OBJECTIVE, QuestObjectiveCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(SYNDICATOR_L_KEYWORD_COLLECTED, CollectedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(SYNDICATOR_L_KEYWORD_UNCOLLECTED, UncollectedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeyword(ITEM_UNIQUE:lower(), UniqueCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+local function AddKeywordManual(keywordLocalised, keywordEnglish, check, group)
+  local keyword = AddKeywordInternal(keywordLocalised, check)
+  if keywordLocalised ~= keywordEnglish then
+    assert(GetLocale() ~= "enUS", keywordLocalised, keywordEnglish)
+    local englishKeyword = AddKeywordInternal(keywordEnglish, check)
+    table.insert(KEYWORD_AND_CATEGORY_ENGLISH, {keyword = englishKeyword, group = group or ""})
+  end
+
+  table.insert(KEYWORD_AND_CATEGORY, {keyword = keyword, group = group or ""})
+end
+
+AddKeywordLocalised("KEYWORD_PET", PetCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
+AddKeywordLocalised("KEYWORD_BATTLE_PET", PetCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
+AddKeywordLocalised("KEYWORD_SOULBOUND", SoulboundCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_BOP", SoulboundCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_BOE", BindOnEquipCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_BWE", BindOnEquipCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_BOU", BindOnUseCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_EQUIPMENT", EquipmentCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
+AddKeywordLocalised("KEYWORD_GEAR", EquipmentCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
+AddKeywordLocalised("KEYWORD_AXE", AxeCheck, SYNDICATOR_L_GROUP_WEAPON_TYPE)
+AddKeywordLocalised("KEYWORD_MACE", MaceCheck, SYNDICATOR_L_GROUP_WEAPON_TYPE)
+AddKeywordLocalised("KEYWORD_SWORD", SwordCheck, SYNDICATOR_L_GROUP_WEAPON_TYPE)
+AddKeywordLocalised("KEYWORD_STAFF", StaffCheck, SYNDICATOR_L_GROUP_WEAPON_TYPE)
+AddKeywordLocalised("KEYWORD_REAGENT", ReagentCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
+AddKeywordLocalised("KEYWORD_FOOD", FoodCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
+AddKeywordLocalised("KEYWORD_DRINK", FoodCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
+AddKeywordLocalised("KEYWORD_POTION", PotionCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
+AddKeywordLocalised("KEYWORD_SET", SetCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_EQUIPMENT_SET", SetCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_ENGRAVABLE", EngravableCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_ENGRAVED", EngravedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_SOCKET", SocketCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_JUNK", JunkCheck, SYNDICATOR_L_GROUP_QUALITY)
+AddKeywordLocalised("KEYWORD_TRASH", JunkCheck, SYNDICATOR_L_GROUP_QUALITY)
+AddKeywordLocalised("KEYWORD_BOA", BindOnAccountCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_ACCOUNT_BOUND", BindOnAccountCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_USE", UseCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_USABLE", UsableCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_OPEN", OpenCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_TRADEABLE_LOOT", IsTradeableLoot, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_TRADABLE_LOOT", IsTradeableLoot, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_RELIC", RelicCheck, SYNDICATOR_L_GROUP_ARMOR_TYPE)
+AddKeywordLocalised("KEYWORD_STACKS", StackableCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_SOCKETED", SocketedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_CURRENCY", CurrencyCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_OBJECTIVE", QuestObjectiveCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_COLLECTED", CollectedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_UNCOLLECTED", UncollectedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordManual(ITEM_UNIQUE:lower(), "unique", UniqueCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 
 if Syndicator.Constants.IsRetail then
-  AddKeyword(SYNDICATOR_L_KEYWORD_COSMETIC, CosmeticCheck, SYNDICATOR_L_GROUP_QUALITY)
-  AddKeyword(TOY:lower(), ToyCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
+  AddKeywordLocalised("KEYWORD_COSMETIC", CosmeticCheck, SYNDICATOR_L_GROUP_QUALITY)
+  AddKeywordManual(TOY:lower(), "toy", ToyCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
   if Syndicator.Constants.WarbandBankActive then
-    AddKeyword(ITEM_ACCOUNTBOUND:lower(), BindOnAccountCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-    AddKeyword(ITEM_ACCOUNTBOUND_UNTIL_EQUIP:lower(), WarboundUntilEquippedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-    AddKeyword(SYNDICATOR_L_KEYWORD_WUE, WarboundUntilEquippedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+    AddKeywordManual(ITEM_ACCOUNTBOUND:lower(), "warbound", BindOnAccountCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+    AddKeywordManual(ITEM_ACCOUNTBOUND_UNTIL_EQUIP:lower(), "warbound until equipped", WarboundUntilEquippedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+    AddKeywordLocalised("KEYWORD_WUE", WarboundUntilEquippedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
   end
 end
 
 local sockets = {
-  "EMPTY_SOCKET_BLUE",
-  "EMPTY_SOCKET_COGWHEEL",
-  "EMPTY_SOCKET_CYPHER",
-  "EMPTY_SOCKET_DOMINATION",
-  "EMPTY_SOCKET_HYDRAULIC",
-  "EMPTY_SOCKET_META",
-  "EMPTY_SOCKET_NO_COLOR",
-  "EMPTY_SOCKET_PRIMORDIAL",
-  "EMPTY_SOCKET_PRISMATIC",
-  "EMPTY_SOCKET_PUNCHCARDBLUE",
-  "EMPTY_SOCKET_PUNCHCARDRED",
-  "EMPTY_SOCKET_PUNCHCARDYELLOW",
-  "EMPTY_SOCKET_RED",
-  "EMPTY_SOCKET_TINKER",
-  "EMPTY_SOCKET_YELLOW",
+  ["EMPTY_SOCKET_BLUE"] = "blue socket",
+  ["EMPTY_SOCKET_COGWHEEL"] = "cogwheel socket",
+  ["EMPTY_SOCKET_CYPHER"] = "crystallic socket",
+  ["EMPTY_SOCKET_DOMINATION"] = "domination socket",
+  ["EMPTY_SOCKET_HYDRAULIC"] = "sha-touched",
+  ["EMPTY_SOCKET_META"] = "meta socket",
+  ["EMPTY_SOCKET_NO_COLOR"] = "prismatic socket",
+  ["EMPTY_SOCKET_PRIMORDIAL"] = "primordial socket",
+  ["EMPTY_SOCKET_PRISMATIC"] = "prismatic socket",
+  ["EMPTY_SOCKET_PUNCHCARDBLUE"] = "blue punchcard socket",
+  ["EMPTY_SOCKET_PUNCHCARDRED"] = "red punchcard socket",
+  ["EMPTY_SOCKET_PUNCHCARDYELLOW"] = "yellow punchcard socket",
+  ["EMPTY_SOCKET_RED"] = "red socket",
+  ["EMPTY_SOCKET_TINKER"] = "tinker socket",
+  ["EMPTY_SOCKET_YELLOW"] = "yellow socket",
 }
 
-for _, key in ipairs(sockets) do
+if Syndicator.Constants.IsClassic and not Syndicator.Constants.IsEra then
+  sockets["EMPTY_SOCKET_HYDRAULIC"] = "hydraulic socket"
+end
+
+for key, english in pairs(sockets) do
   local global = _G[key]
   if global then
-    AddKeyword(global:lower(), function(details)
+    AddKeywordManual(global:lower(), english, function(details)
       SaveGearStats(details)
       if details.itemStats then
         return details.itemStats[key] ~= nil
@@ -627,36 +662,36 @@ for _, key in ipairs(sockets) do
 end
 
 local inventorySlots = {
-  "INVTYPE_HEAD",
-  "INVTYPE_NECK",
-  "INVTYPE_SHOULDER",
-  "INVTYPE_BODY",
-  "INVTYPE_WAIST",
-  "INVTYPE_LEGS",
-  "INVTYPE_FEET",
-  "INVTYPE_WRIST",
-  "INVTYPE_HAND",
-  "INVTYPE_FINGER",
-  "INVTYPE_TRINKET",
-  "INVTYPE_WEAPON",
-  "INVTYPE_RANGED",
-  "INVTYPE_CLOAK",
-  "INVTYPE_2HWEAPON",
-  "INVTYPE_BAG",
-  "INVTYPE_TABARD",
-  "INVTYPE_WEAPONMAINHAND",
-  "INVTYPE_WEAPONOFFHAND",
-  "INVTYPE_HOLDABLE",
-  "INVTYPE_SHIELD",
-  "INVTYPE_AMMO",
-  "INVTYPE_THROWN",
-  "INVTYPE_RANGEDRIGHT",
-  "INVTYPE_QUIVER",
-  "INVTYPE_RELIC",
-  "INVTYPE_PROFESSION_TOOL",
-  "INVTYPE_PROFESSION_GEAR",
-  "INVTYPE_CHEST",
-  "INVTYPE_ROBE",
+  ["INVTYPE_HEAD"] = "head",
+  ["INVTYPE_NECK"] = "neck",
+  ["INVTYPE_SHOULDER"] = "shoulder",
+  ["INVTYPE_BODY"] = "shirt",
+  ["INVTYPE_WAIST"] = "waist",
+  ["INVTYPE_LEGS"] = "legs",
+  ["INVTYPE_FEET"] = "feet",
+  ["INVTYPE_WRIST"] = "wrist",
+  ["INVTYPE_HAND"] = "hands",
+  ["INVTYPE_FINGER"] = "finger",
+  ["INVTYPE_TRINKET"] = "trinket",
+  ["INVTYPE_WEAPON"] = "one-hand",
+  ["INVTYPE_RANGED"] = "ranged",
+  ["INVTYPE_CLOAK"] = "back",
+  ["INVTYPE_2HWEAPON"] = "two-hand",
+  ["INVTYPE_BAG"] = "bag",
+  ["INVTYPE_TABARD"] = "tabard",
+  ["INVTYPE_WEAPONMAINHAND"] = "main hand",
+  ["INVTYPE_WEAPONOFFHAND"] = "off hand",
+  ["INVTYPE_HOLDABLE"] = "held in off-hand",
+  ["INVTYPE_SHIELD"] = "off hand",
+  ["INVTYPE_AMMO"] = "ammo",
+  ["INVTYPE_THROWN"] = "thrown",
+  ["INVTYPE_RANGEDRIGHT"] = "ranged",
+  ["INVTYPE_QUIVER"] = "quiver",
+  ["INVTYPE_RELIC"] = "relic",
+  ["INVTYPE_PROFESSION_TOOL"] = "profession tool",
+  ["INVTYPE_PROFESSION_GEAR"] = "profession equipment",
+  ["INVTYPE_CHEST"] = "chest",
+  ["INVTYPE_ROBE"] = "chest",
 }
 
 local function GetInvType(details)
@@ -666,35 +701,35 @@ local function GetInvType(details)
   details.invType = (select(4, C_Item.GetItemInfoInstant(details.itemID))) or "NONE"
 end
 
-for _, slot in ipairs(inventorySlots) do
+for slot, english in pairs(inventorySlots) do
   local text = _G[slot]
   if text ~= nil then
-    AddKeyword(text:lower(),  function(details) GetInvType(details) return details.invType == slot end, SYNDICATOR_L_GROUP_SLOT)
+    AddKeywordManual(text:lower(), english, function(details) GetInvType(details) return details.invType == slot end, SYNDICATOR_L_GROUP_SLOT)
   end
 end
 
 do
-  AddKeyword(SYNDICATOR_L_KEYWORD_OFF_HAND, function(details)
+  AddKeywordLocalised("KEYWORD_OFF_HAND", function(details)
     GetInvType(details)
     return details.invType == "INVTYPE_HOLDABLE" or details.invType == "INVTYPE_SHIELD"
   end, SYNDICATOR_L_GROUP_SLOT)
 end
 
 local moreSlotMappings = {
-  [SYNDICATOR_L_KEYWORD_HELM] = "INVTYPE_HEAD",
-  [SYNDICATOR_L_KEYWORD_CLOAK] = "INVTYPE_CLOAK",
-  [SYNDICATOR_L_KEYWORD_BRACERS] = "INVTYPE_WRIST",
-  [SYNDICATOR_L_KEYWORD_GLOVES] = "INVTYPE_HAND",
-  [SYNDICATOR_L_KEYWORD_BELT] = "INVTYPE_WAIST",
-  [SYNDICATOR_L_KEYWORD_BOOTS] = "INVTYPE_FEET",
+  ["KEYWORD_HELM"] = "INVTYPE_HEAD",
+  ["KEYWORD_CLOAK"] = "INVTYPE_CLOAK",
+  ["KEYWORD_BRACERS"] = "INVTYPE_WRIST",
+  ["KEYWORD_GLOVES"] = "INVTYPE_HAND",
+  ["KEYWORD_BELT"] = "INVTYPE_WAIST",
+  ["KEYWORD_BOOTS"] = "INVTYPE_FEET",
 }
 
 for keyword, slot in pairs(moreSlotMappings) do
-  AddKeyword(keyword, function(details) GetInvType(details) return details.invType == slot end, SYNDICATOR_L_GROUP_SLOT)
+  AddKeywordLocalised(keyword, function(details) GetInvType(details) return details.invType == slot end, SYNDICATOR_L_GROUP_SLOT)
 end
 
 if Syndicator.Constants.IsRetail then
-  AddKeyword(SYNDICATOR_L_KEYWORD_AZERITE, function(details)
+  AddKeywordLocalised("KEYWORD_AZERITE", function(details)
     return C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItemByID(details.itemID)
   end, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 end
@@ -725,13 +760,6 @@ local TextToExpansion = {
   ["the war within"] = 10,
 }
 
-for key, quality in pairs(Enum.ItemQuality) do
-  local term = _G["ITEM_QUALITY" .. quality .. "_DESC"]
-  if term then
-    AddKeyword(term:lower(), function(details) return details.quality == quality end, SYNDICATOR_L_GROUP_QUALITY)
-  end
-end
-
 function Syndicator.Search.GetExpansion(details)
   if details.itemID == Syndicator.Constants.BattlePetCageID then
     return -1
@@ -748,14 +776,32 @@ function Syndicator.Search.GetExpansion(details)
   end
 end
 for key, expansionID in pairs(TextToExpansion) do
-  AddKeyword(key, function(details)
+  AddKeywordDirect(key, function(details)
     details.expacID = details.expacID or Syndicator.Search.GetExpansion(details)
     return details.expacID and details.expacID == expansionID
   end, SYNDICATOR_L_GROUP_EXPANSION)
 end
 
+local qualityToEnglish = {
+  [0] = "poor",
+  [1] = "common",
+  [2] = "uncommon",
+  [3] = "rare",
+  [4] = "epic",
+  [5] = "legendary",
+  [6] = "artifact",
+  [7] = "heirloom",
+  [8] = "wow token",
+}
+for key, quality in pairs(Enum.ItemQuality) do
+  local term = _G["ITEM_QUALITY" .. quality .. "_DESC"]
+  if term then
+    AddKeywordManual(term:lower(), qualityToEnglish[quality], function(details) return details.quality == quality end, SYNDICATOR_L_GROUP_QUALITY)
+  end
+end
+
 local keyringBagFamily = bit.lshift(1, 9 - 1)
-AddKeyword(SYNDICATOR_L_KEYWORD_KEY, function(details)
+AddKeywordLocalised("KEYWORD_KEY", function(details)
   local itemFamily = C_Item.GetItemFamily(details.itemID)
   if itemFamily == nil then
     return
@@ -765,7 +811,7 @@ AddKeyword(SYNDICATOR_L_KEYWORD_KEY, function(details)
 end, SYNDICATOR_L_GROUP_ITEM_TYPE)
 
 local fishingBagFamily = bit.lshift(1, 16 - 1)
-AddKeyword(SYNDICATOR_L_KEYWORD_FISH, function(details)
+AddKeywordLocalised("KEYWORD_FISH", function(details)
   GetClassSubClass(details)
   local itemFamily = C_Item.GetItemFamily(details.itemID)
   if itemFamily == nil then
@@ -793,7 +839,7 @@ end
 
 if C_TradeSkillUI and C_TradeSkillUI.GetItemReagentQualityByItemInfo then
   for tier = 1, 5 do
-    AddKeyword(SYNDICATOR_L_KEYWORD_RX:format(tier), function(details)
+    AddKeywordManual(SYNDICATOR_L_KEYWORD_RX:format(tier), SYNDICATOR_LOCALES.enUS["KEYWORD_RX"]:format(tier), function(details)
       if not C_Item.IsItemDataCachedByID(details.itemID) then
         C_Item.RequestLoadItemDataByID(details.itemID)
         return nil
@@ -848,68 +894,129 @@ end
 
 -- Based off of GlobalStrings.db2
 local stats = {
-  "AGILITY",
-  "ATTACK_POWER",
-  "BLOCK_RATING",
-  "CORRUPTION",
-  "CRAFTING_SPEED",
-  "CR_AVOIDANCE",
-  "CRIT_MELEE_RATING",
-  "CRIT_RANGED_RATING",
-  "CRIT_RATING",
-  "CRIT_SPELL_RATING",
-  "CRIT_TAKEN_RATING",
-  "CR_LIFESTEAL",
-  "CR_MULTISTRIKE",
-  "CR_SPEED",
-  "CR_STURDINESS",
-  "DAMAGE_PER_SECOND",
-  "DEFENSE_SKILL_RATING",
-  "DEFTNESS",
-  "DODGE_RATING",
-  "EXTRA_ARMOR",
-  "FINESSE",
-  "HASTE_RATING",
-  "HEALTH_REGENERATION",
-  "HIT_MELEE_RATING",
-  "HIT_RANGED_RATING",
-  "HIT_SPELL_RATING",
-  "HIT_RATING",
-  "HIT_TAKEN_RATING",
-  "INTELLECT",
-  "MANA_REGENERATION",
-  "MANA",
-  "MASTERY_RATING",
-  "MULTICRAFT",
-  "PARRY_RATING",
-  "PERCEPTION",
-  "PVP_POWER",
-  "RANGED_ATTACK_POWER",
-  "RESILIENCE_RATING",
-  "RESOURCEFULNESS",
-  "SPELL_DAMAGE_DONE",
-  "SPELL_HEALING_DONE",
-  "SPELL_PENETRATION",
-  "SPELL_POWER",
-  "SPIRIT",
-  "STAMINA",
-  "STRENGTH",
-  "VERSATILITY",
+  ["AGILITY"] = "agility",
+  ["ATTACK_POWER"] = "attack power",
+  ["BLOCK_RATING"] = "block",
+  ["CORRUPTION"] = "corruption",
+  ["CRAFTING_SPEED"] = "crafting speed",
+  ["CR_AVOIDANCE"] = "avoidance",
+  ["CRIT_MELEE_RATING"] = "critical strike (melee)",
+  ["CRIT_RANGED_RATING"] = "critical strike (ranged)",
+  ["CRIT_RATING"] = "critical strike",
+  ["CRIT_SPELL_RATING"] = "critical strike (spell)",
+  ["CRIT_TAKEN_RATING"] = "critical strike avoidance",
+  ["CR_LIFESTEAL"] = "leech",
+  ["CR_MULTISTRIKE"] = "multistrike",
+  ["CR_SPEED"] = "speed",
+  ["CR_STURDINESS"] = "indestructible",
+  ["DAMAGE_PER_SECOND"] = "damage per second",
+  ["DEFENSE_SKILL_RATING"] = "defense",
+  ["DEFTNESS"] = "deftness",
+  ["DODGE_RATING"] = "dodge",
+  ["EXTRA_ARMOR"] = "bonus armor",
+  ["FINESSE"] = "finesse",
+  ["HASTE_RATING"] = "haste",
+  ["HEALTH_REGENERATION"] = "health regeneration",
+  ["HIT_MELEE_RATING"] = "hit (melee)",
+  ["HIT_RANGED_RATING"] = "hit (ranged)",
+  ["HIT_SPELL_RATING"] = "hit (spell)",
+  ["HIT_RATING"] = "hit",
+  ["HIT_TAKEN_RATING"] = "hit avoidance",
+  ["INTELLECT"] = "intellect",
+  ["MANA_REGENERATION"] = "mana regeneration",
+  ["MANA"] = "mana",
+  ["MASTERY_RATING"] = "mastery",
+  ["MULTICRAFT"] = "multicraft",
+  ["PARRY_RATING"] = "parry",
+  ["PERCEPTION"] = "perception",
+  ["PVP_POWER"] = "pvp power",
+  ["RANGED_ATTACK_POWER"] = "ranged attack power",
+  ["RESILIENCE_RATING"] = "pvp resilience",
+  ["RESOURCEFULNESS"] = "resourcefulness",
+  ["SPELL_DAMAGE_DONE"] = "bonus damage",
+  ["SPELL_HEALING_DONE"] = "bonus healing",
+  ["SPELL_PENETRATION"] = "spell penetration",
+  ["SPELL_POWER"] = "spell power",
+  ["SPIRIT"] = "spirit",
+  ["STAMINA"] = "stamina",
+  ["STRENGTH"] = "strength",
+  ["VERSATILITY"] = "versatility",
 }
 
-for _, s in ipairs(stats) do
+if Syndicator.Constants.IsClassic and not Syndicator.Constants.IsEra then
+  stats = {
+    ["AGILITY"] = "agility",
+    ["ATTACK_POWER"] = "attack power",
+    ["BLOCK_RATING"] = "block rating",
+    ["CORRUPTION"] = "corruption",
+    ["CRAFTING_SPEED"] = "crafting speed",
+    ["CR_AVOIDANCE"] = "avoidance",
+    ["CRIT_MELEE_RATING"] = "critical strike rating (melee)",
+    ["CRIT_RANGED_RATING"] = "critical strike rating (ranged)",
+    ["CRIT_RATING"] = "critical strike rating",
+    ["CRIT_SPELL_RATING"] = "critical strike rating (spell)",
+    ["CRIT_TAKEN_RATING"] = "critical strike avoidance rating",
+    ["CR_LIFESTEAL"] = "leech",
+    ["CR_MULTISTRIKE"] = "multistrike",
+    ["CR_SPEED"] = "speed",
+    ["CR_STURDINESS"] = "indestructible",
+    ["DAMAGE_PER_SECOND"] = "damage per second",
+    ["DEFENSE_SKILL_RATING"] = "defense rating",
+    ["DEFTNESS"] = "deftness",
+    ["DODGE_RATING"] = "dodge rating",
+    ["EXTRA_ARMOR"] = "bonus armor",
+    ["FINESSE"] = "finesse",
+    ["HASTE_RATING"] = "haste rating",
+    ["HEALTH_REGENERATION"] = "health regeneration",
+    ["HIT_MELEE_RATING"] = "hit rating (melee)",
+    ["HIT_RANGED_RATING"] = "hit rating (ranged)",
+    ["HIT_SPELL_RATING"] = "hit rating (spell)",
+    ["HIT_RATING"] = "hit rating",
+    ["HIT_TAKEN_RATING"] = "hit avoidance rating",
+    ["INTELLECT"] = "intellect",
+    ["MANA_REGENERATION"] = "mana regeneration",
+    ["MANA"] = "mana",
+    ["MASTERY_RATING"] = "mastery",
+    ["MULTICRAFT"] = "multicraft",
+    ["PARRY_RATING"] = "parry rating",
+    ["PERCEPTION"] = "perception",
+    ["PVP_POWER"] = "pvp power",
+    ["RANGED_ATTACK_POWER"] = "ranged attack power",
+    ["RESILIENCE_RATING"] = "resilience rating",
+    ["RESOURCEFULNESS"] = "resourcefulness",
+    ["SPELL_DAMAGE_DONE"] = "bonus damage",
+    ["SPELL_HEALING_DONE"] = "bonus healing",
+    ["SPELL_PENETRATION"] = "spell penetration",
+    ["SPELL_POWER"] = "spell power",
+    ["SPIRIT"] = "spirit",
+    ["STAMINA"] = "stamina",
+    ["STRENGTH"] = "strength",
+    ["VERSATILITY"] = "versatility",
+  }
+end
+
+for s, english in pairs(stats) do
   local keyword = _G["ITEM_MOD_" .. s .. "_SHORT"] or _G["ITEM_MOD_" .. s]
   if keyword ~= nil then
-    AddKeyword(keyword:lower(), GetGearStatCheck(s), SYNDICATOR_L_GROUP_STAT)
-    AddKeyword(keyword:lower(), GetGemStatCheck(keyword), SYNDICATOR_L_GROUP_STAT)
+    AddKeywordManual(keyword:lower(), english, GetGearStatCheck(s), SYNDICATOR_L_GROUP_STAT)
+    AddKeywordManual(keyword:lower(), english, GetGemStatCheck(keyword), SYNDICATOR_L_GROUP_STAT)
   end
 end
-AddKeyword(STAT_ARMOR:lower(), GetGemStatCheck(STAT_ARMOR), SYNDICATOR_L_GROUP_STAT)
+AddKeywordManual(STAT_ARMOR:lower(), "armor", GetGemStatCheck(STAT_ARMOR), SYNDICATOR_L_GROUP_STAT)
 if Syndicator.Constants.IsClassic then
-  for i = 0, 6 do
+  local resistances = {
+    "holy resistance",
+    "fire resistance",
+    "nature resistance",
+    "frost resistance",
+    "shadow resistance",
+    "arcane resistance",
+    [0] = "armor",
+  }
+  for i, english in pairs(resistances) do
     local keyword = _G["RESISTANCE" .. i .. "_NAME"]
     if keyword ~= nil then
-      AddKeyword(keyword:lower(), GetResistanceStatCheck(keyword), SYNDICATOR_L_GROUP_STAT)
+      AddKeywordManual(keyword:lower(), english, GetResistanceStatCheck(keyword), SYNDICATOR_L_GROUP_STAT)
     end
   end
 end
@@ -1112,7 +1219,9 @@ local patterns = {
 -- tooltip data
 local EXCLUSIVE_KEYWORDS_NO_TOOLTIP_TEXT = {
   [SYNDICATOR_L_KEYWORD_USE] = true,
+  [SYNDICATOR_LOCALES.enUS["KEYWORD_USE"]] = true,
   [SYNDICATOR_L_KEYWORD_EQUIPMENT] = true,
+  [SYNDICATOR_LOCALES.enUS["KEYWORD_EQUIPMENT"]] = true,
 }
 
 local UPGRADE_PATH_PATTERN = ITEM_UPGRADE_TOOLTIP_FORMAT_STRING and "^" .. ITEM_UPGRADE_TOOLTIP_FORMAT_STRING:gsub("%%s", ".*"):gsub("%%d", ".*")
@@ -1475,11 +1584,40 @@ function Syndicator.Search.ClearCache()
 end
 
 function Syndicator.Search.InitializeSearchEngine()
-  for i = 0, Enum.ItemClassMeta.NumValues-1 do
+  local classesToCheck = {
+    [0] = "consumable",
+    [1] = "container",
+    [2] = "weapon",
+    [3] = "gem",
+    [4] = "armor",
+    [5] = "reagent",
+    [6] = "projectile",
+    [7] = "tradeskill",
+    [8] = "item enhancement",
+    [9] = "recipe",
+    --[10] = "money(obsolete)",
+    [11] = "quiver",
+    [12] = "quest",
+    [13] = "key",
+    --[14] = "permanent(obsolete)",
+    [15] = "miscellaneous",
+    [16] = "glyph",
+    [17] = "battle pets",
+    [18] = "wow token",
+    [19] = "profession",
+  }
+  if Syndicator.Constants.IsClassic then
+    classesToCheck[7] = "trade goods"
+    classesToCheck[8] = nil
+  end
+  if Syndicator.Constants.IsEra then
+    classesToCheck[3] = nil
+  end
+  for i, english in pairs(classesToCheck) do
     local name = C_Item.GetItemClassInfo(i)
     if name then
       local classID = i
-      AddKeyword(name:lower(), function(details)
+      AddKeywordManual(name:lower(), english, function(details)
         GetClassSubClass(details)
         return details.classID == classID
       end, SYNDICATOR_L_GROUP_ITEM_TYPE)
@@ -1487,28 +1625,28 @@ function Syndicator.Search.InitializeSearchEngine()
   end
 
   local tradeGoodsToCheck = {
-    1, -- parts
-    4, -- jewelcrafting
-    5, -- cloth
-    6, -- leather
-    7, -- metal and stone
-    8, -- cooking
-    9, -- herb
-    10, -- elemental
-    12, -- enchanting
-    16, -- inscription
-    18, -- optional reagents
+    [1] = "parts",
+    [4] = "jewelcrafting",
+    [5] = "cloth",
+    [6] = "leather",
+    [7] = "metal & stone",
+    [8] = "cooking",
+    [9] = "herb",
+    [10] = "elemental",
+    [12] = "enchanting",
+    [16] = "inscription",
+    [18] = "optional reagents",
+    [19] = "finishing reagents",
   }
   if Syndicator.Constants.IsClassic then
-    tAppendAll(tradeGoodsToCheck, {
-      2, -- explosive
-      3, -- device
-    })
+    tradeGoodsToCheck[2] = "explosives"
+    tradeGoodsToCheck[3] = "devices"
+    tradeGoodsToCheck[8] = "meat"
   end
-  for _, subClass in ipairs(tradeGoodsToCheck) do
+  for subClass, english in pairs(tradeGoodsToCheck) do
     local keyword = C_Item.GetItemSubClassInfo(7, subClass)
     if keyword ~= nil then
-      AddKeyword(keyword:lower(), function(details)
+      AddKeywordManual(keyword:lower(), english, function(details)
         GetClassSubClass(details)
         return details.classID == 7 and details.subClassID == subClass
       end, SYNDICATOR_L_GROUP_TRADE_GOODS)
@@ -1516,48 +1654,91 @@ function Syndicator.Search.InitializeSearchEngine()
   end
 
   local armorTypesToCheck = {
-    2, -- leather
-    3, -- mail
-    4, -- plate
-    6, -- shield
-    7, -- libram
-    8, -- idol
-    9, -- totem
-    10,-- sigil
-    11,-- relic
+    [2] = "leather",
+    [3] = "mail",
+    [4] = "plate",
+    [6] = "shields",
+    [7] = "librams",
+    [8] = "idols",
+    [9] = "totems",
+    [10] = "sigils",
+    [11] = "relic",
   }
-  for _, subClass in ipairs(armorTypesToCheck) do
+  for subClass, english in pairs(armorTypesToCheck) do
     local keyword = C_Item.GetItemSubClassInfo(Enum.ItemClass.Armor, subClass)
     if keyword ~= nil then
-      AddKeyword(keyword:lower(), function(details)
+      AddKeywordManual(keyword:lower(), english, function(details)
         GetClassSubClass(details)
         return details.classID == Enum.ItemClass.Armor and details.subClassID == subClass
       end, SYNDICATOR_L_GROUP_ARMOR_TYPE)
     end
   end
   -- cloth armor, but excluding cloaks
-  AddKeyword(C_Item.GetItemSubClassInfo(Enum.ItemClass.Armor, 1):lower(), function(details)
+  AddKeywordManual(C_Item.GetItemSubClassInfo(Enum.ItemClass.Armor, 1):lower(), "cloth", function(details)
     GetClassSubClass(details)
     GetInvType(details)
     return details.classID == Enum.ItemClass.Armor and details.subClassID == 1 and details.invType ~= "INVTYPE_CLOAK"
   end, SYNDICATOR_L_GROUP_ARMOR_TYPE)
 
+  local weaponTypesToCheck = {
+    "two-handed axes",
+    "bows",
+    "guns",
+    "one-handed maces",
+    "two-handed maces",
+    "polearms",
+    "one-handed swords",
+    "two-handed swords",
+    "warglaives",
+    "staves",
+    "bear claws",
+    "catclaws",
+    "fist weapons",
+    "miscellaneous",
+    "daggers",
+    "thrown",
+    "spears",
+    "crossbows",
+    "wands",
+    "fishing poles",
+    [0] = "one-handed axes",
+  }
+  if Syndicator.Constants.IsClassic then
+    weaponTypesToCheck[9] = nil
+    weaponTypesToCheck[11] = "one-handed exotics"
+    weaponTypesToCheck[12] = "two-handed exotics"
+  end
+  if Syndicator.Constants.IsEra then
+    weaponTypesToCheck[20] = "fishing pole"
+  end
   -- All weapons + fishingpole
-  for subClass = 0, 20 do
+  for subClass, english in pairs(weaponTypesToCheck) do
     local keyword = C_Item.GetItemSubClassInfo(Enum.ItemClass.Weapon, subClass)
     if keyword ~= nil then
-      AddKeyword(keyword:lower(), function(details)
+      AddKeywordManual(keyword:lower(), english, function(details)
         GetClassSubClass(details)
         return details.classID == Enum.ItemClass.Weapon and details.subClassID == subClass
       end, SYNDICATOR_L_GROUP_WEAPON_TYPE)
     end
   end
 
-  -- All weapons + fishingpole
-  for subClass = 1, 11 do
+  local recipeTypesToCheck = {
+    "leatherworking",
+    "tailoring",
+    "engineering",
+    "blacksmithing",
+    "cooking",
+    "alchemy",
+    "first aid",
+    "enchanting",
+    "fishing",
+    "jewelcrafting",
+    "inscription",
+  }
+  for subClass, english in pairs(recipeTypesToCheck) do
     local keyword = C_Item.GetItemSubClassInfo(Enum.ItemClass.Recipe, subClass)
     if keyword ~= nil then
-      AddKeyword(keyword:lower(), function(details)
+      AddKeywordManual(keyword:lower(), english, function(details)
         GetClassSubClass(details)
         return details.classID == Enum.ItemClass.Recipe and details.subClassID == subClass
       end, SYNDICATOR_L_GROUP_RECIPE)
@@ -1565,10 +1746,22 @@ function Syndicator.Search.InitializeSearchEngine()
   end
 
   if C_PetJournal then
-    for subClass = 0, 9 do
+    local petsToCheck = {
+      "dragonkin",
+      "flying",
+      "undead",
+      "critter",
+      "magic",
+      "elemental",
+      "beast",
+      "aquatic",
+      "mechanical",
+      [0] = "humanoid",
+    }
+    for subClass, english in pairs(petsToCheck) do
       local keyword = C_Item.GetItemSubClassInfo(Enum.ItemClass.Battlepet, subClass)
       if keyword ~= nil then
-        AddKeyword(keyword:lower(), function(details)
+        AddKeywordManual(keyword:lower(), english, function(details)
         GetClassSubClass(details)
           return details.classID == Enum.ItemClass.Battlepet and details.subClassID == subClass
         end, SYNDICATOR_L_GROUP_BATTLE_PET)
@@ -1576,29 +1769,66 @@ function Syndicator.Search.InitializeSearchEngine()
     end
   end
 
-  for subClass = 1, 12 do
+  local glyphsToCheck = {
+    "warrior",
+    "paladin",
+    "hunter",
+    "rogue",
+    "priest",
+    "death knight",
+    "shaman",
+    "mage",
+    "warlock",
+    "monk",
+    "druid",
+    "demon hunter",
+  }
+  for subClass, english in pairs(glyphsToCheck) do
     local keyword = C_Item.GetItemSubClassInfo(Enum.ItemClass.Glyph, subClass)
     if keyword ~= nil then
-      AddKeyword(keyword:lower(), function(details)
+      AddKeywordManual(keyword:lower(), english, function(details)
         GetClassSubClass(details)
         return details.classID == Enum.ItemClass.Glyph and details.subClassID == subClass
       end, SYNDICATOR_L_GROUP_GLYPH)
     end
   end
 
-  for subClass = 0, 9 do
-    local keyword = C_Item.GetItemSubClassInfo(Enum.ItemClass.Consumable, subClass)
-    if keyword ~= nil then
-      AddKeyword(keyword:lower(), function(details)
-        GetClassSubClass(details)
-        return details.classID == Enum.ItemClass.Consumable and details.subClassID == subClass
-      end, SYNDICATOR_L_GROUP_CONSUMABLE)
+  if not Syndicator.Constants.IsEra then
+    local consumablesToCheck = {
+      "potions",
+      "elixirs",
+      "flasks & phials",
+      nil,
+      "food & drink",
+      nil,
+      "bandages",
+      "other",
+      "vantus runes",
+      [0] = "explosives and devices",
+    }
+    if Syndicator.Constants.IsClassic then
+      consumablesToCheck[0] = nil
+      consumablesToCheck[1] = "potion"
+      consumablesToCheck[2] = "elixir"
+      consumablesToCheck[3] = "flask"
+      consumablesToCheck[4] = "scroll"
+      consumablesToCheck[6] = "item enhancement"
+      consumablesToCheck[7] = "bandage"
+    end
+    for subClass, english in pairs(consumablesToCheck) do
+      local keyword = C_Item.GetItemSubClassInfo(Enum.ItemClass.Consumable, subClass)
+      if keyword ~= nil then
+        AddKeywordManual(keyword:lower(), english, function(details)
+          GetClassSubClass(details)
+          return details.classID == Enum.ItemClass.Consumable and details.subClassID == subClass
+        end, SYNDICATOR_L_GROUP_CONSUMABLE)
+      end
     end
   end
 
   local mount = C_Item.GetItemSubClassInfo(Enum.ItemClass.Miscellaneous, Enum.ItemMiscellaneousSubclass.Mount)
   if mount ~= nil then
-    AddKeyword(mount:lower(), MountCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
+    AddKeywordManual(mount:lower(), "mount", MountCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
   end
 
   Syndicator.Search.RebuildKeywordList()
@@ -1613,4 +1843,8 @@ end
 
 function Syndicator.Search.GetKeywords()
   return KEYWORD_AND_CATEGORY
+end
+
+function Syndicator.Search.GetKeywordsEnglish()
+  return KEYWORD_AND_CATEGORY_ENGLISH
 end
