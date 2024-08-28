@@ -23,14 +23,21 @@ function SyndicatorCurrencyCacheMixin:OnLoad()
       if type(sourceGUID) ~= "string" then
         return
       end
+
+      local info = C_CurrencyInfo.GetCurrencyInfo(currencyID)
+      if not info then
+        return
+      end
+
       local possibilities = C_CurrencyInfo.FetchCurrencyDataFromAccountCharacters(currencyID)
       for _, option in ipairs(possibilities) do
         if option.characterGUID == sourceGUID then
           self:RegisterEvent("CURRENCY_TRANSFER_LOG_UPDATE")
+
           self.pendingTransfer = {
             sourceCharacter = option.fullCharacterName,
             currencyID = currencyID,
-            quantity = amount,
+            quantity = math.ceil(amount * (100 / info.transferPercentage)),
           }
         end
       end
