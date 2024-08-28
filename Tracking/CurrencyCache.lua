@@ -19,8 +19,21 @@ function SyndicatorCurrencyCacheMixin:OnLoad()
   end
   if Syndicator.Constants.IsRetail then
     self:RegisterEvent("CURRENCY_TRANSFER_FAILED")
-    hooksecurefunc(C_CurrencyInfo, "RequestCurrencyFromAccountCharacter", function()
-      self:RegisterEvent("CURRENCY_TRANSFER_LOG_UPDATE")
+    hooksecurefunc(C_CurrencyInfo, "RequestCurrencyFromAccountCharacter", function(sourceGUID, currencyID, amount)
+      if type(sourceGUID) ~= "string" then
+        return
+      end
+      local possibilities = C_CurrencyInfo.FetchCurrencyDataFromAccountCharacters(currencyID)
+      for _, option in ipairs(possibilities) do
+        if option.characterGUID == sourceGUID then
+          self:RegisterEvent("CURRENCY_TRANSFER_LOG_UPDATE")
+          self.pendingTransfer = {
+            sourceCharacter = option.fullCharacterName,
+            currencyID = currencyID,
+            quantity = amount,
+          }
+        end
+      end
     end)
   end
 end
@@ -45,40 +58,18 @@ function SyndicatorCurrencyCacheMixin:OnEvent(eventName, ...)
     SYNDICATOR_DATA.Warband[1].money = C_Bank.FetchDepositedMoney(Enum.BankType.Account)
     Syndicator.CallbackRegistry:TriggerEvent("WarbandCurrencyCacheUpdate", 1)
   elseif eventName == "CURRENCY_TRANSFER_LOG_UPDATE" then
-    local allTransfers = C_CurrencyInfo.FetchCurrencyTransferTransactions()
-    local lastTransfer = allTransfers[#allTransfers]
-    local sourceCharacter
-    local function Finish()
-      if SYNDICATOR_DATA.Characters[sourceCharacter] then
-        local oldValue = SYNDICATOR_DATA.Characters[sourceCharacter].currencies[lastTransfer.currencyType]
-        if oldValue ~= nil then
-          SYNDICATOR_DATA.Characters[sourceCharacter].currencies[lastTransfer.currencyType] = oldValue - lastTransfer.quantityTransferred
+    local sourceCharacter = self.pendingTransfer.sourceCharacter
+    if SYNDICATOR_DATA.Characters[sourceCharacter] then
+      local oldValue = SYNDICATOR_DATA.Characters[sourceCharacter].currencies[self.pendingTransfer.currencyID]
+      if oldValue ~= nil then
+        SYNDICATOR_DATA.Characters[sourceCharacter].currencies[self.pendingTransfer.currencyID] = oldValue - self.pendingTransfer.quantity
 
-          self:SetScript("OnUpdate", self.OnUpdate)
-        end
+        self:SetScript("OnUpdate", self.OnUpdate)
       end
-      self:UnregisterEvent("CURRENCY_TRANSFER_LOG_UPDATE")
     end
-    if lastTransfer.sourceCharacterGUID then
-      local ticker
-      ticker = C_Timer.NewTicker(0.2, function()
-        local name, realm = select(6, GetPlayerInfoByGUID(lastTransfer.sourceCharacterGUID))
-        if realm ~= "" then
-          ticker:Cancel()
-          sourceCharacter = name .. "-" .. realm
-          Finish()
-        elseif GetTime() - ticker.startTime > 5 then
-          ticker:Cancel()
-          sourceCharacter = lastTransfer.sourceCharacterName .. "-" .. GetNormalizedRealmName()
-          Finish()
-        end
-      end)
-      ticker.startTime = GetTime()
-    else
-      sourceCharacter = lastTransfer.sourceCharacterName .. "-" .. GetNormalizedRealmName()
-      Finish()
-    end
+    self:UnregisterEvent("CURRENCY_TRANSFER_LOG_UPDATE")
   elseif eventName == "CURRENCY_TRANSFER_FAILED" then
+    self.pendingTransfer = nil
     self:UnregisterEvent("CURRENCY_TRANSFER_LOG_UPDATE")
   end
 end
