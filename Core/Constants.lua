@@ -45,7 +45,7 @@ if Syndicator.Constants.IsRetail then
     Enum.BagIndex.AccountBankTab_4,
     Enum.BagIndex.AccountBankTab_5,
   }
-  Syndicator.Constants.WarbandBankActive = C_Bank ~= nil and C_Bank.UpdateBankTabSettings ~= nil
+  Syndicator.Constants.WarbandBankActive = true
 end
 
 if Syndicator.Constants.IsEra or KeyRingButtonIDToInvSlotID then
