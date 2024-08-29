@@ -304,6 +304,13 @@ local function JunkCheck(details)
   end
 end
 
+local function UpgradeCheck(details)
+  if details.isUpgrade ~= nil then
+    return details.isUpgrade
+  end
+  return false
+end
+
 local function BindOnEquipCheck(details)
   if details.isBound or (not Syndicator.Utilities.IsEquipment(details.itemLink) and details.classID ~= Enum.ItemClass.Container) then
     return false
@@ -600,6 +607,7 @@ AddKeywordLocalised("KEYWORD_ENGRAVED", EngravedCheck, SYNDICATOR_L_GROUP_ITEM_D
 AddKeywordLocalised("KEYWORD_SOCKET", SocketCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_JUNK", JunkCheck, SYNDICATOR_L_GROUP_QUALITY)
 AddKeywordLocalised("KEYWORD_TRASH", JunkCheck, SYNDICATOR_L_GROUP_QUALITY)
+AddKeywordLocalised("KEYWORD_UPGRADE", UpgradeCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_BOA", BindOnAccountCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_ACCOUNT_BOUND", BindOnAccountCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_USE", UseCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
