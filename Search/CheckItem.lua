@@ -1680,6 +1680,34 @@ function Syndicator.Search.InitializeSearchEngine()
     return details.classID == Enum.ItemClass.Armor and details.subClassID == 1 and details.invType ~= "INVTYPE_CLOAK"
   end, SYNDICATOR_L_GROUP_ARMOR_TYPE)
 
+  local classArmorTypes = {
+    ["WARRIOR"] = 4,
+    ["HUNTER"] = 3,
+    ["MAGE"] = 1,
+    ["ROGUE"] = 2,
+    ["PRIEST"] = 1,
+    ["WARLOCK"] = 1,
+    ["PALADIN"] = 4,
+    ["DRUID"] = 2,
+    ["SHAMAN"] = 3,
+    ["MONK"] = 2,
+    ["DEMONHUNTER"] = 2,
+    ["DEATHKNIGHT"] = 4,
+    ["EVOKER"] = 3
+  }
+  AddKeywordManual(SYNDICATOR_L_KEYWORD_MYCLASS, "myclass", function(details)
+    local character = Syndicator.Utilities.GetCharacterFullName()
+    local className = SYNDICATOR_DATA.Characters[character].details.className
+    local armorClass = classArmorTypes[className]
+    GetClassSubClass(details)
+    if armorClass == 1 then 
+      GetInvType(details)
+      return details.classID == Enum.ItemClass.Armor and details.subClassID == 1 and details.invType ~= "INVTYPE_CLOAK"
+    else
+      return details.classID == Enum.ItemClass.Armor and details.subClassID == armorClass
+    end
+  end, SYNDICATOR_L_GROUP_ARMOR_TYPE)
+
   local weaponTypesToCheck = {
     "two-handed axes",
     "bows",
