@@ -106,6 +106,7 @@ L["KEYWORD_UPGRADE"] = "upgrade"
 L["SEARCH_AND"] = "and"
 L["SEARCH_OR"] = "or"
 L["SEARCH_NOT"] = "not"
+L["KEYWORD_MY_CLASS"] = "my class"
 
 L["GROUP_ARMOR_TYPE"] = "Armor Type"
 L["GROUP_BATTLE_PET"] = "Battle Pet Type"

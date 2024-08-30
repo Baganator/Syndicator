@@ -36,6 +36,7 @@ Tracking\Tooltips.lua
 Tracking\CurrencyTooltipData.lua
 Tracking\Main.lua
 
+Search\Constants.lua
 Search\Initialize.lua
 Search\BaseInfo.lua
 Search\CheckItem.lua
