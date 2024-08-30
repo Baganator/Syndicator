@@ -1812,6 +1812,8 @@ function Syndicator.Search.InitializeSearchEngine()
       "bandages",
       "other",
       "vantus runes",
+      "utility curio",
+      "combat curio",
       [0] = "explosives and devices",
     }
     if Syndicator.Constants.IsClassic then
@@ -1822,6 +1824,8 @@ function Syndicator.Search.InitializeSearchEngine()
       consumablesToCheck[4] = "scroll"
       consumablesToCheck[6] = "item enhancement"
       consumablesToCheck[7] = "bandage"
+      consumablesToCheck[10] = nil
+      consumablesToCheck[11] = nil
     end
     for subClass, english in pairs(consumablesToCheck) do
       local keyword = C_Item.GetItemSubClassInfo(Enum.ItemClass.Consumable, subClass)
