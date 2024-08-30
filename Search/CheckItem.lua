@@ -439,6 +439,23 @@ local function OpenCheck(details)
   end
 end
 
+local function ReadCheck(details)
+  if not details.itemLink:find("item:", nil, true) then
+    return false
+  end
+
+  GetTooltipInfoSpell(details)
+
+  if details.tooltipInfoSpell then
+    for _, row in ipairs(details.tooltipInfoSpell.lines) do
+      if row.leftText == ITEM_READABLE then
+        return true
+      end
+    end
+    return false
+  end
+end
+
 local GetItemStats = C_Item.GetItemStats or GetItemStats
 
 local function SaveGearStats(details)
@@ -613,6 +630,7 @@ AddKeywordLocalised("KEYWORD_ACCOUNT_BOUND", BindOnAccountCheck, SYNDICATOR_L_GR
 AddKeywordLocalised("KEYWORD_USE", UseCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_USABLE", UsableCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_OPEN", OpenCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_READ", ReadCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_TRADEABLE_LOOT", IsTradeableLoot, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_TRADABLE_LOOT", IsTradeableLoot, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_RELIC", RelicCheck, SYNDICATOR_L_GROUP_ARMOR_TYPE)
