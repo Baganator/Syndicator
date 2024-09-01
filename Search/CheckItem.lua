@@ -561,7 +561,7 @@ local function UniqueCheck(details)
   return false
 end
 
-PVP_PATTERN = PVP_ITEM_LEVEL_TOOLTIP:gsub("%%d", ".*")
+local PVP_PATTERN = PVP_ITEM_LEVEL_TOOLTIP:gsub("%%d", ".*")
 local function PvPCheck(details)
   if not Syndicator.Utilities.IsEquipment(details.itemLink) then
     return false
