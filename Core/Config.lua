@@ -12,6 +12,7 @@ Syndicator.Config.Options = {
   TOOLTIPS_FACTION_ONLY = "tooltips_faction_only",
   TOOLTIPS_CHARACTER_LIMIT = "tooltips_character_limit",
   TOOLTIPS_SORT_BY_NAME = "tooltips_sort_by_name",
+  TOOLTIPS_AMOUNT_USES_CLASS_COLOR = "amount_uses_class_color",
 
   DEBUG = "debug",
   DEBUG_TIMERS = "debug_timers",
@@ -26,6 +27,7 @@ Syndicator.Config.Defaults = {
   [Syndicator.Config.Options.TOOLTIPS_CONNECTED_REALMS_ONLY] = not Syndicator.Constants.IsRetail,
   [Syndicator.Config.Options.TOOLTIPS_SORT_BY_NAME] = false,
   [Syndicator.Config.Options.TOOLTIPS_FACTION_ONLY] = false,
+  [Syndicator.Config.Options.TOOLTIPS_AMOUNT_USES_CLASS_COLOR] = false,
   [Syndicator.Config.Options.TOOLTIPS_CHARACTER_LIMIT] = 4,
   [Syndicator.Config.Options.SHOW_CHARACTER_RACE_ICONS] = true,
 
