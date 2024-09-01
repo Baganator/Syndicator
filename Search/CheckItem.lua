@@ -561,6 +561,26 @@ local function UniqueCheck(details)
   return false
 end
 
+PVP_PATTERN = PVP_ITEM_LEVEL_TOOLTIP:gsub("%%d", ".*")
+local function PvPCheck(details)
+  if not Syndicator.Utilities.IsEquipment(details.itemLink) then
+    return false
+  end
+
+  GetTooltipInfoSpell(details)
+
+  if not details.tooltipInfoSpell then
+    return
+  end
+
+  for _, row in ipairs(details.tooltipInfoSpell.lines) do
+    if row.leftText:match(PVP_PATTERN) then
+      return true
+    end
+  end
+  return false
+end
+
 local function UseATTInfo(details)
   if details.ATTInfoAcquired or not ATTC or not ATTC.SearchForField then -- All The Things
     return
@@ -677,6 +697,7 @@ AddKeywordLocalised("KEYWORD_OBJECTIVE", QuestObjectiveCheck, SYNDICATOR_L_GROUP
 AddKeywordLocalised("KEYWORD_COLLECTED", CollectedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_UNCOLLECTED", UncollectedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_MY_CLASS", MyClassCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_PVP", PvPCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordManual(ITEM_UNIQUE:lower(), "unique", UniqueCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 
 if Syndicator.Constants.IsRetail then
