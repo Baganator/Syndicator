@@ -267,7 +267,7 @@ function SyndicatorAuctionCacheMixin:ProcessCommodityPurchase()
   local itemCount = self.purchasedCommodity.itemCount
 
   local function GetItem()
-    local itemInfo = {C_Item.GetItemInfo(self.purchasedCommodity.itemID)}
+    local itemInfo = {C_Item.GetItemInfo(itemID)}
     return {
       itemID = itemID,
       itemCount = itemCount,
