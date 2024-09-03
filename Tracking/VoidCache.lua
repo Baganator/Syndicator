@@ -60,7 +60,7 @@ function SyndicatorVoidCacheMixin:ScanVoidStorage()
       void[page][slot] = {}
       local itemID, iconTexture, _, _, _, quality = GetVoidItemInfo(page, slot)
       if itemID ~= nil then
-        if not C_Item.IsItemDataCachedByID(itemID) then
+        if C_Item.IsItemDataCachedByID(itemID) then
           DoSlot(page, slot)
         else
           Syndicator.Utilities.LoadItemData(itemID, function()
