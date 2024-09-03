@@ -84,6 +84,7 @@ local raceCorrections = {
   ["zandalaritroll"] = "zandalari",
   ["highmountaintauren"] = "highmountain",
   ["lightforgeddraenei"] = "lightforged",
+  ["earthendwarf"] = "earthen",
 }
 local prefix
 if Syndicator.Constants.IsRetail then
