@@ -1598,11 +1598,12 @@ local notPattern1 = " " .. SYNDICATOR_L_SEARCH_NOT .. " "
 local notPattern2 = "^" .. SYNDICATOR_L_SEARCH_NOT .. " "
 
 local function ProcessTerms(text)
-  text = text:gsub("^%s*(.-)%s*$", "%1") -- remove surrounding whitespace
-    :gsub(" or ", "|"):gsub(orPattern, "|")
-    :gsub(" and ", "&"):gsub(andPattern, "&")
-    :gsub("^not ", "!"):gsub(notPattern1, "!")
-    :gsub(" not ", "!"):gsub(notPattern2, "|")
+  text = text
+    :gsub(" or ", " | "):gsub(orPattern, " | ")
+    :gsub(" and ", " & "):gsub(andPattern, " & ")
+    :gsub("^not ", " !"):gsub(notPattern1, " !")
+    :gsub(" not ", " !"):gsub(notPattern2, " !")
+    :gsub("^%s*(.-)%s*$", "%1") -- remove surrounding whitespace
 
   local index = text:find("[~&|()!]")
   if index == nil then
