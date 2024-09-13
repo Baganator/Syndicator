@@ -95,20 +95,7 @@ function SyndicatorGuildCacheMixin:GetGuildKey()
     return
   end
 
-  local connectedRealms = Syndicator.Utilities.GetConnectedRealms()
-
   local gmKey = guildName .. "-" .. gmRealm
-
-  for _, r in ipairs(connectedRealms) do
-    local key = guildName .. "-" .. r
-    if key ~= gmKey and SYNDICATOR_DATA.Guilds[key] then
-      if not SYNDICATOR_DATA.Guilds[gmKey] then
-        SYNDICATOR_DATA.Guilds[gmKey] = SYNDICATOR_DATA.Guilds[key]
-      end
-      Syndicator.API.DeleteGuild(key)
-      break
-    end
-  end
 
   -- No guild found cached, create it
   InitGuild(gmKey, guildName, gmRealm)
