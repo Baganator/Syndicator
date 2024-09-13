@@ -49,6 +49,7 @@ end
 
 function SyndicatorGuildCacheMixin:GetGuildKey()
   if not IsInGuild() then
+    Syndicator.CallbackRegistry:TriggerEvent("GuildNameSet", nil)
     return
   end
 
