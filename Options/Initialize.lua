@@ -59,6 +59,11 @@ local TOOLTIP_OPTIONS = {
     option = "show_tooltips_on_shift",
   },
   {
+    type = "checkbox",
+    text = SYNDICATOR_L_AMOUNT_USES_CLASS_COLOR,
+    option = "amount_uses_class_color",
+  },
+  {
     type = "slider",
     min = 1,
     max = 40,
