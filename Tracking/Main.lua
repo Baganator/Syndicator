@@ -59,6 +59,7 @@ local function InitCurrentCharacter()
   characterData.equipped = characterData.equipped or {}
   characterData.containerInfo = characterData.containerInfo or {}
   characterData.currencies = characterData.currencies or {}
+  characterData.currencyByHeader = characterData.currencyByHeader or {}
   characterData.void = characterData.void or {}
   characterData.auctions = characterData.auctions or {}
 end

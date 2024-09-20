@@ -51,9 +51,13 @@ function SyndicatorCurrencyCacheMixin:OnEvent(eventName, ...)
     -- Conquest currency changes
     local currencyID = ...
     if currencyID ~= nil then
-      local info = C_CurrencyInfo.GetCurrencyInfo(currencyID)
-      SYNDICATOR_DATA.Characters[self.currentCharacter].currencies[currencyID] = info.quantity
-      self:SetScript("OnUpdate", self.OnUpdate)
+      if SYNDICATOR_DATA.Characters[self.currentCharacter].currencies[currencyID] == nil then
+        self:ScanAllCurrencies() -- used to get header information
+      else
+        local info = C_CurrencyInfo.GetCurrencyInfo(currencyID)
+        SYNDICATOR_DATA.Characters[self.currentCharacter].currencies[currencyID] = info.quantity
+        self:SetScript("OnUpdate", self.OnUpdate)
+      end
     elseif not self.scannedLate then
       self.scannedLate = true
       self:ScanAllCurrencies()
@@ -83,6 +87,7 @@ end
 
 function SyndicatorCurrencyCacheMixin:ScanAllCurrencies()
   local currencies = {}
+  local currencyByHeader = { { name = UNKNOWN, currencies = {} } }
 
   if Syndicator.Constants.IsRetail then
     local index = 0
@@ -91,6 +96,10 @@ function SyndicatorCurrencyCacheMixin:ScanAllCurrencies()
       index = index + 1
       local info = C_CurrencyInfo.GetCurrencyListInfo(index)
       if info.isHeader then
+        table.insert(currencyByHeader, {
+          header = info.name,
+          currencies = {},
+        })
         if not info.isHeaderExpanded then
           table.insert(toCollapse, index)
           C_CurrencyInfo.ExpandCurrencyList(index, true)
@@ -100,6 +109,7 @@ function SyndicatorCurrencyCacheMixin:ScanAllCurrencies()
         if link ~= nil then
           local currencyID = C_CurrencyInfo.GetCurrencyIDFromLink(link)
           currencies[currencyID] = info.quantity
+          table.insert(currencyByHeader[#currencyByHeader].currencies, currencyID)
         end
       end
     end
@@ -114,8 +124,12 @@ function SyndicatorCurrencyCacheMixin:ScanAllCurrencies()
     local toCollapse = {}
     while index < GetCurrencyListSize() do
       index = index + 1
-      local _, isHeader, isHeaderExpanded, _, _, quantity = GetCurrencyListInfo(index)
+      local name, isHeader, isHeaderExpanded, _, _, quantity = GetCurrencyListInfo(index)
       if isHeader then
+        table.insert(currencyByHeader, {
+          header = name,
+          currencies = {},
+        })
         if not isHeaderExpanded then
           table.insert(toCollapse, index)
           ExpandCurrencyList(index, 1)
@@ -124,9 +138,8 @@ function SyndicatorCurrencyCacheMixin:ScanAllCurrencies()
         local link = C_CurrencyInfo.GetCurrencyListLink(index)
         if link ~= nil then
           local currencyID = tonumber((link:match("|Hcurrency:(%d+)")))
-          if currencyID ~= nil then
-            currencies[currencyID] = quantity
-          end
+          currencies[currencyID] = quantity
+          table.insert(currencyByHeader[#currencyByHeader].currencies, currencyID)
         end
       end
     end
@@ -139,6 +152,7 @@ function SyndicatorCurrencyCacheMixin:ScanAllCurrencies()
   end
 
   SYNDICATOR_DATA.Characters[self.currentCharacter].currencies = currencies
+  SYNDICATOR_DATA.Characters[self.currentCharacter].currencyByHeader = currencyByHeader
 
   self:SetScript("OnUpdate", self.OnUpdate)
 end
