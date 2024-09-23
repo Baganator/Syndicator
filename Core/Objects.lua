@@ -4,5 +4,6 @@ Syndicator = {
   Search = {},
   Utilities = {},
   Tracking = {},
+  ChatSync = {},
   API = {},
 }

@@ -11,6 +11,7 @@ Locales.lua
 
 Libs\LibBattlePetTooltipLine\LibStub\LibStub.lua
 Libs\LibBattlePetTooltipLine\LibBattlePetTooltipLine.xml
+Libs\ChatThrottleLib\ChatThrottleLib.xml
 
 Core\Objects.lua
 Core\Locales.lua

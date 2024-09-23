@@ -9,3 +9,4 @@ plain-copy:
 enable-toc-creation: yes
 externals:
   Libs/LibBattlePetTooltipLine: https://github.com/plusmouse/LibBattlePetTooltipLine
+  Libs/ChatThrottleLib: https://repos.curseforge.com/wow/chatthrottlelib/trunk
