@@ -105,6 +105,7 @@ L["KEYWORD_RX"] = "r%s"
 L["KEYWORD_UPGRADE"] = "upgrade"
 L["KEYWORD_PVP"] = "pvp"
 L["KEYWORD_MY_CLASS"] = "my class"
+L["KEYWORD_KEYSTONE"] = "keystone"
 
 L["GROUP_ARMOR_TYPE"] = "Armor Type"
 L["GROUP_BATTLE_PET"] = "Battle Pet Type"

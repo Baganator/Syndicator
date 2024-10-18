@@ -30,7 +30,7 @@ local function GetClassSubClass(details)
     details.subClassID = petType - 1
   else
     local classID, subClassID = select(6, C_Item.GetItemInfoInstant(details.itemID))
-    details.classID = classID
+    details.classID = classIselfD
     details.subClassID = subClassID
   end
 end
@@ -492,6 +492,10 @@ local function ReadCheck(details)
   end
 end
 
+local function KeystoneCheck(details)
+  return C_Item.IsItemKeystoneByID(details.itemID)
+end
+
 local GetItemStats = C_Item.GetItemStats or GetItemStats
 
 local function SaveGearStats(details)
@@ -703,6 +707,7 @@ AddKeywordManual(ITEM_UNIQUE:lower(), "unique", UniqueCheck, SYNDICATOR_L_GROUP_
 if Syndicator.Constants.IsRetail then
   AddKeywordLocalised("KEYWORD_COSMETIC", CosmeticCheck, SYNDICATOR_L_GROUP_QUALITY)
   AddKeywordManual(TOY:lower(), "toy", ToyCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
+  AddKeywordLocalised("KEYWORD_KEYSTONE", KeystoneCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
   if Syndicator.Constants.WarbandBankActive then
     AddKeywordManual(ITEM_ACCOUNTBOUND:lower(), "warbound", BindOnAccountCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
     AddKeywordManual(ITEM_ACCOUNTBOUND_UNTIL_EQUIP:lower(), "warbound until equipped", WarboundUntilEquippedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
