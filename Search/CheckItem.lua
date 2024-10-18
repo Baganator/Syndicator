@@ -30,7 +30,7 @@ local function GetClassSubClass(details)
     details.subClassID = petType - 1
   else
     local classID, subClassID = select(6, C_Item.GetItemInfoInstant(details.itemID))
-    details.classID = classIselfD
+    details.classID = classID
     details.subClassID = subClassID
   end
 end
