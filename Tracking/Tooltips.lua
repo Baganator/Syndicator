@@ -142,23 +142,27 @@ function Syndicator.Tooltips.AddItemLines(tooltip, summaries, itemLink)
   local charactersShown = 0
   for _, s in ipairs(tooltipInfo.characters) do
     local entries = {}
+    local amountColor = WHITE_FONT_COLOR
+    if s.className and Syndicator.Config.Get("amount_uses_class_color") then
+      amountColor = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[s.className]
+    end
     if s.bags > 0 then
-      table.insert(entries, SYNDICATOR_L_BAGS_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.bags)))
+      table.insert(entries, SYNDICATOR_L_BAGS_X:format(amountColor:WrapTextInColorCode(s.bags)))
     end
     if s.bank > 0 then
-      table.insert(entries, SYNDICATOR_L_BANK_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.bank)))
+      table.insert(entries, SYNDICATOR_L_BANK_X:format(amountColor:WrapTextInColorCode(s.bank)))
     end
     if s.mail > 0 then
-      table.insert(entries, SYNDICATOR_L_MAIL_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.mail)))
+      table.insert(entries, SYNDICATOR_L_MAIL_X:format(amountColor:WrapTextInColorCode(s.mail)))
     end
     if s.equipped > 0 then
-      table.insert(entries, SYNDICATOR_L_EQUIPPED_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.equipped)))
+      table.insert(entries, SYNDICATOR_L_EQUIPPED_X:format(amountColor:WrapTextInColorCode(s.equipped)))
     end
     if s.void > 0 then
-      table.insert(entries, SYNDICATOR_L_VOID_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.void)))
+      table.insert(entries, SYNDICATOR_L_VOID_X:format(amountColor:WrapTextInColorCode(s.void)))
     end
     if s.auctions > 0 then
-      table.insert(entries, SYNDICATOR_L_AUCTIONS_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.auctions)))
+      table.insert(entries, SYNDICATOR_L_AUCTIONS_X:format(amountColor:WrapTextInColorCode(s.auctions)))
     end
     local character = s.character
     if appendRealm then
