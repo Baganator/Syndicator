@@ -40,10 +40,9 @@ local battlePetTooltip = {
   "battlePetSpeed",
 }
 
-function Syndicator.Utilities.RecoverBattlePetLink(tooltipInfo)
-  if not tooltipInfo then
-    print("miss")
-    return
+function Syndicator.Utilities.RecoverBattlePetLink(tooltipInfo, itemLink, quality)
+  if not tooltipInfo or not tooltipInfo[battlePetTooltip[1]] then
+    return itemLink, quality
   end
 
   local itemString = "battlepet"

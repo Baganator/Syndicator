@@ -292,7 +292,7 @@ function SyndicatorGuildCacheMixin:ExamineBankTab(tabIndex, callback)
 
       if itemID == Syndicator.Constants.BattlePetCageID then
         local tooltipInfo = C_TooltipInfo.GetGuildBankItem(tabIndex, slotIndex)
-        itemLink, quality = Syndicator.Utilities.RecoverBattlePetLink(tooltipInfo)
+        itemLink, quality = Syndicator.Utilities.RecoverBattlePetLink(tooltipInfo, itemLink, quality)
       end
 
       tab.slots[slotIndex] = {
