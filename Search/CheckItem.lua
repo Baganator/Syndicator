@@ -6,7 +6,7 @@ local function GetItemName(details)
     return
   end
 
-  if details.itemID == Syndicator.Constants.BattlePetCageID then
+  if details.itemID == Syndicator.Constants.BattlePetCageID and details.itemLink:find("battlepet:") then
     local petID = details.itemLink:match("battlepet:(%d+)")
     details.itemName = C_PetJournal.GetPetInfoBySpeciesID(tonumber(petID))
   elseif C_Item.IsItemDataCachedByID(details.itemID) then
@@ -23,9 +23,9 @@ local function GetClassSubClass(details)
     return
   end
 
-  if details.itemID == Syndicator.Constants.BattlePetCageID then
+  if details.itemID == Syndicator.Constants.BattlePetCageID and details.itemLink:find("battlepet:") then
     local petID = details.itemLink:match("battlepet:(%d+)")
-    local itemName, _, petType = C_PetJournal.GetPetInfoBySpeciesID(tonumber(petID))
+    local _, _, petType = C_PetJournal.GetPetInfoBySpeciesID(tonumber(petID))
     details.classID = Enum.ItemClass.Battlepet
     details.subClassID = petType - 1
   else
@@ -194,6 +194,9 @@ end
 
 local function IsPetCollected(itemLink)
   local speciesID = tonumber((itemLink:match("battlepet:(%d+)")))
+  if speciesID == nil then
+    return
+  end
   local numCollected = C_PetJournal.GetNumCollectedInfo(speciesID)
   return numCollected > 0
 end
