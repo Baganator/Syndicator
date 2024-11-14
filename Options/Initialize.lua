@@ -412,12 +412,18 @@ function Syndicator.Options.Initialize()
   optionsFrame.OnRefresh = function() end
 
   local characterEditor = MakeCharacterEditor(optionsFrame)
-  characterEditor:SetPoint("TOPRIGHT", optionsFrame, -15, -60)
+  characterEditor:SetPoint("TOPRIGHT", optionsFrame, -15, -80)
   characterEditor:SetSize(320, 210)
+  local characterHeader = optionsFrame:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
+  characterHeader:SetPoint("BOTTOMLEFT", characterEditor, "TOPLEFT", 0, 5)
+  characterHeader:SetText(SYNDICATOR_L_CHARACTERS)
 
   local guildEditor = MakeGuildEditor(optionsFrame)
-  guildEditor:SetPoint("TOPRIGHT", optionsFrame, -15, -280)
+  guildEditor:SetPoint("TOPRIGHT", optionsFrame, -15, -320)
   guildEditor:SetSize(320, 130)
+  local guildHeader = optionsFrame:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
+  guildHeader:SetPoint("BOTTOMLEFT", guildEditor, "TOPLEFT", 0, 5)
+  guildHeader:SetText(SYNDICATOR_L_GUILDS)
 
   local category = Settings.RegisterCanvasLayoutCategory(optionsFrame, SYNDICATOR_L_SYNDICATOR)
   category.ID = SYNDICATOR_L_SYNDICATOR

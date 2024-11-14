@@ -34,6 +34,8 @@ L["SHOW_RACE_ICONS"] = "Show race icons"
 L["HIDE_IN_TOOLTIPS"] = "Hide in tooltips"
 L["DELETE_CHARACTER"] = "Delete Character"
 L["SHOW_IN_TOOLTIPS"] = "Show in tooltips"
+L["CHARACTERS"] = "Characters"
+L["GUILDS"] = "Guilds"
 
 L["ALL_CHARACTERS_COLON"] = "All Characters:"
 
