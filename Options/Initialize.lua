@@ -267,6 +267,7 @@ local function MakeGuildEditor(parent)
       local info = Syndicator.API.GetGuild(guild)
       table.insert(allGuilds, {
         fullName = guild,
+        guild = info.details.guild,
         realm = info.details.realm,
       })
     end
@@ -295,7 +296,7 @@ local function MakeGuildEditor(parent)
     frame:SetHighlightAtlas("search-highlight")
     frame:SetNormalFontObject(GameFontHighlight)
     frame.fullName = elementData.fullName
-    frame:SetText(frame.fullName)
+    frame:SetText(TRANSMOGRIFY_FONT_COLOR:WrapTextInColorCode(elementData.guild) .. "-" .. NORMAL_FONT_COLOR:WrapTextInColorCode(elementData.realm))
     frame:GetFontString():SetPoint("LEFT", 52, 0)
     frame:GetFontString():SetPoint("RIGHT", -20, 0)
     frame:GetFontString():SetJustifyH("LEFT")
