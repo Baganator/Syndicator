@@ -243,7 +243,7 @@ local function MakeGuildEditor(parent)
     end)
     frame.DeleteButton:SetScript("OnEnter", function()
       GameTooltip:SetOwner(frame.DeleteButton, "ANCHOR_RIGHT")
-      GameTooltip:SetText(SYNDICATOR_L_DELETE_CHARACTER)
+      GameTooltip:SetText(SYNDICATOR_L_DELETE_GUILD)
       GameTooltip:Show()
       frame.DeleteButton:SetAlpha(0.5)
     end)
@@ -252,6 +252,14 @@ local function MakeGuildEditor(parent)
       frame.DeleteButton:SetAlpha(1)
     end)
   end
+
+  local function SetGuildIcon(frame)
+    frame.GuildIcon = frame:CreateFontString(nil, "BACKGROUND", "GameFontHighlight")
+    frame.GuildIcon:SetSize(15, 15)
+    frame.GuildIcon:SetPoint("TOPLEFT", 35, -2.5)
+    frame.GuildIcon:SetText(Syndicator.Utilities.GetGuildIcon())
+  end
+
   local container = CreateFrame("Frame", nil, parent, "InsetFrameTemplate")
 
   local scrollBar = CreateFrame("EventFrame", nil, container, "MinimalScrollBar")
@@ -310,6 +318,7 @@ local function MakeGuildEditor(parent)
     if not frame.HideButton then
       SetHideButton(frame)
       SetDeleteButton(frame)
+      SetGuildIcon(frame)
     end
     frame.DeleteButton:SetShown(frame.fullName ~= Syndicator.API.GetCurrentGuild())
     frame:UpdateHideVisual()
