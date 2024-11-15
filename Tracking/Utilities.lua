@@ -98,3 +98,6 @@ end
 function Syndicator.Utilities.GetGuildIcon()
   return "|A:communities-guildbanner-background:13:13|a"
 end
+function Syndicator.Utilities.GetWarbandIcon()
+  return "|A:warbands-icon:17:13|a"
+end

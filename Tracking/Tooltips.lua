@@ -196,7 +196,7 @@ function Syndicator.Tooltips.AddItemLines(tooltip, summaries, itemLink)
     tooltip:AddLine("  ...")
   end
   if tooltipInfo.warband[1] > 0 then
-    AddDoubleLine("  " .. PASSIVE_SPELL_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_WARBAND), WHITE_FONT_COLOR:WrapTextInColorCode(tooltipInfo.warband[1]))
+    AddDoubleLine("  " .. Syndicator.Utilities.GetWarbandIcon() .. " " .. PASSIVE_SPELL_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_WARBAND), LINK_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_BANK_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(tooltipInfo.warband[1]))))
   end
   tooltip:Show()
 end
