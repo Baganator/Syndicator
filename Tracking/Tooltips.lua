@@ -196,7 +196,11 @@ function Syndicator.Tooltips.AddItemLines(tooltip, summaries, itemLink)
     tooltip:AddLine("  ...")
   end
   if tooltipInfo.warband[1] > 0 then
-    AddDoubleLine("  " .. Syndicator.Utilities.GetWarbandIcon() .. " " .. PASSIVE_SPELL_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_WARBAND), LINK_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_BANK_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(tooltipInfo.warband[1]))))
+    local icon = ""
+    if Syndicator.Config.Get(Syndicator.Config.Options.SHOW_CHARACTER_RACE_ICONS) then
+      icon = Syndicator.Utilities.GetWarbandIcon() .. " "
+    end
+    AddDoubleLine("  " .. icon .. PASSIVE_SPELL_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_WARBAND), LINK_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_BANK_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(tooltipInfo.warband[1]))))
   end
   tooltip:Show()
 end
