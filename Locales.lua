@@ -127,6 +127,7 @@ L["GROUP_CONSUMABLE"] = "Consumable"
 
 L["SEARCHED_EVERYWHERE_COLON"] = "Searched Everywhere:"
 L["CANNOT_SEARCH_BY_ITEM_LINK"] = "Cannot search by item link"
+L["NO_RESULTS_FOUND"] = "No results found"
 L["BAGS_LOWER"] = "bags"
 L["BANK_LOWER"] = "bank"
 L["MAIL_LOWER"] = "mail"

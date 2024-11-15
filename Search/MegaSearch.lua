@@ -401,11 +401,15 @@ function Syndicator.Search.RunMegaSearchAndPrintResults(searchTerm)
   Syndicator.Search.RequestMegaSearchResults(searchTerm, function(results)
     print(GREEN_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_SEARCHED_EVERYWHERE_COLON) .. " " .. YELLOW_FONT_COLOR:WrapTextInColorCode(searchTerm))
     Syndicator.Search.CombineMegaSearchResults(results, function(results)
+      local indent = "       "
       for _, r in ipairs(results) do
         print("   " .. r.itemLink, BLUE_FONT_COLOR:WrapTextInColorCode("x" .. FormatLargeNumber(r.itemCount)))
         for _, s in ipairs(r.sources) do
-          PrintSource("       ", s, s.itemNameLower)
+          PrintSource(indent, s, s.itemNameLower)
         end
+      end
+      if #results == 0 then
+        print(indent, RED_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_NO_RESULTS_FOUND))
       end
     end)
   end)
