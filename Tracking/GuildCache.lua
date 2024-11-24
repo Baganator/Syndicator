@@ -26,13 +26,19 @@ local GUILD_OPEN_EVENTS = {
   "GUILDBANK_UPDATE_MONEY",
 }
 
+local ROSTER_EVENTS = {
+  "GUILD_ROSTER_UPDATE",
+  "PLAYER_GUILD_UPDATE",
+}
+
 function SyndicatorGuildCacheMixin:OnLoad()
   FrameUtil.RegisterFrameForEvents(self, {
     "PLAYER_INTERACTION_MANAGER_FRAME_SHOW",
     "PLAYER_INTERACTION_MANAGER_FRAME_HIDE",
-    "GUILD_ROSTER_UPDATE",
-    "PLAYER_GUILD_UPDATE",
+    "LOADING_SCREEN_ENABLED",
+    "LOADING_SCREEN_DISABLED",
   })
+  FrameUtil.RegisterFrameForEvents(self, ROSTER_EVENTS)
 
   self:GetGuildKey()
   self.lastTabPickups = {}
@@ -139,6 +145,10 @@ function SyndicatorGuildCacheMixin:OnEvent(eventName, ...)
   elseif eventName == "GUILD_ROSTER_UPDATE" or eventName == "PLAYER_GUILD_UPDATE" then
     local oldGuild = self.currentGuild
     self:GetGuildKey()
+  elseif eventName == "LOADING_SCREEN_DISABLED" then
+    FrameUtil.RegisterFrameForEvents(self, ROSTER_EVENTS)
+  elseif eventName == "LOADING_SCREEN_ENABLED" then
+    FrameUtil.UnregisterFrameForEvents(self, ROSTER_EVENTS)
   end
 end
 
