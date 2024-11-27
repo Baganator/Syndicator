@@ -8,7 +8,7 @@ end
 function Syndicator.Search.GetGroupingKey(item, callback)
   local function Result()
     local lower = GetLower(item)
-    if item.itemID == Syndicator.Constants.BattlePetCageID then
+    if item.itemID == Syndicator.Constants.BattlePetCageID and item.itemLink:find("battlepet:") ~= nil then
       callback(lower .. "_" .. strjoin("-", BattlePetToolTip_UnpackBattlePetLink(item.itemLink)) .. "_" .. tostring(item.isBound))
     elseif stackable[item.itemID] then
       callback(lower .. "_" .. tostring(item.itemID))
