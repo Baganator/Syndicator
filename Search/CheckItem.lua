@@ -385,9 +385,11 @@ local function WarboundUntilEquippedCheck(details)
   GetTooltipInfoSpell(details)
 
   if details.tooltipInfoSpell then
-    for _, row in ipairs(details.tooltipInfoSpell.lines) do
-      if row.leftText == ITEM_ACCOUNTBOUND_UNTIL_EQUIP or (not details.isBound and row.leftText == ITEM_BIND_TO_ACCOUNT_UNTIL_EQUIP) then
-        return true
+    if not details.isBound then
+      for _, row in ipairs(details.tooltipInfoSpell.lines) do
+        if not details.isBound and tIndexOf(Syndicator.Constants.AccountBoundTooltipLinesNotBound, row.leftText) ~= nil then
+          return true
+        end
       end
     end
     return false
