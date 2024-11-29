@@ -104,7 +104,7 @@ function SyndicatorCurrencyCacheMixin:ScanAllCurrencies()
           table.insert(toCollapse, index)
           C_CurrencyInfo.ExpandCurrencyList(index, true)
         end
-      else
+      elseif info.discovered then
         local link = C_CurrencyInfo.GetCurrencyListLink(index)
         if link ~= nil then
           local currencyID = C_CurrencyInfo.GetCurrencyIDFromLink(link)
