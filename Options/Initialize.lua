@@ -276,7 +276,7 @@ local function MakeGuildEditor(parent)
       table.insert(allGuilds, {
         fullName = guild,
         guild = info.details.guild,
-        realm = info.details.realm,
+        realm = info.details.realm or guild, -- Fallback value for legacy format
       })
     end
     table.sort(allGuilds, function(a, b)
