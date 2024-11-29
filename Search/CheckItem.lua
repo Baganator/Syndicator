@@ -381,6 +381,8 @@ local function BindOnAccountCheck(details)
   end
 end
 
+Syndicator.Utilities.BindOnAccountCheck = BindOnAccountCheck -- export so it can be used by Baganator
+
 local function WarboundUntilEquippedCheck(details)
   GetTooltipInfoSpell(details)
 
