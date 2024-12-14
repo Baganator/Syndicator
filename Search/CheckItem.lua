@@ -321,6 +321,20 @@ local function GetTooltipInfoSpell(details)
   details.tooltipInfoSpell = details.tooltipGetter() or {lines={}}
 end
 
+local function GetTooltipInfoFromLink(details)
+  if details.tooltipInfoFromLink then
+    return
+  end
+
+  if not C_Item.IsItemDataCachedByID(details.itemID) then
+    C_Item.RequestLoadItemDataByID(details.itemID)
+    return
+  end
+
+  local baseInfo = Syndicator.Search.GetBaseInfo(details)
+  details.tooltipInfoFromLink = baseInfo.tooltipGetter() or {lines={}}
+end
+
 local JUNK_PATTERN = "^" .. SELL_PRICE
 local function JunkCheck(details)
   if details.isJunk ~= nil then
@@ -590,6 +604,42 @@ local function PvPCheck(details)
   return false
 end
 
+local function LockboxCheck(details)
+  GetTooltipInfoFromLink(details)
+
+  if details.tooltipInfoFromLink then
+    for _, row in ipairs(details.tooltipInfoFromLink.lines) do
+      if row.leftText == LOCKED then
+        return true
+      end
+    end
+    return false
+  end
+end
+
+local lockedIteration = 0
+local function LockedCheck(details)
+  if not details.hasLoot then
+    return false
+  end
+
+  if details.lockedIteration and details.lockedIteration ~= lockedIteration then
+    details.tooltipInfoSpell = nil
+  end
+
+  GetTooltipInfoSpell(details)
+
+  if details.tooltipInfoSpell then
+    for _, row in ipairs(details.tooltipInfoSpell.lines) do
+      if row.leftText == LOCKED then
+        details.lockedIteration = lockedIteration
+        return true, true
+      end
+    end
+    return false
+  end
+end
+
 local function UseATTInfo(details)
   if details.ATTInfoAcquired or not ATTC or not ATTC.SearchForField then -- All The Things
     return
@@ -708,6 +758,8 @@ AddKeywordLocalised("KEYWORD_UNCOLLECTED", UncollectedCheck, SYNDICATOR_L_GROUP_
 AddKeywordLocalised("KEYWORD_MY_CLASS", MyClassCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_PVP", PvPCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordManual(ITEM_UNIQUE:lower(), "unique", UniqueCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_LOCKBOX", LockboxCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
+AddKeywordLocalised("KEYWORD_LOCKED", LockedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 
 if Syndicator.Constants.IsRetail then
   AddKeywordLocalised("KEYWORD_COSMETIC", CosmeticCheck, SYNDICATOR_L_GROUP_QUALITY)
@@ -1294,7 +1346,11 @@ end
 
 local function ExactKeywordCheck(details, text)
   local keyword = text:match("^#(.*)$")
-  return KEYWORDS_TO_CHECK[keyword] ~= nil and KEYWORDS_TO_CHECK[keyword](details)
+  if KEYWORDS_TO_CHECK[keyword] ~= nil then
+    return KEYWORDS_TO_CHECK[keyword](details)
+  else
+    return false
+  end
 end
 
 local patterns = {

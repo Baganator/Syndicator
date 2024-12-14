@@ -324,6 +324,7 @@ function SyndicatorBagCacheMixin:OnUpdate()
       itemLink = slotInfo.hyperlink,
       quality = slotInfo.quality,
       isBound = slotInfo.isBound,
+      hasLoot = slotInfo.hasLoot,
     }
   end
 
