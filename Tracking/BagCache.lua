@@ -142,8 +142,10 @@ function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
     for bagID in pairs(bankBags) do
       self.pending.bank[bagID] = true
     end
-    for bagID in pairs(warbandBags) do
-      self.pending.warband[bagID] = true
+    if next(warbandBags) and C_PlayerInfo.HasAccountInventoryLock() then
+      for bagID in pairs(warbandBags) do
+        self.pending.warband[bagID] = true
+      end
     end
     self:ScanContainerBagSlots()
     self:ScanWarbandSlots()
