@@ -62,19 +62,30 @@ local function FindMatchingKeys(originalLocation)
   return queue
 end
 
+local durationToTime = {
+  [1] = 12 * 60 * 60,
+  [2] = 24 * 60 * 60,
+  [3] = 48 * 60 * 60,
+}
+
 function SyndicatorAuctionCacheMixin:OnLoad()
   FrameUtil.RegisterFrameForEvents(self, AUCTIONS_UPDATED_EVENTS)
   self.currentCharacter = Syndicator.Utilities.GetCharacterFullName()
 
-  hooksecurefunc(C_AuctionHouse, "PostItem", function(itemLocation)
+  hooksecurefunc(C_AuctionHouse, "PostItem", function(itemLocation, duration)
     self:ClearAuctionPending()
     self.lastPostedItem = FindMatchingKeys(itemLocation)
+    local expirationTime = time() + durationToTime[duration]
+    for _, item in ipairs(self.lastPostedItem) do
+      item.expirationTime = expirationTime
+    end
   end)
-  hooksecurefunc(C_AuctionHouse, "PostCommodity", function(itemLocation, _, itemCount)
+  hooksecurefunc(C_AuctionHouse, "PostCommodity", function(itemLocation, duration, itemCount)
     self:ClearAuctionPending()
     self.postedCommodity = {
       itemID = C_Item.GetItemID(itemLocation),
       itemCount = itemCount,
+      expirationTime = time() + durationToTime[duration],
     }
   end)
 
@@ -132,10 +143,12 @@ local function ConvertAuctionInfoToItem(auctionInfo, itemCount)
     itemLink = itemLink,
     quality = quality,
     isBound = false,
+    expirationTime = time() + auctionInfo.timeLeftSeconds,
   }
 end
 
 function SyndicatorAuctionCacheMixin:AddToMail(item)
+  item.expirationTime = time() + Syndicator.Constants.MailExpiryDuration
   table.insert(SYNDICATOR_DATA.Characters[self.currentCharacter].mail, item)
   Syndicator.CallbackRegistry:TriggerEvent("MailCacheUpdate", self.currentCharacter)
 end
@@ -305,6 +318,7 @@ function SyndicatorAuctionCacheMixin:ProcessAuctionCreated(auctionID)
         itemLink = itemInfo[2],
         quality = itemInfo[3],
         isBound = false,
+        expirationTime = self.postedCommodity.expirationTime,
       }
       item.auctionID = auctionID
       table.insert(

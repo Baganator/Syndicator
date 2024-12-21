@@ -19,7 +19,7 @@ local function ExtractBattlePetLink(mailIndex, attachmentIndex, itemLink, qualit
   return Syndicator.Utilities.RecoverBattlePetLink(tooltipInfo, itemLink, quality)
 end
 
-local function DoAttachment(attachments, mailIndex, attachmentIndex)
+local function DoAttachment(attachments, mailIndex, attachmentIndex, expirationTime)
   local _, itemID, texture, count, quality, canUse = GetInboxItem(mailIndex, attachmentIndex)
   if itemID == nil then
     return
@@ -34,6 +34,7 @@ local function DoAttachment(attachments, mailIndex, attachmentIndex)
     iconTexture = texture,
     itemLink = itemLink,
     quality = quality,
+    expirationTime = expirationTime,
   })
 end
 
@@ -60,6 +61,7 @@ function SyndicatorMailCacheMixin:OnLoad()
       return
     end
 
+    local expirationTime = time() + Syndicator.Constants.MailExpiryDuration
     for index = 1, ATTACHMENTS_MAX_SEND do
       local itemLink = GetSendMailItemLink(index)
       if itemLink ~= nil then
@@ -70,6 +72,7 @@ function SyndicatorMailCacheMixin:OnLoad()
           iconTexture = iconTexture,
           itemCount = itemCount,
           quality = quality,
+          expirationTime = expirationTime,
         })
       end
     end
@@ -83,7 +86,7 @@ function SyndicatorMailCacheMixin:OnLoad()
   end)
 
   hooksecurefunc("ReturnInboxItem", function(mailIndex)
-    local recipient = select(3, GetInboxHeaderInfo(mailIndex))
+    local _, _, recipient, _, _, _, daysLeft = GetInboxHeaderInfo(mailIndex)
 
     if type(recipient) ~= "string" then -- Hooked function called mistakenly
       return
@@ -107,17 +110,19 @@ function SyndicatorMailCacheMixin:OnLoad()
       self:RegisterEvent("MAIL_SUCCESS")
     end
 
+    local expirationTime = time() + math.floor(daysLeft * 24 * 60 * 60)
+
     local waiting = 0
     local loopComplete = false
     for attachmentIndex = 1, ATTACHMENTS_MAX do
       local _, itemID = GetInboxItem(mailIndex, attachmentIndex)
       if itemID ~= nil then
         if C_Item.IsItemDataCachedByID(itemID) then
-          DoAttachment(mail.items, mailIndex, attachmentIndex)
+          DoAttachment(mail.items, mailIndex, attachmentIndex, expirationTime)
         else
           waiting = waiting + 1
           Syndicator.Utilities.LoadItemData(itemID, function()
-            DoAttachment(mail.items, mailIndex, attachmentIndex)
+            DoAttachment(mail.items, mailIndex, attachmentIndex, expirationTime)
             waiting = waiting - 1
             if loopComplete and waiting == 0 then
               OnComplete()
@@ -175,15 +180,18 @@ function SyndicatorMailCacheMixin:ScanMail()
   local waiting = 0
   local loopsComplete = false
   for mailIndex = 1, (GetInboxNumItems()) do
+    local _, _, _, _, _, _, daysLeft = GetInboxHeaderInfo(mailIndex)
+    local expirationTime = time() + math.floor(daysLeft * 24 * 60 * 60)
+
     for attachmentIndex = 1, ATTACHMENTS_MAX do
       local _, itemID = GetInboxItem(mailIndex, attachmentIndex)
       if itemID ~= nil then
         if C_Item.IsItemDataCachedByID(itemID) then
-          DoAttachment(attachments, mailIndex, attachmentIndex)
+          DoAttachment(attachments, mailIndex, attachmentIndex, expirationTime)
         else
           waiting = waiting + 1
           Syndicator.Utilities.LoadItemData(itemID, function()
-            DoAttachment(attachments, mailIndex, attachmentIndex)
+            DoAttachment(attachments, mailIndex, attachmentIndex, expirationTime)
             waiting = waiting - 1
             if loopsComplete and waiting == 0 then
               FireMailChange(attachments)

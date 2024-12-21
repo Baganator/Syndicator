@@ -31,6 +31,8 @@ Syndicator.Constants = {
   EquippedInventorySlotOffset = 1,
 
   WarbandBankActive = false,
+
+  MailExpiryDuration = 30 * 24 * 60 * 60,
 }
 
 if Syndicator.Constants.IsRetail then
