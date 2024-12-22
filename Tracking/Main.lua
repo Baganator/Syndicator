@@ -109,9 +109,13 @@ local function SetupTooltips()
       if ValidateTooltip(tooltip) and Syndicator.ItemSummaries then
         local itemName, itemLink = TooltipUtil.GetDisplayedItem(tooltip)
 
+        local info = tooltip.processingInfo
+        if info.excludeLines then
+          return
+        end
+
         -- Fix to get recipes to show the inventory data for the recipe when
         -- tooltip shown via a hyperlink
-        local info = tooltip.processingInfo
         if info and info.getterName == "GetHyperlink" then
           local _, newItemLink = C_Item.GetItemInfo(info.getterArgs[1])
           if newItemLink ~= nil then
