@@ -143,7 +143,6 @@ local function ConvertAuctionInfoToItem(auctionInfo, itemCount)
     itemLink = itemLink,
     quality = quality,
     isBound = false,
-    expirationTime = time() + auctionInfo.timeLeftSeconds,
   }
 end
 
@@ -155,6 +154,7 @@ end
 
 function SyndicatorAuctionCacheMixin:AddAuction(auctionInfo, itemCount)
   local item = ConvertAuctionInfoToItem(auctionInfo, itemCount)
+  item.expirationTime = time() + auctionInfo.timeLeftSeconds
   item.auctionID = auctionInfo.auctionID
   table.insert(
     SYNDICATOR_DATA.Characters[self.currentCharacter].auctions,
