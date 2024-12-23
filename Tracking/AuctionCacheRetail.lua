@@ -154,7 +154,7 @@ end
 
 function SyndicatorAuctionCacheMixin:AddAuction(auctionInfo, itemCount)
   local item = ConvertAuctionInfoToItem(auctionInfo, itemCount)
-  item.expirationTime = time() + auctionInfo.timeLeftSeconds
+  item.expirationTime = auctionInfo.timeLeftSeconds and (time() + auctionInfo.timeLeftSeconds) or nil
   item.auctionID = auctionInfo.auctionID
   table.insert(
     SYNDICATOR_DATA.Characters[self.currentCharacter].auctions,
