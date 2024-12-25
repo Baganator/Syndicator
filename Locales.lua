@@ -110,6 +110,7 @@ L["KEYWORD_PVP"] = "pvp"
 L["KEYWORD_MY_CLASS"] = "my class"
 L["KEYWORD_KEYSTONE"] = "keystone"
 L["KEYWORD_LOCKED"] = "locked"
+L["KEYWORD_ANIMA"] = "anima"
 
 L["GROUP_ARMOR_TYPE"] = "Armor Type"
 L["GROUP_BATTLE_PET"] = "Battle Pet Type"

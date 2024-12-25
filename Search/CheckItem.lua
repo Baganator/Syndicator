@@ -590,6 +590,10 @@ local function PvPCheck(details)
   return false
 end
 
+local function AnimaCheck(details)
+  return C_Item.IsAnimaItemByID(details.itemID)
+end
+
 local function LockedCheck(details)
   if not details.hasLoot then
     return false
@@ -726,6 +730,7 @@ AddKeywordLocalised("KEYWORD_MY_CLASS", MyClassCheck, SYNDICATOR_L_GROUP_ITEM_DE
 AddKeywordLocalised("KEYWORD_PVP", PvPCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordManual(ITEM_UNIQUE:lower(), "unique", UniqueCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_LOCKED", LockedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_ANIMA", AnimaCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 
 if Syndicator.Constants.IsRetail then
   AddKeywordLocalised("KEYWORD_COSMETIC", CosmeticCheck, SYNDICATOR_L_GROUP_QUALITY)
