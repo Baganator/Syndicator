@@ -51,8 +51,12 @@ if Syndicator.Constants.IsClassic then
         leftText = leftFontString:GetText(),
         leftColor = CreateColor(leftFontString:GetTextColor()),
         rightText = rightFontString:GetText(),
-        rightColor = CreateColor(rightFontString:GetTextColor())
+        rightColor = CreateColor(rightFontString:GetTextColor()),
       }
+      if entry.rightText == "" or entry.rightText == nil then
+        entry.rightText = nil
+        entry.rightColor = nil
+      end
       if entry.leftText or entry.rightText then
         table.insert(dump, entry)
       end
