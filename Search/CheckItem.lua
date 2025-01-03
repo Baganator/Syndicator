@@ -72,6 +72,11 @@ local function EngravedCheck(details)
   return details.engravingInfo ~= nil
 end
 
+local function RefundableCheck(details)
+  local refundable = details.refundable == true
+  return refundable, refundable
+end
+
 local function EquipmentCheck(details)
   GetClassSubClass(details)
   return details.classID == Enum.ItemClass.Armor or details.classID == Enum.ItemClass.Weapon
@@ -730,6 +735,7 @@ AddKeywordLocalised("KEYWORD_MY_CLASS", MyClassCheck, SYNDICATOR_L_GROUP_ITEM_DE
 AddKeywordLocalised("KEYWORD_PVP", PvPCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordManual(ITEM_UNIQUE:lower(), "unique", UniqueCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_LOCKED", LockedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_REFUNDABLE", RefundableCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 
 if Syndicator.Constants.IsRetail then
   AddKeywordLocalised("KEYWORD_COSMETIC", CosmeticCheck, SYNDICATOR_L_GROUP_QUALITY)
