@@ -110,7 +110,9 @@ local function SetupTooltips()
         local itemName, itemLink = TooltipUtil.GetDisplayedItem(tooltip)
 
         local info = tooltip.processingInfo
-        if info.excludeLines then
+        -- not info checked because some weird tooltips are missing it (probably
+        -- from addon old-style tooltip scans)
+        if not info or info.excludeLines then
           return
         end
 
