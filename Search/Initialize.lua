@@ -1,7 +1,7 @@
 function Syndicator.Search.Initialize()
   Syndicator.Search.InitializeSearchEngine()
 
-  SlashCmdList["SyndicatorSearch"] = Syndicator.Search.RunMegaSearchAndPrintResults
+  SlashCmdList["SyndicatorSearch"] = Syndicator.Search.SearchEverywhereAndPrintResults
   SLASH_SyndicatorSearch1 = "/baganatorsearch"
   SLASH_SyndicatorSearch2 = "/bgrs"
   SLASH_SyndicatorSearch3 = "/syndicatorsearch"

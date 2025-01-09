@@ -144,7 +144,7 @@ Syndicator.CallbackRegistry:RegisterCallback("WarbandBankCacheUpdate", function(
   end
 end)
 
-function Syndicator.Search.RequestMegaSearchResults(searchTerm, callback)
+function Syndicator.Search.RequestSearchEverywhereResults(searchTerm, callback)
   if pending == nil then
     pending = {
       Characters = {},
@@ -241,7 +241,7 @@ local function GetKeys(results, callback)
   end
 end
 
-function Syndicator.Search.CombineMegaSearchResults(results, callback)
+function Syndicator.Search.CombineSearchEverywhereResults(results, callback)
   local items = {}
   local seenCharacters = {}
   local seenGuilds = {}
@@ -392,15 +392,15 @@ EventRegistry:RegisterCallback("SetItemRef", function(_, link, text, button, cha
     end
 end)
 
-function Syndicator.Search.RunMegaSearchAndPrintResults(searchTerm)
+function Syndicator.Search.SearchEverywhereAndPrintResults(searchTerm)
   if searchTerm:match("|H") then
     Syndicator.Utilities.Message(SYNDICATOR_L_CANNOT_SEARCH_BY_ITEM_LINK)
     return
   end
   searchTerm = searchTerm:lower()
-  Syndicator.Search.RequestMegaSearchResults(searchTerm, function(results)
+  Syndicator.Search.RequestSearchEverywhereResults(searchTerm, function(results)
     print(GREEN_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_SEARCHED_EVERYWHERE_COLON) .. " " .. YELLOW_FONT_COLOR:WrapTextInColorCode(searchTerm))
-    Syndicator.Search.CombineMegaSearchResults(results, function(results)
+    Syndicator.Search.CombineSearchEverywhereResults(results, function(results)
       local indent = "       "
       for _, r in ipairs(results) do
         print("   " .. r.itemLink, BLUE_FONT_COLOR:WrapTextInColorCode("x" .. FormatLargeNumber(r.itemCount)))
@@ -414,3 +414,5 @@ function Syndicator.Search.RunMegaSearchAndPrintResults(searchTerm)
     end)
   end)
 end
+-- Compatibility
+Syndicator.Search.RunMegaSearchAndPrintResults = Syndicator.Search.SearchEverywhereAndPrintResults

@@ -43,7 +43,7 @@ Search\CheckItem.lua
 Search\GetGroupingKey.lua
 Search\OfflineList.lua
 Search\OfflineList.xml
-Search\MegaSearch.lua
+Search\SearchEverywhere.lua
 Search\Utilities.lua
 
 API\Main.lua
