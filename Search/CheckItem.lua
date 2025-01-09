@@ -155,6 +155,35 @@ local function SocketedCheck(details)
   end
 end
 
+-- Compare item spell details to determine if this item's spell is one for
+-- profession knowledge, using base spell for the spell's name
+local baseKnowledgeSpell, baseKnowledgeName = 384372
+local function KnowledgeCheck(details)
+  if baseKnowledgeName == nil then -- cache the comparison name
+    if not C_Spell.IsSpellDataCached(baseKnowledgeSpell) then
+      C_Spell.RequestLoadSpellData(baseKnowledgeSpell)
+      return nil
+    end
+    baseKnowledgeName = C_Spell.GetSpellInfo(baseKnowledgeSpell).name
+  end
+  if not C_Item.IsItemDataCachedByID(details.itemID) then
+    C_Item.RequestLoadItemDataByID(details.itemID)
+    return nil
+  end
+  local spellName, spellID = C_Item.GetItemSpell(details.itemID)
+  if spellID == nil then
+    return false
+  end
+  if spellID and not spellName then
+    C_Spell.RequestLoadSpellData(spellID)
+    return nil
+  end
+  local spellInfo = C_Spell.GetSpellInfo(spellID)
+  -- Check it has the right name and the appropriate icon (which should be
+  -- enough to guarantee its a knowledge item)
+  return spellName == baseKnowledgeName and (spellInfo.iconID == 236225 or spellInfo.iconID == 136175)
+end
+
 local function GetSourceID(itemLink)
   local _, sourceID = C_TransmogCollection.GetItemInfo(itemLink)
   if sourceID then
@@ -742,6 +771,7 @@ if Syndicator.Constants.IsRetail then
   AddKeywordManual(TOY:lower(), "toy", ToyCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
   AddKeywordLocalised("KEYWORD_KEYSTONE", KeystoneCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
   AddKeywordManual(WORLD_QUEST_REWARD_FILTERS_ANIMA:lower(), "anima", AnimaCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+  AddKeywordLocalised("KEYWORD_KNOWLEDGE", KnowledgeCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
   if Syndicator.Constants.WarbandBankActive then
     AddKeywordManual(ITEM_ACCOUNTBOUND:lower(), "warbound", BindOnAccountCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
     AddKeywordManual(ITEM_ACCOUNTBOUND_UNTIL_EQUIP:lower(), "warbound until equipped", WarboundUntilEquippedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
