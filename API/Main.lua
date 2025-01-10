@@ -122,13 +122,13 @@ end
 function Syndicator.API.ToggleCharacterHidden(characterFullName)
   local characterData = Syndicator.API.GetByCharacterFullName(characterFullName)
   assert(characterData, "Character does not exist")
-  characterData.details.hidden = not characterData.details.hidden
+  characterData.details.show.inventory = not characterData.details.show.inventory
 end
 
 function Syndicator.API.ToggleGuildHidden(guildFullName)
   local guildData, guildFullName = Syndicator.API.GetByGuildFullName(guildFullName)
   assert(guildData, "Guild does not exist")
-  guildData.details.hidden = not guildData.details.hidden
+  guildData.details.show.inventory = not guildData.details.show.inventory
 end
 
 -- Returns if the tracking data is ready for use

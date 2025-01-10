@@ -73,29 +73,60 @@ local hiddenColor = CreateColor(1, 0, 0)
 local shownColor = CreateColor(0, 1, 0)
 
 local function MakeCharacterEditor(parent)
-  local function SetHideButton(frame)
-    frame.HideButton = CreateFrame("Button", nil, frame)
-    frame.HideButton:SetNormalAtlas("socialqueuing-icon-eye")
-    frame.HideButton:SetPoint("TOPLEFT", 8, -2.5)
-    frame.HideButton:SetSize(15, 15)
-    frame.HideButton:SetScript("OnClick", function()
+  local function SetShowInventoryButton(frame)
+    frame.ShowInventoryButton = CreateFrame("Button", nil, frame)
+    frame.ShowInventoryButton:SetNormalAtlas("socialqueuing-icon-eye")
+    frame.ShowInventoryButton:SetPoint("TOPLEFT", 8, -2.5)
+    frame.ShowInventoryButton:SetSize(15, 15)
+    frame.ShowInventoryButton:SetScript("OnClick", function()
       Syndicator.API.ToggleCharacterHidden(frame.fullName)
       GameTooltip:Hide()
       frame:UpdateHideVisual()
     end)
-    frame.HideButton:SetScript("OnEnter", function()
-      GameTooltip:SetOwner(frame.HideButton, "ANCHOR_RIGHT")
-      if Syndicator.API.GetCharacter(frame.fullName).details.hidden then
-        GameTooltip:SetText(SYNDICATOR_L_SHOW_IN_TOOLTIPS)
+    frame.ShowInventoryButton:SetScript("OnEnter", function()
+      GameTooltip:SetOwner(frame.ShowInventoryButton, "ANCHOR_RIGHT")
+      if Syndicator.API.GetCharacter(frame.fullName).details.show.inventory then
+        GameTooltip:SetText(SYNDICATOR_L_HIDE_IN_INVENTORY_TOOLTIPS)
       else
-        GameTooltip:SetText(SYNDICATOR_L_HIDE_IN_TOOLTIPS)
+        GameTooltip:SetText(SYNDICATOR_L_SHOW_IN_INVENTORY_TOOLTIPS)
       end
       GameTooltip:Show()
-      frame.HideButton:SetAlpha(0.5)
+      frame.ShowInventoryButton:SetAlpha(0.5)
     end)
-    frame.HideButton:SetScript("OnLeave", function()
+    frame.ShowInventoryButton:SetScript("OnLeave", function()
       GameTooltip:Hide()
-      frame.HideButton:SetAlpha(1)
+      frame.ShowInventoryButton:SetAlpha(1)
+    end)
+  end
+
+  local function SetShowGoldButton(frame)
+    frame.ShowGoldButton = CreateFrame("Button", nil, frame)
+    frame.ShowGoldButton:SetNormalAtlas("coin-gold")
+    local tex = frame.ShowGoldButton:GetNormalTexture()
+    tex:ClearAllPoints()
+    tex:SetSize(11, 11)
+    tex:SetPoint("CENTER")
+    frame.ShowGoldButton:SetPoint("TOPLEFT", 27, -2.5)
+    frame.ShowGoldButton:SetSize(15, 15)
+    frame.ShowGoldButton:SetScript("OnClick", function()
+      local characterData = Syndicator.API.GetCharacter(frame.fullName)
+      characterData.details.show.gold = not characterData.details.show.gold
+      GameTooltip:Hide()
+      frame:UpdateHideVisual()
+    end)
+    frame.ShowGoldButton:SetScript("OnEnter", function()
+      GameTooltip:SetOwner(frame.ShowGoldButton, "ANCHOR_RIGHT")
+      if Syndicator.API.GetCharacter(frame.fullName).details.show.gold then
+        GameTooltip:SetText(SYNDICATOR_L_HIDE_IN_GOLD_SUMMARY)
+      else
+        GameTooltip:SetText(SYNDICATOR_L_SHOW_IN_GOLD_SUMMARY)
+      end
+      GameTooltip:Show()
+      frame.ShowGoldButton:SetAlpha(0.5)
+    end)
+    frame.ShowGoldButton:SetScript("OnLeave", function()
+      GameTooltip:Hide()
+      frame.ShowGoldButton:SetAlpha(1)
     end)
   end
 
@@ -122,7 +153,7 @@ local function MakeCharacterEditor(parent)
   local function SetRaceIcon(frame)
     frame.RaceIcon = frame:CreateFontString(nil, "BACKGROUND", "GameFontHighlight")
     frame.RaceIcon:SetSize(15, 15)
-    frame.RaceIcon:SetPoint("TOPLEFT", 35, -2.5)
+    frame.RaceIcon:SetPoint("TOPLEFT", 47, -2.5)
   end
 
   local container = CreateFrame("Frame", nil, parent, "InsetFrameTemplate")
@@ -173,12 +204,17 @@ local function MakeCharacterEditor(parent)
     frame.fullName = elementData.fullName
     if not frame.RaceIcon then
       SetRaceIcon(frame)
+      SetShowInventoryButton(frame)
+      SetShowGoldButton(frame)
+      SetDeleteButton(frame)
     end
     if elementData.race then
       frame.RaceIcon:SetText(Syndicator.Utilities.GetCharacterIcon(elementData.race, elementData.sex))
+    else
+      frame.RaceIcon:SetText("")
     end
     frame:SetText(frame.fullName)
-    frame:GetFontString():SetPoint("LEFT", 52, 0)
+    frame:GetFontString():SetPoint("LEFT", 66, 0)
     frame:GetFontString():SetPoint("RIGHT", -20, 0)
     frame:GetFontString():SetJustifyH("LEFT")
     if elementData.className then
@@ -188,15 +224,16 @@ local function MakeCharacterEditor(parent)
       frame:GetFontString():SetTextColor(1, 1, 1)
     end
     frame.UpdateHideVisual = function()
-      if Syndicator.API.GetCharacter(frame.fullName).details.hidden then
-        frame.HideButton:GetNormalTexture():SetVertexColor(hiddenColor.r, hiddenColor.g, hiddenColor.b)
+      if Syndicator.API.GetCharacter(frame.fullName).details.show.inventory then
+        frame.ShowInventoryButton:GetNormalTexture():SetVertexColor(shownColor.r, shownColor.g, shownColor.b)
       else
-        frame.HideButton:GetNormalTexture():SetVertexColor(shownColor.r, shownColor.g, shownColor.b)
+        frame.ShowInventoryButton:GetNormalTexture():SetVertexColor(hiddenColor.r, hiddenColor.g, hiddenColor.b)
       end
-    end
-    if not frame.HideButton then
-      SetHideButton(frame)
-      SetDeleteButton(frame)
+      if Syndicator.API.GetCharacter(frame.fullName).details.show.gold then
+        frame.ShowGoldButton:GetNormalTexture():SetVertexColor(1, 1, 1)
+      else
+        frame.ShowGoldButton:GetNormalTexture():SetVertexColor(hiddenColor.r, hiddenColor.g, hiddenColor.b)
+      end
     end
     frame.DeleteButton:SetShown(frame.fullName ~= Syndicator.API.GetCurrentCharacter())
     frame:UpdateHideVisual()
@@ -207,29 +244,60 @@ local function MakeCharacterEditor(parent)
 end
 
 local function MakeGuildEditor(parent)
-  local function SetHideButton(frame)
-    frame.HideButton = CreateFrame("Button", nil, frame)
-    frame.HideButton:SetNormalAtlas("socialqueuing-icon-eye")
-    frame.HideButton:SetPoint("TOPLEFT", 8, -2.5)
-    frame.HideButton:SetSize(15, 15)
-    frame.HideButton:SetScript("OnClick", function()
+  local function SetShowInventoryButton(frame)
+    frame.ShowInventoryButton = CreateFrame("Button", nil, frame)
+    frame.ShowInventoryButton:SetNormalAtlas("socialqueuing-icon-eye")
+    frame.ShowInventoryButton:SetPoint("TOPLEFT", 8, -2.5)
+    frame.ShowInventoryButton:SetSize(15, 15)
+    frame.ShowInventoryButton:SetScript("OnClick", function()
       Syndicator.API.ToggleGuildHidden(frame.fullName)
       GameTooltip:Hide()
       frame:UpdateHideVisual()
     end)
-    frame.HideButton:SetScript("OnEnter", function()
-      GameTooltip:SetOwner(frame.HideButton, "ANCHOR_RIGHT")
-      if Syndicator.API.GetGuild(frame.fullName).details.hidden then
-        GameTooltip:SetText(SYNDICATOR_L_SHOW_IN_TOOLTIPS)
+    frame.ShowInventoryButton:SetScript("OnEnter", function()
+      GameTooltip:SetOwner(frame.ShowInventoryButton, "ANCHOR_RIGHT")
+      if Syndicator.API.GetGuild(frame.fullName).details.show.inventory then
+        GameTooltip:SetText(SYNDICATOR_L_HIDE_IN_INVENTORY_TOOLTIPS)
       else
-        GameTooltip:SetText(SYNDICATOR_L_HIDE_IN_TOOLTIPS)
+        GameTooltip:SetText(SYNDICATOR_L_SHOW_IN_INVENTORY_TOOLTIPS)
       end
       GameTooltip:Show()
-      frame.HideButton:SetAlpha(0.5)
+      frame.ShowInventoryButton:SetAlpha(0.5)
     end)
-    frame.HideButton:SetScript("OnLeave", function()
+    frame.ShowInventoryButton:SetScript("OnLeave", function()
       GameTooltip:Hide()
-      frame.HideButton:SetAlpha(1)
+      frame.ShowInventoryButton:SetAlpha(1)
+    end)
+  end
+
+  local function SetShowGoldButton(frame)
+    frame.ShowGoldButton = CreateFrame("Button", nil, frame)
+    frame.ShowGoldButton:SetNormalAtlas("coin-gold")
+    local tex = frame.ShowGoldButton:GetNormalTexture()
+    tex:ClearAllPoints()
+    tex:SetSize(11, 11)
+    tex:SetPoint("CENTER")
+    frame.ShowGoldButton:SetPoint("TOPLEFT", 27, -2.5)
+    frame.ShowGoldButton:SetSize(15, 15)
+    frame.ShowGoldButton:SetScript("OnClick", function()
+      local guildData = Syndicator.API.GetGuild(frame.fullName)
+      guildData.details.show.gold = not guildData.details.show.gold
+      GameTooltip:Hide()
+      frame:UpdateHideVisual()
+    end)
+    frame.ShowGoldButton:SetScript("OnEnter", function()
+      GameTooltip:SetOwner(frame.ShowGoldButton, "ANCHOR_RIGHT")
+      if Syndicator.API.GetGuild(frame.fullName).details.show.gold then
+        GameTooltip:SetText(SYNDICATOR_L_HIDE_IN_GOLD_SUMMARY)
+      else
+        GameTooltip:SetText(SYNDICATOR_L_SHOW_IN_GOLD_SUMMARY)
+      end
+      GameTooltip:Show()
+      frame.ShowGoldButton:SetAlpha(0.5)
+    end)
+    frame.ShowGoldButton:SetScript("OnLeave", function()
+      GameTooltip:Hide()
+      frame.ShowGoldButton:SetAlpha(1)
     end)
   end
 
@@ -256,7 +324,7 @@ local function MakeGuildEditor(parent)
   local function SetGuildIcon(frame)
     frame.GuildIcon = frame:CreateFontString(nil, "BACKGROUND", "GameFontHighlight")
     frame.GuildIcon:SetSize(15, 15)
-    frame.GuildIcon:SetPoint("TOPLEFT", 35, -2.5)
+    frame.GuildIcon:SetPoint("TOPLEFT", 47, -5)
     frame.GuildIcon:SetText(Syndicator.Utilities.GetGuildIcon())
   end
 
@@ -305,18 +373,24 @@ local function MakeGuildEditor(parent)
     frame:SetNormalFontObject(GameFontHighlight)
     frame.fullName = elementData.fullName
     frame:SetText(TRANSMOGRIFY_FONT_COLOR:WrapTextInColorCode(elementData.guild) .. "-" .. NORMAL_FONT_COLOR:WrapTextInColorCode(elementData.realm))
-    frame:GetFontString():SetPoint("LEFT", 52, 0)
+    frame:GetFontString():SetPoint("LEFT", 66, 0)
     frame:GetFontString():SetPoint("RIGHT", -20, 0)
     frame:GetFontString():SetJustifyH("LEFT")
     frame.UpdateHideVisual = function()
-      if Syndicator.API.GetGuild(frame.fullName).details.hidden then
-        frame.HideButton:GetNormalTexture():SetVertexColor(hiddenColor.r, hiddenColor.g, hiddenColor.b)
+      if Syndicator.API.GetGuild(frame.fullName).details.show.inventory then
+        frame.ShowInventoryButton:GetNormalTexture():SetVertexColor(shownColor.r, shownColor.g, shownColor.b)
       else
-        frame.HideButton:GetNormalTexture():SetVertexColor(shownColor.r, shownColor.g, shownColor.b)
+        frame.ShowInventoryButton:GetNormalTexture():SetVertexColor(hiddenColor.r, hiddenColor.g, hiddenColor.b)
+      end
+      if Syndicator.API.GetGuild(frame.fullName).details.show.gold then
+        frame.ShowGoldButton:GetNormalTexture():SetVertexColor(1, 1, 1)
+      else
+        frame.ShowGoldButton:GetNormalTexture():SetVertexColor(hiddenColor.r, hiddenColor.g, hiddenColor.b)
       end
     end
-    if not frame.HideButton then
-      SetHideButton(frame)
+    if not frame.ShowInventoryButton then
+      SetShowInventoryButton(frame)
+      SetShowGoldButton(frame)
       SetDeleteButton(frame)
       SetGuildIcon(frame)
     end

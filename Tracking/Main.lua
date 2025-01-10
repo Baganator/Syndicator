@@ -20,7 +20,7 @@ local function InitializeSavedVariables()
   end
   if SYNDICATOR_DATA == nil then
     SYNDICATOR_DATA = {
-      Version = 1,
+      Version = 2,
       Characters = {},
       Guilds = {},
     }
@@ -30,6 +30,30 @@ local function InitializeSavedVariables()
     SYNDICATOR_DATA.Warband = { { bank = SYNDICATOR_DATA.Warband.bank } }
   end
   SYNDICATOR_DATA.Warband[1].money = SYNDICATOR_DATA.Warband[1].money or 0
+
+  if SYNDICATOR_DATA.Version == 1 then
+    for _, characterData in pairs(SYNDICATOR_DATA.Characters) do
+      if characterData.details.show == nil then
+        characterData.details.show = {
+          inventory = not characterData.details.hidden,
+          gold = true,
+        }
+        characterData.details.hidden = nil
+      end
+    end
+
+    for _, guildData in pairs(SYNDICATOR_DATA.Guilds) do
+      if guildData.details.show == nil then
+        guildData.details.show = {
+          inventory = not guildData.details.hidden,
+          gold = false,
+        }
+        guildData.details.hidden = nil
+      end
+    end
+
+    SYNDICATOR_DATA.Version = 2
+  end
 end
 
 local currentCharacter
@@ -45,7 +69,10 @@ local function InitCurrentCharacter()
         realmNormalized = GetNormalizedRealmName(),
         realm = GetRealmName(),
         character = UnitName("player"),
-        hidden = false,
+        show = {
+          inventory = true,
+          gold = true,
+        },
       }
     }
   end

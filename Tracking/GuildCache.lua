@@ -8,14 +8,18 @@ local function InitGuild(key, guild, realm)
       details = {
         guild = guild,
         faction = UnitFactionGroup("player"),
-        hidden = false,
+        show = {
+          inventory = true,
+          gold = false
+        },
         visited = false,
         realm = realm,
       },
     }
   end
-  SYNDICATOR_DATA.Guilds[key].details.realms = nil
-  SYNDICATOR_DATA.Guilds[key].details.realm = realm
+  local guildData = SYNDICATOR_DATA.Guilds[key]
+  guildData.details.realms = nil
+  guildData.details.realm = realm
 end
 
 local seenGuilds = {}
@@ -88,7 +92,6 @@ function SyndicatorGuildCacheMixin:GetGuildKey()
 
   if not gmRealm then
     if gmGUID then
-      print("guid")
       GetPlayerInfoByGUID(gmGUID)
     else
       C_GuildInfo.GuildRoster()
