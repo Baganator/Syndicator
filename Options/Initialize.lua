@@ -71,10 +71,16 @@ local TOOLTIP_OPTIONS = {
 
 local hiddenColor = CreateColor(1, 0, 0)
 
+local inventoryIcon = "banker"
+local goldIcon = "coin-gold"
+if C_Texture.GetAtlasInfo(goldIcon) == nil then
+  goldIcon = "auctionhouse-icon-coin-gold"
+end
+
 local function MakeCharacterEditor(parent)
   local function SetShowInventoryButton(frame)
     frame.ShowInventoryButton = CreateFrame("Button", nil, frame)
-    frame.ShowInventoryButton:SetNormalAtlas("banker")
+    frame.ShowInventoryButton:SetNormalAtlas(inventoryIcon)
     frame.ShowInventoryButton:SetPoint("TOPLEFT", 8, -2.5)
     frame.ShowInventoryButton:SetSize(15, 15)
     frame.ShowInventoryButton:SetScript("OnClick", function()
@@ -100,7 +106,7 @@ local function MakeCharacterEditor(parent)
 
   local function SetShowGoldButton(frame)
     frame.ShowGoldButton = CreateFrame("Button", nil, frame)
-    frame.ShowGoldButton:SetNormalAtlas("coin-gold")
+    frame.ShowGoldButton:SetNormalAtlas(goldIcon)
     local tex = frame.ShowGoldButton:GetNormalTexture()
     tex:ClearAllPoints()
     tex:SetSize(11, 11)
@@ -245,7 +251,7 @@ end
 local function MakeGuildEditor(parent)
   local function SetShowInventoryButton(frame)
     frame.ShowInventoryButton = CreateFrame("Button", nil, frame)
-    frame.ShowInventoryButton:SetNormalAtlas("banker")
+    frame.ShowInventoryButton:SetNormalAtlas(inventoryIcon)
     frame.ShowInventoryButton:SetPoint("TOPLEFT", 8, -2.5)
     frame.ShowInventoryButton:SetSize(15, 15)
     frame.ShowInventoryButton:SetScript("OnClick", function()
@@ -271,7 +277,7 @@ local function MakeGuildEditor(parent)
 
   local function SetShowGoldButton(frame)
     frame.ShowGoldButton = CreateFrame("Button", nil, frame)
-    frame.ShowGoldButton:SetNormalAtlas("coin-gold")
+    frame.ShowGoldButton:SetNormalAtlas(goldIcon)
     local tex = frame.ShowGoldButton:GetNormalTexture()
     tex:ClearAllPoints()
     tex:SetSize(11, 11)
