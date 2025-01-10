@@ -70,12 +70,11 @@ local TOOLTIP_OPTIONS = {
 }
 
 local hiddenColor = CreateColor(1, 0, 0)
-local shownColor = CreateColor(0, 1, 0)
 
 local function MakeCharacterEditor(parent)
   local function SetShowInventoryButton(frame)
     frame.ShowInventoryButton = CreateFrame("Button", nil, frame)
-    frame.ShowInventoryButton:SetNormalAtlas("socialqueuing-icon-eye")
+    frame.ShowInventoryButton:SetNormalAtlas("banker")
     frame.ShowInventoryButton:SetPoint("TOPLEFT", 8, -2.5)
     frame.ShowInventoryButton:SetSize(15, 15)
     frame.ShowInventoryButton:SetScript("OnClick", function()
@@ -225,7 +224,7 @@ local function MakeCharacterEditor(parent)
     end
     frame.UpdateHideVisual = function()
       if Syndicator.API.GetCharacter(frame.fullName).details.show.inventory then
-        frame.ShowInventoryButton:GetNormalTexture():SetVertexColor(shownColor.r, shownColor.g, shownColor.b)
+        frame.ShowInventoryButton:GetNormalTexture():SetVertexColor(1, 1, 1)
       else
         frame.ShowInventoryButton:GetNormalTexture():SetVertexColor(hiddenColor.r, hiddenColor.g, hiddenColor.b)
       end
@@ -246,7 +245,7 @@ end
 local function MakeGuildEditor(parent)
   local function SetShowInventoryButton(frame)
     frame.ShowInventoryButton = CreateFrame("Button", nil, frame)
-    frame.ShowInventoryButton:SetNormalAtlas("socialqueuing-icon-eye")
+    frame.ShowInventoryButton:SetNormalAtlas("banker")
     frame.ShowInventoryButton:SetPoint("TOPLEFT", 8, -2.5)
     frame.ShowInventoryButton:SetSize(15, 15)
     frame.ShowInventoryButton:SetScript("OnClick", function()
@@ -378,7 +377,7 @@ local function MakeGuildEditor(parent)
     frame:GetFontString():SetJustifyH("LEFT")
     frame.UpdateHideVisual = function()
       if Syndicator.API.GetGuild(frame.fullName).details.show.inventory then
-        frame.ShowInventoryButton:GetNormalTexture():SetVertexColor(shownColor.r, shownColor.g, shownColor.b)
+        frame.ShowInventoryButton:GetNormalTexture():SetVertexColor(1, 1, 1)
       else
         frame.ShowInventoryButton:GetNormalTexture():SetVertexColor(hiddenColor.r, hiddenColor.g, hiddenColor.b)
       end
