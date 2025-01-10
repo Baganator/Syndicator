@@ -30,6 +30,7 @@ local function InitializeSavedVariables()
     SYNDICATOR_DATA.Warband = { { bank = SYNDICATOR_DATA.Warband.bank } }
   end
   SYNDICATOR_DATA.Warband[1].money = SYNDICATOR_DATA.Warband[1].money or 0
+  SYNDICATOR_DATA.Warband[1].details = SYNDICATOR_DATA.Warband[1].details or {gold = true, inventory = true}
 
   if SYNDICATOR_DATA.Version == 1 then
     for _, characterData in pairs(SYNDICATOR_DATA.Characters) do
