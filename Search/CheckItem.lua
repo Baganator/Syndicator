@@ -104,15 +104,6 @@ local function CosmeticCheck(details)
   return details.isCosmetic
 end
 
-local function HeirloomCheck(details)
-  if not C_Item.IsItemDataCachedByID(details.itemID) then
-    C_Item.RequestLoadItemDataByID(details.itemID)
-    return nil
-  end
-  details.isHeirloom = C_Heirloom.GetHeirloomInfo(details.itemID) ~= nil
-  return details.isHeirloom
-end
-
 local function AxeCheck(details)
   GetClassSubClass(details)
   return details.classID == Enum.ItemClass.Weapon and (details.subClassID == Enum.ItemWeaponSubclass.Axe2H or details.subClassID == Enum.ItemWeaponSubclass.Axe1H)
@@ -656,8 +647,6 @@ local function LockedCheck(details)
   return false
 end
 
-local TIER_SET_PATTERN1 = "^" .. ITEM_SET_BONUS:gsub("%%s", "%.+")
-local TIER_SET_PATTERN2 = "^" .. ITEM_SET_BONUS_GRAY:gsub("%(.*%)", "%%(.*%%)"):gsub("%%s", "%.+")
 local function TierSetCheck(details)
   if C_Item.IsCosmeticItem then
     local result = CosmeticCheck(details)
@@ -668,26 +657,16 @@ local function TierSetCheck(details)
     end
   end
 
-  if C_Heirloom and C_Heirloom.GetHeirloomInfo then
-    local result = HeirloomCheck(details)
-    if result then
-      return false
-    elseif result == nil then
-      return nil
-    end
+  if details.quality == 7 then -- filter out heirlooms
+    return false
   end
 
-  GetTooltipInfoSpell(details)
-
-  if not details.tooltipInfoSpell then
-    return
+  local linkParts = {strsplit(":", details.itemLink)}
+  local specID = tonumber(linkParts[11])
+  if specID then
+    return C_Item.GetSetBonusesForSpecializationByItemID(specID, details.itemID) ~= nil
   end
 
-  for _, row in ipairs(details.tooltipInfoSpell.lines) do
-    if row.leftText:match(TIER_SET_PATTERN1) or row.leftText:match(TIER_SET_PATTERN2) then
-      return true
-    end
-  end
   return false
 end
 
@@ -812,10 +791,6 @@ AddKeywordManual(ITEM_UNIQUE:lower(), "unique", UniqueCheck, SYNDICATOR_L_GROUP_
 AddKeywordLocalised("KEYWORD_LOCKED", LockedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_REFUNDABLE", RefundableCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_TIER_SET", TierSetCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-
-if C_Heirloom and C_Heirloom.GetHeirloomInfo then
-  AddKeywordLocalised("KEYWORD_HEIRLOOM", HeirloomCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-end
 
 if Syndicator.Constants.IsRetail then
   AddKeywordLocalised("KEYWORD_COSMETIC", CosmeticCheck, SYNDICATOR_L_GROUP_QUALITY)
