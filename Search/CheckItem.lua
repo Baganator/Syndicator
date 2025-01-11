@@ -73,8 +73,12 @@ local function EngravedCheck(details)
 end
 
 local function RefundableCheck(details)
-  local refundable = details.refundable == true
-  return refundable, refundable
+  if details.refundable == nil and details.itemLocation and C_Item.DoesItemExist(details.itemLocation) then
+    details.refundable = C_Item.CanBeRefunded(details.itemLocation)
+  elseif details.refundable == nil then
+    details.refundable = false
+  end
+  return details.refundable, details.refundable
 end
 
 local function EquipmentCheck(details)
