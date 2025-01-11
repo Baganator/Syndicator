@@ -667,10 +667,6 @@ local function SetBonusCheck(details)
     end
   end
 
-  if not details.tooltipInfoSpell then
-    return
-  end
-
   local linkParts = {strsplit(":", details.itemLink)}
   local specID = tonumber(linkParts[11])
   return specID ~= nil and C_Item.GetSetBonusesForSpecializationByItemID(specID, details.itemID) ~= nil
