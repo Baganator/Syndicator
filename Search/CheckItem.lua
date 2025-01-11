@@ -653,7 +653,7 @@ local function CraftedCheck(details)
   return details.quality ~= 7 and details.classID ~= Enum.ItemClass.Questitem and details.itemLink:match("Player-") ~= nil
 end
 
-local function TierSetCheck(details)
+local function SetBonusCheck(details)
   if C_Item.IsCosmeticItem then
     local result = CosmeticCheck(details)
     if result then
@@ -663,20 +663,13 @@ local function TierSetCheck(details)
     end
   end
 
-  if details.quality == 7 then -- filter out heirlooms
-    return false
-  end
-
   if not details.tooltipInfoSpell then
     return
   end
 
   local linkParts = {strsplit(":", details.itemLink)}
   local specID = tonumber(linkParts[11])
-  if specID and C_Item.GetSetBonusesForSpecializationByItemID(specID, details.itemID) ~= nil and not CraftedCheck(details) then
-    return true
-  end
-  return false
+  return specID ~= nil and C_Item.GetSetBonusesForSpecializationByItemID(specID, details.itemID) ~= nil
 end
 
 local function UseATTInfo(details)
@@ -799,7 +792,7 @@ AddKeywordLocalised("KEYWORD_PVP", PvPCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordManual(ITEM_UNIQUE:lower(), "unique", UniqueCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_LOCKED", LockedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_REFUNDABLE", RefundableCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_TIER_SET", TierSetCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_SET_BONUS", SetBonusCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_CRAFTED", CraftedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 
 if Syndicator.Constants.IsRetail then
