@@ -667,6 +667,11 @@ local function SetBonusCheck(details)
     end
   end
 
+  if not C_Item.IsItemDataCachedByID(details.itemID) then
+    C_Item.RequestLoadItemDataByID(details.itemID)
+    return nil
+  end
+
   local linkParts = {strsplit(":", details.itemLink)}
   local specID = tonumber(linkParts[11])
   return specID ~= nil and C_Item.GetSetBonusesForSpecializationByItemID(specID, details.itemID) ~= nil
