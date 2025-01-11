@@ -806,7 +806,6 @@ AddKeywordLocalised("KEYWORD_PVP", PvPCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordManual(ITEM_UNIQUE:lower(), "unique", UniqueCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_LOCKED", LockedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_REFUNDABLE", RefundableCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_SET_BONUS", SetBonusCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_CRAFTED", CraftedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 
 if Syndicator.Constants.IsRetail then
@@ -815,6 +814,7 @@ if Syndicator.Constants.IsRetail then
   AddKeywordLocalised("KEYWORD_KEYSTONE", KeystoneCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
   AddKeywordManual(WORLD_QUEST_REWARD_FILTERS_ANIMA:lower(), "anima", AnimaCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
   AddKeywordLocalised("KEYWORD_KNOWLEDGE", KnowledgeCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+  AddKeywordLocalised("KEYWORD_SET_BONUS", SetBonusCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
   if Syndicator.Constants.WarbandBankActive then
     AddKeywordManual(ITEM_ACCOUNTBOUND:lower(), "warbound", BindOnAccountCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
     AddKeywordManual(ITEM_ACCOUNTBOUND_UNTIL_EQUIP:lower(), "warbound until equipped", WarboundUntilEquippedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
