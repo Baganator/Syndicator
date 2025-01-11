@@ -114,6 +114,8 @@ L["KEYWORD_KEYSTONE"] = "keystone"
 L["KEYWORD_LOCKED"] = "locked"
 L["KEYWORD_REFUNDABLE"] = "refundable"
 L["KEYWORD_KNOWLEDGE"] = "knowledge"
+L["KEYWORD_TIER_SET"] = "tier set"
+L["KEYWORD_HEIRLOOM"] = "heirloom"
 
 L["GROUP_ARMOR_TYPE"] = "Armor Type"
 L["GROUP_BATTLE_PET"] = "Battle Pet Type"
