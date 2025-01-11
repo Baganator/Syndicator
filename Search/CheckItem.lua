@@ -658,6 +658,10 @@ local function CraftedCheck(details)
 end
 
 local function SetBonusCheck(details)
+  if not Syndicator.Utilities.IsEquipment(details.itemLink) then
+    return false
+  end
+
   if C_Item.IsCosmeticItem then
     local result = CosmeticCheck(details)
     if result then
@@ -672,9 +676,14 @@ local function SetBonusCheck(details)
     return nil
   end
 
-  local linkParts = {strsplit(":", details.itemLink)}
-  local specID = tonumber(linkParts[11])
-  return specID ~= nil and C_Item.GetSetBonusesForSpecializationByItemID(specID, details.itemID) ~= nil
+  -- We would use the specID in the item link, but that doesn't always
+  -- correspond to the class that can use the item
+  for _, specID in ipairs(Syndicator.Search.Constants.AllClassSpecializations) do
+    if C_Item.GetSetBonusesForSpecializationByItemID(specID, details.itemID) ~= nil then
+      return true
+    end
+  end
+  return false
 end
 
 local function UseATTInfo(details)

@@ -128,6 +128,20 @@ local ClassData = {
   }
 }
 
+Syndicator.Search.Constants.AllClassSpecializations = {}
+for classID in ipairs(ClassData) do
+  local index = 1
+  local id
+  while true do
+    id = GetSpecializationInfoForClassID(classID, index)
+    index = index + 1
+    table.insert(Syndicator.Search.Constants.AllClassSpecializations, id)
+    if id == nil then
+      break
+    end
+  end
+end
+
 Syndicator.Search.Constants.ClassGear = {}
 
 local currentClass = select(3, UnitClass("player"))
