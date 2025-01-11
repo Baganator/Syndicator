@@ -647,6 +647,12 @@ local function LockedCheck(details)
   return false
 end
 
+local CRAFTED_PATTERN = ITEM_CREATED_BY:gsub("%%s", ".+")
+
+local function CraftedCheck(details)
+  return details.quality ~= 7 and details.classID ~= Enum.ItemClass.Questitem and details.itemLink:match("Player-") ~= nil
+end
+
 local function TierSetCheck(details)
   if C_Item.IsCosmeticItem then
     local result = CosmeticCheck(details)
@@ -661,12 +667,15 @@ local function TierSetCheck(details)
     return false
   end
 
-  local linkParts = {strsplit(":", details.itemLink)}
-  local specID = tonumber(linkParts[11])
-  if specID then
-    return C_Item.GetSetBonusesForSpecializationByItemID(specID, details.itemID) ~= nil
+  if not details.tooltipInfoSpell then
+    return
   end
 
+  local linkParts = {strsplit(":", details.itemLink)}
+  local specID = tonumber(linkParts[11])
+  if specID and C_Item.GetSetBonusesForSpecializationByItemID(specID, details.itemID) ~= nil and not CraftedCheck(details) then
+    return true
+  end
   return false
 end
 
@@ -791,6 +800,7 @@ AddKeywordManual(ITEM_UNIQUE:lower(), "unique", UniqueCheck, SYNDICATOR_L_GROUP_
 AddKeywordLocalised("KEYWORD_LOCKED", LockedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_REFUNDABLE", RefundableCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_TIER_SET", TierSetCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_CRAFTED", CraftedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 
 if Syndicator.Constants.IsRetail then
   AddKeywordLocalised("KEYWORD_COSMETIC", CosmeticCheck, SYNDICATOR_L_GROUP_QUALITY)

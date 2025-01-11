@@ -115,6 +115,7 @@ L["KEYWORD_LOCKED"] = "locked"
 L["KEYWORD_REFUNDABLE"] = "refundable"
 L["KEYWORD_KNOWLEDGE"] = "knowledge"
 L["KEYWORD_TIER_SET"] = "tier set"
+L["KEYWORD_CRAFTED"] = "crafted"
 
 L["GROUP_ARMOR_TYPE"] = "Armor Type"
 L["GROUP_BATTLE_PET"] = "Battle Pet Type"
