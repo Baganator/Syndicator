@@ -21,7 +21,7 @@
 
 Locales.lua
 
-Libs\LibBattlePetTooltipLine\LibStub\LibStub.lua
+Libs\LibStub.lua
 Libs\LibBattlePetTooltipLine\LibBattlePetTooltipLine.xml
 
 Core\Objects.lua
