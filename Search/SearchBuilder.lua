@@ -541,13 +541,10 @@ function OperatorButtonMixin:OnLoad()
   end)
   self.AddContextMenu:RegisterCallback("OnMenuClose", function()
     if not self.AddInput:IsVisible() then
-      self.component.isAdding = false
       return
     end
     self.component.isAdding = enterPressed and self.AddInput:GetText() ~= "" and self.component.subType ~= OperatorType.Not
-    local text = self.AddInput:GetText()
-    self.AddInput:SetText("")
-    ApplyAddInput(text)
+    ApplyAddInput(self.AddInput:GetText())
   end)
   self.skinned = false
 
@@ -679,6 +676,7 @@ function OperatorButtonMixin:Setup(callbackRegistry, component, index)
       self.AddButton:Click()
     end)
   end
+  self.component.isAdding = false
 
   self:Resize()
 end
