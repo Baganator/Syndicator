@@ -1849,12 +1849,19 @@ function Syndicator.Search.InitializeSearchEngine()
     [3] = "mail",
     [4] = "plate",
     [6] = "shields",
-    [7] = "librams",
-    [8] = "idols",
-    [9] = "totems",
-    [10] = "sigils",
-    [11] = "relic",
   }
+  if Syndicator.Constants.IsEra then
+    for subClass, english in pairs({
+        [7] = "librams",
+        [8] = "idols",
+        [9] = "totems",
+        [10] = "sigils",
+        [11] = "relic",
+      }) do
+      armorTypesToCheck[subClass] = english
+    end
+  end
+  local er
   for subClass, english in pairs(armorTypesToCheck) do
     local keyword = C_Item.GetItemSubClassInfo(Enum.ItemClass.Armor, subClass)
     if keyword ~= nil then
