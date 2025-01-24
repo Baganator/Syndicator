@@ -30,9 +30,11 @@ end
 local function GetMatches(text)
   local searchTerms = Syndicator.Search.GetKeywords()
   local result = {}
+  local seen = {}
 
   for _, term in ipairs(searchTerms) do
-    if term.keyword:sub(1, #text) == text then
+    if term.keyword:sub(1, #text) == text and not seen[term.keyword] then
+      seen[term.keyword] = true
       table.insert(result, term.keyword)
     end
   end
@@ -427,6 +429,7 @@ function OperatorButtonMixin:OnLoad()
   plus:SetPoint("CENTER")
   self.AddButton:SetPoint("TOPLEFT")
   self.AddButton:SetScript("OnClick", function()
+    self.AddInput:SetText("")
     self.AddInput:Show()
     self.AddInput:SetFocus()
     self.AddButton:Hide()
