@@ -239,7 +239,7 @@ local function GetOperatorMenu(rootDescription, index, callbackRegistry, event)
 end
 
 local function GetKeywordMenu(rootDescription, index, callbackRegistry, event)
-  rootDescription:CreateButton("Name/Tooltip Search", function()
+  rootDescription:CreateButton(SYNDICATOR_L_CUSTOM_SEARCH, function()
     callbackRegistry:TriggerEvent(event, CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.Custom, ""), index)
   end)
   rootDescription:CreateDivider()

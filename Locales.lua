@@ -158,6 +158,7 @@ L["COPY"] = "Copy"
 L["CUT"] = "Cut"
 L["PASTE"] = "Paste"
 L["NO_MATCHING_KEYWORDS"] = "No matching keywords"
+L["CUSTOM_SEARCH"] = "Custom search"
 
 local L = Locales.frFR
 --@localization(locale="frFR", format="lua_additive_table")@
