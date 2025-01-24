@@ -545,7 +545,9 @@ function OperatorButtonMixin:OnLoad()
       return
     end
     self.component.isAdding = enterPressed and self.AddInput:GetText() ~= "" and self.component.subType ~= OperatorType.Not
-    ApplyAddInput(self.AddInput:GetText())
+    local text = self.AddInput:GetText()
+    self.AddInput:SetText("")
+    ApplyAddInput(text)
   end)
   self.skinned = false
 
