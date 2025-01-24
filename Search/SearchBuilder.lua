@@ -300,7 +300,7 @@ function TermButtonMixin:OnLoad()
     self:OnEnter()
   end)
   self.CustomInput:HookScript("OnLeave", function()
-    self:OnEnter()
+    self:OnLeave()
   end)
   self.CustomInput:HookScript("OnMouseUp", function(_, button)
     self:OnClick(button)
@@ -461,6 +461,8 @@ function OperatorButtonMixin:OnLoad()
       local matches = GetMatches(text)
       if matches[1] then
         component = CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.Keyword, matches[1])
+      else
+        component = CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.Custom, text)
       end
     end
     if component then
