@@ -541,6 +541,7 @@ function OperatorButtonMixin:OnLoad()
   end)
   self.AddContextMenu:RegisterCallback("OnMenuClose", function()
     if not self.AddInput:IsVisible() then
+      self.component.isAdding = false
       return
     end
     self.component.isAdding = enterPressed and self.AddInput:GetText() ~= "" and self.component.subType ~= OperatorType.Not
