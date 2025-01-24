@@ -27,6 +27,20 @@ local function GetKeywordGroups()
   return result
 end
 
+local function GetMatches(text)
+  local searchTerms = Syndicator.Search.GetKeywords()
+  local result = {}
+
+  for _, term in ipairs(searchTerms) do
+    if term.keyword:sub(1, #text) == text then
+      table.insert(result, term.keyword)
+    end
+  end
+
+  table.sort(result)
+  return result
+end
+
 local groups
 
 local RootType = {
@@ -272,6 +286,7 @@ function TermButtonMixin:OnLoad()
   end)
   self.CustomInput:SetScript("OnEnterPressed", function()
     self.CustomInput:ClearFocus()
+    self.CustomInput:Hide()
     self.callbackRegistry:TriggerEvent("OnChange")
   end)
   self.CustomInput:SetScript("OnEditFocusLost", function()
@@ -304,7 +319,7 @@ function TermButtonMixin:OnLoad()
   self.CustomInput.Suffix:SetPoint("TOPLEFT", self.CustomInput.WidthChecker, "TOPRIGHT")
 
   self.CustomInput:SetScript("OnTextChanged", function()
-    self.component.value = self.CustomInput:GetText():gsub("[()|&#]", "")
+    self.component.value = self.CustomInput:GetText()
     self.CustomInput:SetText(self.component.value)
     if self.CustomInput:GetText() == "" then
       self.CustomInput.WidthChecker:SetText("    ")
@@ -350,7 +365,11 @@ function TermButtonMixin:Setup(callbackRegistry, component, index, color)
     self.CustomInput.Suffix:SetTextColor(color.r, color.g, color.b)
     self.CustomInput:GetScript("OnTextChanged")(self.CustomInput)
     self.CustomInput:SetCursorPosition(0)
+    if component.isAdding then
+      self.CustomInput:SetFocus()
+    end
   end
+  component.isAdding = false
 end
 function TermButtonMixin:OnClick(button)
   if self.component.subType == TermType.Keyword or (self.component.subType == TermType.Custom and button == "RightButton") then
@@ -408,10 +427,94 @@ function OperatorButtonMixin:OnLoad()
   plus:SetPoint("CENTER")
   self.AddButton:SetPoint("TOPLEFT")
   self.AddButton:SetScript("OnClick", function()
+    self.AddInput:Show()
+    self.AddInput:SetFocus()
+    self.AddButton:Hide()
+    self.AddContextMenu:OpenMenu()
+    self:Resize()
+  end)
+
+  self.AddInput = CreateFrame("EditBox", nil, self)
+  self.AddInput:SetFontObject(GameFontHighlight)
+  self.AddInput:SetHeight(22)
+  self.AddInput:SetAutoFocus(false)
+  local function ApplyAddInput(raw, index)
+    local text = raw:lower():gsub("[()|&#]", "")
+    if not index then
+      index = CopyTable(self.index)
+      table.insert(index, #self.component.value + 1)
+    end
+    local component
+    if text == "any" or raw == "|" then
+      component = CreateAndInitFromMixin(ComponentMixin, RootType.Operator, OperatorType.Any, {})
+    elseif text == "all" or raw == "&" then
+      component = CreateAndInitFromMixin(ComponentMixin, RootType.Operator, OperatorType.All, {})
+    elseif text == "not" or raw == "!" then
+      component = CreateAndInitFromMixin(ComponentMixin, RootType.Operator, OperatorType.Not, {})
+    elseif text:match("\".*\"") then
+      text = text:match("\"(.*)\"")
+      component = CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.Custom, text)
+    elseif not text:match("^%s*$") then
+      local matches = GetMatches(text)
+      if matches[1] then
+        component = CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.Keyword, matches[1])
+      end
+    end
+    if component then
+      self.callbackRegistry:TriggerEvent("Insert", component, index)
+    else
+      self.AddButton:Show()
+      self.AddInput:Hide()
+      self:Resize()
+    end
+  end
+  self.AddInput:SetScript("OnEscapePressed", function()
+    self.AddContextMenu:CloseMenu()
+  end)
+  local enterPressed = false
+  self.AddInput:SetScript("OnEnterPressed", function()
+    enterPressed = true
+    self.AddContextMenu:CloseMenu()
+    enterPressed = false
+  end)
+
+  self.AddInput.WidthChecker = self.AddInput:CreateFontString(nil, nil, "GameFontNormal")
+  self.AddInput:SetScript("OnTextChanged", function()
+    if not self:IsVisible() then
+      return
+    end
+    local text = self.AddInput:GetText():gsub("[()|&#]", "")
+    self.AddInput:SetText(text)
+    if self.AddInput:GetText() == "" then
+      self.AddInput.WidthChecker:SetText("")
+      self.AddInput.WidthChecker:SetWidth(self.AddButton:GetWidth())
+      self.AddInput:SetWidth(self.AddInput.WidthChecker:GetUnboundedStringWidth() + 40)
+      self:Resize()
+    else
+      self.AddInput.WidthChecker:SetText(self.AddInput:GetText())
+      self.AddInput.WidthChecker:SetWidth(self.AddInput.WidthChecker:GetUnboundedStringWidth())
+      self.AddInput:SetWidth(self.AddInput.WidthChecker:GetUnboundedStringWidth() + 40)
+      self:Resize()
+    end
+
+    if not self.AddInput:GetText():match("^%s*$") then
+      self.AddContextMenu:GenerateMenu()
+    end
+  end)
+  self.AddInput:SetHeight(22)
+
+  self.AddContextMenu = CreateFrame("DropdownButton", nil, self)
+  self.AddContextMenu:SetAllPoints(self.AddButton)
+  self.AddContextMenu:SetFrameStrata("LOW")
+  self.AddContextMenu:SetupMenu(function(_, rootDescription)
+    if self.index == nil then
+      return
+    end
     local insertIndex = CopyTable(self.index)
     table.insert(insertIndex, #self.component.value + 1)
-    MenuUtil.CreateContextMenu(self, function(_, rootDescription)
-      rootDescription:CreateTitle("Insert")
+
+    if self.AddInput:GetText():match("^%s*$") then
+      rootDescription:CreateTitle(SYNDICATOR_L_INSERT)
       GetOperatorMenu(rootDescription, insertIndex, self.callbackRegistry, "Insert")
       rootDescription:CreateDivider()
       GetKeywordMenu(rootDescription, insertIndex, self.callbackRegistry, "Insert")
@@ -419,7 +522,24 @@ function OperatorButtonMixin:OnLoad()
       local button = rootDescription:CreateButton(SYNDICATOR_L_PASTE, function()
         self.callbackRegistry:TriggerEvent("Paste", insertIndex)
       end)
-    end)
+    else
+      local matches = GetMatches(self.AddInput:GetText())
+      for _, match in ipairs(matches) do
+        rootDescription:CreateButton(match, function()
+          ApplyAddInput(match, insertIndex)
+        end)
+      end
+      if #matches == 0 then
+        rootDescription:CreateTitle(RED_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_NO_MATCHING_KEYWORDS))
+      end
+    end
+  end)
+  self.AddContextMenu:RegisterCallback("OnMenuClose", function()
+    if not self.AddInput:IsVisible() then
+      return
+    end
+    self.component.isAdding = enterPressed and self.AddInput:GetText() ~= "" and self.component.subType ~= OperatorType.Not
+    ApplyAddInput(self.AddInput:GetText())
   end)
   self.skinned = false
 
@@ -478,6 +598,7 @@ function OperatorButtonMixin:Setup(callbackRegistry, component, index)
   self:SetAlpha(1)
 
   self.AddButton:Hide()
+  self.AddInput:Hide()
 
   self.component = component
   self.index = index
@@ -536,11 +657,20 @@ function OperatorButtonMixin:Setup(callbackRegistry, component, index)
       table.insert(self.regions, comma)
     end
 
+    self.AddInput:SetPoint("TOPLEFT", self.regions[#self.regions], "TOPRIGHT", 0, 0)
+    self.AddInput:SetText("")
     self.AddButton:Show()
     self.AddButton:SetPoint("TOPLEFT", self.regions[#self.regions], "TOPRIGHT", 0, 4)
     table.insert(self.regions, self.AddButton)
   end
   table.insert(self.regions, self.TailText)
+
+  if component.isAdding then
+    self.AddButton:Hide()
+    C_Timer.After(0, function()
+      self.AddButton:Click()
+    end)
+  end
 
   self:Resize()
 end
@@ -549,6 +679,10 @@ function OperatorButtonMixin:Resize()
   local width = 0
   for _, r in ipairs(self.regions) do
     width = width + r:GetWidth()
+  end
+  if self.AddInput:IsShown() then
+    width = width + self.AddInput.WidthChecker:GetWidth()
+    width = width - self.AddButton:GetWidth()
   end
   self:SetWidth(width)
 
@@ -668,6 +802,7 @@ function Syndicator.Search.GetSearchBuilder(parent)
         place = place.value[index[j]]
       end
     end
+    component.isAdding = true
     table.insert(place.value, index[#index], component)
     cb:TriggerEvent("OnChange")
   end)

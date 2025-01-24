@@ -150,12 +150,14 @@ L["NOT_TOOLTIP_TEXT"] = "Not this entry"
 L["ANY_UPPER"] = "ANY"
 L["ALL_UPPER"] = "ALL"
 L["NOT_UPPER"] = "NOT"
+L["INSERT"] = "Insert"
 L["WRAP_WITH"] = "Wrap with"
 L["UNWRAP"] = "Unwrap"
 L["SWAP"] = "Swap"
 L["COPY"] = "Copy"
 L["CUT"] = "Cut"
 L["PASTE"] = "Paste"
+L["NO_MATCHING_KEYWORDS"] = "No matching keywords"
 
 local L = Locales.frFR
 --@localization(locale="frFR", format="lua_additive_table")@
