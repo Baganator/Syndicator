@@ -176,7 +176,7 @@ local function ProcessTerms(rawText)
         end
         current = c
       -- Apply tighter binding of "&" over "|"
-      elseif current.subType == OperatorType.All then
+      elseif current.subType ~= OperatorType.Any then
         if #index == 0 then
           c.value = {root}
           current = c
@@ -210,6 +210,20 @@ local function ProcessTerms(rawText)
         table.insert(current.value, c)
         table.insert(index, #current.value)
         current = c
+      -- Apply tighter binding of "&" over "|"
+      elseif current.subType == OperatorType.Not then
+        if #index == 0 then
+          c.value = {root}
+          current = c
+          root = c
+        else
+          table.insert(c.value, current)
+          local tmpIndex = CopyTable(index)
+          table.remove(tmpIndex)
+          local tmp = GetByIndex(root, tmpIndex)
+          tmp.value[index[#index]] = c
+          current = c
+        end
       end
     elseif c and c.type == RootType.Term then
       table.insert(current.value, c)
