@@ -144,6 +144,22 @@ L["AUCTIONS_LOWER"] = "auctions"
 L["GUILD_LOWER"] = "guild"
 L["WARBAND_LOWER"] = "warband"
 
+L["ANY_TOOLTIP_TEXT"] = "Any entry is valid"
+L["ALL_TOOLTIP_TEXT"] = "All the entries apply"
+L["NOT_TOOLTIP_TEXT"] = "Not this entry"
+L["ANY_UPPER"] = "ANY"
+L["ALL_UPPER"] = "ALL"
+L["NOT_UPPER"] = "NOT"
+L["INSERT"] = "Insert"
+L["WRAP_WITH"] = "Wrap with"
+L["UNWRAP"] = "Unwrap"
+L["SWAP"] = "Swap"
+L["COPY"] = "Copy"
+L["CUT"] = "Cut"
+L["PASTE"] = "Paste"
+L["NO_MATCHING_KEYWORDS"] = "No matching keywords"
+L["CUSTOM_SEARCH"] = "Custom search"
+
 local L = Locales.frFR
 --@localization(locale="frFR", format="lua_additive_table")@
 
