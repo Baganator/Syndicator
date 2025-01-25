@@ -431,10 +431,10 @@ function OperatorButtonMixin:OnLoad()
 
   self.AddButton = CreateFrame("Button", nil, self, "UIPanelButtonTemplate")
   self.AddButton:SetSize(26, 24)
-  local plus = self.AddButton:CreateTexture(nil, "ARTWORK")
-  plus:SetAtlas("Garr_Building-AddFollowerPlus")
-  plus:SetSize(19, 19)
-  plus:SetPoint("CENTER")
+  self.AddButton.Icon = self.AddButton:CreateTexture(nil, "ARTWORK")
+  self.AddButton.Icon:SetAtlas("Garr_Building-AddFollowerPlus")
+  self.AddButton.Icon:SetSize(19, 19)
+  self.AddButton.Icon:SetPoint("CENTER")
   self.AddButton:SetPoint("TOPLEFT")
   self.AddButton:SetScript("OnClick", function()
     self.AddInput:SetText("")
@@ -604,7 +604,7 @@ function OperatorButtonMixin:Setup(callbackRegistry, component, index)
 
   if not self.skinned then
     self.skinned = true
-    self.callbackRegistry:TriggerEvent("OnSkin", "Button", self.AddButton)
+    self.callbackRegistry:TriggerEvent("OnSkin", "IconButton", self.AddButton)
   end
 
   self.HoverTexture:Hide()
