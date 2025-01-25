@@ -370,10 +370,15 @@ function TermButtonMixin:Setup(callbackRegistry, component, index, color)
     if component.isAdding then
       self.CustomInput:SetFocus()
     end
+    self.CustomInput:SetEnabled(callbackRegistry.enabled)
   end
   component.isAdding = false
 end
 function TermButtonMixin:OnClick(button)
+  if not self.callbackRegistry.enabled then
+    return
+  end
+
   if self.component.subType == TermType.Keyword or (self.component.subType == TermType.Custom and button == "RightButton") then
     local index = self.index
     MenuUtil.CreateContextMenu(self, function(_, rootDescription)
@@ -696,6 +701,10 @@ function OperatorButtonMixin:Resize()
 end
 
 function OperatorButtonMixin:OnClick(button)
+  if not self.callbackRegistry.enabled then
+    return
+  end
+
   if self.OperatorText:IsMouseOver() then
     local index = self.index
     MenuUtil.CreateContextMenu(self, function(_, rootDescription)
