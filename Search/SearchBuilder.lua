@@ -142,6 +142,7 @@ local function ProcessTerms(rawText)
     if t == "(" then
       -- Generic ANY for brackets, will get replaced later if needed
       c = GetComponent("|")
+      c.brackets = true
       table.insert(current.value, c)
       table.insert(index, #current.value)
       current = c
@@ -161,6 +162,7 @@ local function ProcessTerms(rawText)
       -- Replace the root with the current operator if there's no difference
       if current.subType == OperatorType.All and #current.value <= 1 then
         c.value = current.value
+        c.brackets = current.brackets
         if #index > 0 then
           local tmpIndex = CopyTable(index)
           table.remove(tmpIndex)
@@ -189,6 +191,7 @@ local function ProcessTerms(rawText)
       -- Replace the root with the current operator if there's no difference
       if current.subType == OperatorType.Any and #current.value <= 1 then
         c.value = current.value
+        c.brackets = current.brackets
         if #index > 0 then
           local tmpIndex = CopyTable(index)
           table.remove(tmpIndex)
@@ -749,13 +752,13 @@ local function CombineForOutput(joiner, elements)
       end
     else
       if entry.subType == OperatorType.Any then
-        if joiner == "&" or joiner == "!" then
+        if joiner == "&" or joiner == "!" or entry.brackets then
           result = result .. "(" .. CombineForOutput("|", entry.value) .. ")"
         else
           result = result .. CombineForOutput("|", entry.value)
         end
       elseif entry.subType == OperatorType.All then
-        if joiner == "!" then
+        if joiner == "!" or entry.brackets then
           result = result .. "(" .. CombineForOutput("&", entry.value) .. ")"
         else
           result = result .. CombineForOutput("&", entry.value)
