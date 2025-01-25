@@ -651,7 +651,7 @@ function OperatorButtonMixin:Setup(callbackRegistry, component, index)
     end
   end
 
-  if operator ~= OperatorType.Not or #elements == 0 then
+  if self.callbackRegistry.enabled and (operator ~= OperatorType.Not or #elements == 0) then
     if #elements > 0 then
       local comma = self.commaPool:Acquire()
       comma:SetText(", ")
@@ -769,6 +769,7 @@ function Syndicator.Search.GetSearchBuilder(parent)
     groups = GetKeywordGroups()
   end
   local frame = CreateFrame("Frame", nil, parent)
+  frame.enabled = true
   Mixin(frame, CallbackRegistryMixin)
   local cb = frame
   cb:OnLoad()
@@ -786,6 +787,21 @@ function Syndicator.Search.GetSearchBuilder(parent)
 
   function frame:GetText()
     return CombineForOutput("", {root})
+  end
+
+  function frame:Disable()
+    frame.enabled = false
+    cb:TriggerEvent("OnChange")
+  end
+
+  function frame:SetEnabled(state)
+    frame.enabled = not not state
+    cb:TriggerEvent("OnChange")
+  end
+
+  function frame:Enable()
+    frame.enabled = true
+    cb:TriggerEvent("OnChange")
   end
 
   local rootFrame = GetOperatorButton(frame)
