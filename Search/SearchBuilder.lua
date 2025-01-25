@@ -136,6 +136,9 @@ local function ProcessTerms(rawText)
     while current.subType == OperatorType.Not and #current.value > 0 do
       table.remove(index)
       current = GetByIndex(root, index)
+      if #index == 0 then
+        break
+      end
     end
 
     local c = GetComponent(t)
