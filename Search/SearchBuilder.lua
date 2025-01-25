@@ -165,7 +165,7 @@ local function ProcessTerms(rawText)
           local tmpIndex = CopyTable(index)
           table.remove(tmpIndex)
           local tmp = GetByIndex(root, tmpIndex)
-          tmp[index[#index]] = c
+          tmp.value[index[#index]] = c
         else
           root = c
         end
@@ -181,7 +181,7 @@ local function ProcessTerms(rawText)
           local tmpIndex = CopyTable(index)
           table.remove(tmpIndex)
           local tmp = GetByIndex(root, tmpIndex)
-          tmp[index[#index]] = c
+          tmp.value[index[#index]] = c
           current = c
         end
       end
@@ -193,7 +193,7 @@ local function ProcessTerms(rawText)
           local tmpIndex = CopyTable(index)
           table.remove(tmpIndex)
           local tmp = GetByIndex(root, tmpIndex)
-          tmp[index[#index]] = c
+          tmp.value[index[#index]] = c
         else
           root = c
         end
