@@ -838,6 +838,9 @@ local sockets = {
   ["EMPTY_SOCKET_RED"] = "red socket",
   ["EMPTY_SOCKET_TINKER"] = "tinker socket",
   ["EMPTY_SOCKET_YELLOW"] = "yellow socket",
+  ["EMPTY_SOCKET_SINGINGSEA"] = "singing sea socket",
+  ["EMPTY_SOCKET_SINGINGTHUNDER"] = "singing thunder socket",
+  ["EMPTY_SOCKET_SINGINGWIND"] = "singing wind socket",
 }
 
 if Syndicator.Constants.IsClassic and not Syndicator.Constants.IsEra then
