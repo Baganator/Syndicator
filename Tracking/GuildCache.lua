@@ -46,6 +46,7 @@ function SyndicatorGuildCacheMixin:OnLoad()
 
   self:GetGuildKey()
   self.lastTabPickups = {}
+  self.seenBagPickup = false
 
   local function UpdateForPickup(tabIndex, slotID)
     table.insert(self.lastTabPickups, tabIndex)
@@ -55,6 +56,9 @@ function SyndicatorGuildCacheMixin:OnLoad()
   end
   hooksecurefunc("PickupGuildBankItem", UpdateForPickup)
   hooksecurefunc("SplitGuildBankItem", UpdateForPickup)
+  hooksecurefunc(C_Container, "PickupContainerItem", function()
+    self.seenBagPickup = true
+  end)
 end
 
 function SyndicatorGuildCacheMixin:GetGuildKey()
@@ -178,10 +182,7 @@ function SyndicatorGuildCacheMixin:OnUpdate()
 end
 
 function SyndicatorGuildCacheMixin:ProcessTransfers(changed)
-  if next(changed) == nil then
-    return
-  end
-  if #self.lastTabPickups > 1 then
+  if (next(changed) ~= nil and #self.lastTabPickups > 1) or (next(changed) == nil and #self.lastTabPickups == 1 and self.seenBagPickup) then
     local indexes = {}
     for _, tabIndex in ipairs(self.lastTabPickups) do
       indexes[tabIndex] = true
@@ -200,6 +201,7 @@ function SyndicatorGuildCacheMixin:ProcessTransfers(changed)
     end
     self.lastTabPickups = {}
   end
+  self.seenBagPickup = false
 end
 
 function SyndicatorGuildCacheMixin:ExamineGeneralTabInfo()
