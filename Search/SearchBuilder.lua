@@ -53,6 +53,10 @@ local RootType = {
 local TermType = {
   Keyword = 1,
   Custom = 2,
+  ItemLevelLess = 3,
+  ItemLevelMore = 4,
+  ItemLevelRange = 5,
+  ItemLevelEquals = 6,
 }
 
 local OperatorType = {
@@ -77,6 +81,14 @@ local function GetComponent(text)
     return CreateAndInitFromMixin(ComponentMixin, RootType.Operator, OperatorType.Not, {})
   elseif text:sub(1, 1) == "#" then
     return CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.Keyword, text:sub(2))
+  elseif text:match("^<%d+$") then
+    return CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.ItemLevelLess, {-1, tonumber(text:match("%d+"))})
+  elseif text:match("^>%d+$") then
+    return CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.ItemLevelMore, {tonumber(text:match("%d+")), -1})
+  elseif text:match("^%d+%-%d+$") then
+    return CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.ItemLevelRange, {tonumber(text:match("^%d+")), tonumber(text:match("%d+$"))})
+  elseif text:match("^%d+$") then
+    return CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.ItemLevelEquals, {tonumber(text), tonumber(text)})
   elseif text ~= "(" and text ~= ")" then
     return CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.Custom, text)
   end
@@ -262,6 +274,19 @@ local function GetKeywordMenu(rootDescription, index, callbackRegistry, event)
   rootDescription:CreateButton(SYNDICATOR_L_CUSTOM_SEARCH, function()
     callbackRegistry:TriggerEvent(event, CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.Custom, ""), index)
   end)
+  local itemLevelButton = rootDescription:CreateButton(SYNDICATOR_L_ITEM_LEVEL)
+  itemLevelButton:CreateButton(SYNDICATOR_L_ITEM_LEVEL_LESS, function()
+    callbackRegistry:TriggerEvent(event, CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.ItemLevelLess, {-1, -1}), index)
+  end)
+  itemLevelButton:CreateButton(SYNDICATOR_L_ITEM_LEVEL_MORE, function()
+    callbackRegistry:TriggerEvent(event, CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.ItemLevelMore, {-1, -1}), index)
+  end)
+  itemLevelButton:CreateButton(SYNDICATOR_L_ITEM_LEVEL_RANGE, function()
+    callbackRegistry:TriggerEvent(event, CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.ItemLevelRange, {-1, -1}), index)
+  end)
+  itemLevelButton:CreateButton(SYNDICATOR_L_ITEM_LEVEL_EQUALS, function()
+    callbackRegistry:TriggerEvent(event, CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.ItemLevelEquals, {-1, -1}), index)
+  end)
   rootDescription:CreateDivider()
   for _, group in ipairs(groups) do
     local root = rootDescription:CreateButton(group.label)
@@ -298,39 +323,44 @@ function TermButtonMixin:OnLoad()
   self.KeywordText:SetPoint("TOPLEFT")
   self.KeywordText:SetHeight(22)
 
-  self.CustomInput = CreateFrame("EditBox", nil, self)
-  self.CustomInput:SetFontObject(GameFontHighlight)
-  self.CustomInput:SetHeight(22)
-  self.CustomInput:SetAutoFocus(false)
-  self.CustomInput:SetScript("OnEscapePressed", function()
-    self.CustomInput:ClearFocus()
-    self.callbackRegistry:TriggerEvent("OnChange")
-  end)
-  self.CustomInput:SetScript("OnEnterPressed", function()
-    self.CustomInput:ClearFocus()
-    self.CustomInput:Hide()
-    self.callbackRegistry:TriggerEvent("OnChange")
-  end)
-  self.CustomInput:SetScript("OnEditFocusLost", function()
-    if self:IsVisible() then
-      self.callbackRegistry:TriggerEvent("OnChange")
-    end
-  end)
-  self.CustomInput:HookScript("OnEnter", function()
-    self:OnEnter()
-  end)
-  self.CustomInput:HookScript("OnLeave", function()
-    self:OnLeave()
-  end)
-  self.CustomInput:HookScript("OnMouseUp", function(_, button)
-    self:OnClick(button)
-  end)
+  local function GetInput()
+    local input = CreateFrame("EditBox", nil, self)
+    input:SetFontObject(GameFontHighlight)
+    input:SetHeight(22)
+    input:SetAutoFocus(false)
+    input:SetScript("OnEscapePressed", function()
+      input:ClearFocus()
+    end)
+    input:SetScript("OnEnterPressed", function()
+      input:ClearFocus()
+    end)
+    input:SetScript("OnEditFocusLost", function()
+      if input:IsVisible() then
+        self.callbackRegistry:TriggerEvent("OnChange")
+      end
+    end)
+    input:HookScript("OnEnter", function()
+      self:OnEnter()
+    end)
+    input:HookScript("OnLeave", function()
+      self:OnLeave()
+    end)
+    input:HookScript("OnMouseUp", function(_, button)
+      self:OnClick(button)
+    end)
+    input.WidthChecker = input:CreateFontString(nil, nil, "GameFontHighlight")
+    input.WidthChecker:SetPoint("TOPLEFT")
+    input.WidthChecker:SetHeight(22)
+    input.WidthChecker:Hide()
+
+    return input
+  end
+
+  self.CustomInput = GetInput()
 
   self.CustomInput.Prefix = self.CustomInput:CreateFontString(nil, nil, "GameFontNormal")
   self.CustomInput.Prefix:SetText("\"")
   self.CustomInput.Prefix:SetHeight(22)
-  self.CustomInput.WidthChecker = self.CustomInput:CreateFontString(nil, nil, "GameFontHighlight")
-  self.CustomInput.WidthChecker:Hide()
   self.CustomInput.Suffix = self.CustomInput:CreateFontString(nil, nil, "GameFontNormal")
   self.CustomInput.Suffix:SetText("\"")
   self.CustomInput.Suffix:SetHeight(22)
@@ -345,13 +375,129 @@ function TermButtonMixin:OnLoad()
     self.CustomInput:SetText(self.component.value)
     if self.CustomInput:GetText() == "" then
       self.CustomInput.WidthChecker:SetText("    ")
-      self.CustomInput:SetWidth(self.CustomInput.WidthChecker:GetUnboundedStringWidth())
+      self.CustomInput:SetWidth(self.CustomInput.WidthChecker:GetUnboundedStringWidth() + 20)
       self:SetWidth(self.CustomInput.WidthChecker:GetUnboundedStringWidth() + self.CustomInput.Prefix:GetWidth() + self.CustomInput.Suffix:GetWidth())
     else
       self.CustomInput.WidthChecker:SetText(self.CustomInput:GetText())
       self.CustomInput:SetWidth(self.CustomInput.WidthChecker:GetUnboundedStringWidth() + 20)
       self:SetWidth(self.CustomInput.WidthChecker:GetUnboundedStringWidth() + self.CustomInput.Prefix:GetWidth() + self.CustomInput.Suffix:GetWidth())
     end
+    self.onResizeFunc()
+  end)
+
+  self.ItemLevelWrapper = CreateFrame("Frame", nil, self)
+  self.ItemLevelWrapper:SetAllPoints()
+  self.ItemLevelMinInput = GetInput()
+  self.ItemLevelMinInput:SetParent(self.ItemLevelWrapper)
+  self.ItemLevelMinInput.Placeholder = self.ItemLevelMinInput:CreateFontString(nil, nil, "GameFontNormal")
+  self.ItemLevelMinInput.Placeholder:SetText(LIGHTGRAY_FONT_COLOR:WrapTextInColorCode("?"))
+  self.ItemLevelMinInput.Placeholder:SetAllPoints(self.ItemLevelMinInput.WidthChecker)
+  self.ItemLevelMinInput:SetScript("OnEnterPressed", function()
+    if self.component.subType == TermType.ItemLevelRange and self.component.value[1] ~= -1 then
+      self.component.isAdding = true
+    end
+    self.ItemLevelMinInput:ClearFocus()
+  end)
+  self.ItemLevelMinInput:SetScript("OnTabPressed", function()
+    if self.component.subType ~= TermType.ItemLevelRange then
+      return
+    end
+    self.component.isAdding = true
+    self.ItemLevelMinInput:ClearFocus()
+  end)
+  self.ItemLevelMaxInput = GetInput()
+  self.ItemLevelMaxInput:SetParent(self.ItemLevelWrapper)
+  self.ItemLevelMaxInput.Placeholder = self.ItemLevelMaxInput:CreateFontString(nil, nil, "GameFontNormal")
+  self.ItemLevelMaxInput.Placeholder:SetText(LIGHTGRAY_FONT_COLOR:WrapTextInColorCode("?"))
+  self.ItemLevelMaxInput.Placeholder:SetAllPoints(self.ItemLevelMaxInput.WidthChecker)
+  self.ItemLevelEqualsInput = GetInput()
+  self.ItemLevelEqualsInput:SetParent(self.ItemLevelWrapper)
+  self.ItemLevelEqualsInput.Placeholder = self.ItemLevelEqualsInput:CreateFontString(nil, nil, "GameFontNormal")
+  self.ItemLevelEqualsInput.Placeholder:SetText(LIGHTGRAY_FONT_COLOR:WrapTextInColorCode("?"))
+  self.ItemLevelEqualsInput.Placeholder:SetAllPoints(self.ItemLevelEqualsInput.WidthChecker)
+  self.ItemLevelText = self.ItemLevelWrapper:CreateFontString(nil, nil, "GameFontNormal")
+  self.ItemLevelText:SetHeight(22)
+  self.ItemLevelText:SetPoint("TOPLEFT")
+  self.ItemLevelDash = self.ItemLevelWrapper:CreateFontString(nil, nil, "GameFontNormal")
+  self.ItemLevelDash:SetPoint("TOPLEFT", self.ItemLevelMinInput.WidthChecker, "TOPRIGHT")
+  self.ItemLevelDash:SetText("-")
+  self.ItemLevelDash:SetHeight(22)
+
+  local function SizeItemLevel()
+    self:SetWidth(
+      (self.ItemLevelMinInput:IsShown() and self.ItemLevelMinInput.WidthChecker:GetUnboundedStringWidth() or 0) +
+      (self.ItemLevelMaxInput:IsShown() and self.ItemLevelMaxInput.WidthChecker:GetUnboundedStringWidth() or 0) +
+      (self.ItemLevelEqualsInput:IsShown() and self.ItemLevelEqualsInput.WidthChecker:GetUnboundedStringWidth() or 0) +
+      (self.ItemLevelDash:IsShown() and self.ItemLevelDash:GetUnboundedStringWidth() or 0) +
+      self.ItemLevelText:GetUnboundedStringWidth()
+    )
+  end
+
+  self.ItemLevelMinInput:SetScript("OnTextChanged", function()
+    local text = self.ItemLevelMinInput:GetText()
+    if not text:match("^%d+$") then
+      self.component.value[1] = -1
+      self.ItemLevelMinInput:SetText("")
+    else
+      self.component.value[1] = tonumber(text)
+      self.ItemLevelMinInput:SetText(self.component.value[1])
+    end
+    if self.ItemLevelMinInput:GetText() == "" then
+      self.ItemLevelMinInput.Placeholder:Show()
+      self.ItemLevelMinInput.WidthChecker:SetText("   ")
+      self.ItemLevelMinInput:SetWidth(self.ItemLevelMinInput.WidthChecker:GetUnboundedStringWidth() + 20)
+    else
+      self.ItemLevelMinInput.Placeholder:Hide()
+      self.ItemLevelMinInput.WidthChecker:SetText(self.ItemLevelMinInput:GetText())
+      self.ItemLevelMinInput:SetWidth(self.ItemLevelMinInput.WidthChecker:GetUnboundedStringWidth() + 20)
+    end
+    SizeItemLevel()
+    self.onResizeFunc()
+  end)
+
+  self.ItemLevelMaxInput:SetScript("OnTextChanged", function()
+    local text = self.ItemLevelMaxInput:GetText()
+    if not text:match("^%d+$") then
+      self.component.value[2] = -1
+      self.ItemLevelMaxInput:SetText("")
+    else
+      self.component.value[2] = tonumber(text)
+      self.ItemLevelMaxInput:SetText(self.component.value[2])
+    end
+    if self.ItemLevelMaxInput:GetText() == "" then
+      self.ItemLevelMaxInput.Placeholder:Show()
+      self.ItemLevelMaxInput.WidthChecker:SetText("   ")
+      self.ItemLevelMaxInput:SetWidth(self.ItemLevelMaxInput.WidthChecker:GetUnboundedStringWidth() + 20)
+    else
+      self.ItemLevelMaxInput.Placeholder:Hide()
+      self.ItemLevelMaxInput.WidthChecker:SetText(self.ItemLevelMaxInput:GetText())
+      self.ItemLevelMaxInput:SetWidth(self.ItemLevelMaxInput.WidthChecker:GetUnboundedStringWidth() + 20)
+    end
+    SizeItemLevel()
+    self.onResizeFunc()
+  end)
+
+  self.ItemLevelEqualsInput:SetScript("OnTextChanged", function()
+    local text = self.ItemLevelEqualsInput:GetText()
+    if not text:match("^%d+$") then
+      self.component.value[1] = -1
+      self.component.value[2] = -1
+      self.ItemLevelEqualsInput:SetText("")
+    else
+      self.component.value[1] = tonumber(text)
+      self.component.value[2] = tonumber(text)
+      self.ItemLevelEqualsInput:SetText(self.component.value[2])
+    end
+    if self.ItemLevelEqualsInput:GetText() == "" then
+      self.ItemLevelEqualsInput.Placeholder:Show()
+      self.ItemLevelEqualsInput.WidthChecker:SetText("   ")
+      self.ItemLevelEqualsInput:SetWidth(self.ItemLevelEqualsInput.WidthChecker:GetUnboundedStringWidth() + 20)
+    else
+      self.ItemLevelEqualsInput.Placeholder:Hide()
+      self.ItemLevelEqualsInput.WidthChecker:SetText(self.ItemLevelEqualsInput:GetText())
+      self.ItemLevelEqualsInput:SetWidth(self.ItemLevelEqualsInput.WidthChecker:GetUnboundedStringWidth() + 20)
+    end
+    SizeItemLevel()
     self.onResizeFunc()
   end)
 end
@@ -370,6 +516,7 @@ function TermButtonMixin:Setup(callbackRegistry, component, index, color)
 
   self.KeywordText:Hide()
   self.CustomInput:Hide()
+  self.ItemLevelWrapper:Hide()
 
   self.component = component
   self.index = index
@@ -391,6 +538,76 @@ function TermButtonMixin:Setup(callbackRegistry, component, index, color)
       self.CustomInput:SetFocus()
     end
     self.CustomInput:SetEnabled(callbackRegistry.enabled)
+  elseif component.subType == TermType.ItemLevelLess then
+    self.ItemLevelWrapper:Show()
+    self.ItemLevelDash:Hide()
+    self.ItemLevelEqualsInput:Hide()
+    self.ItemLevelMinInput:Hide()
+    self.ItemLevelMaxInput:Show()
+
+    self.ItemLevelMaxInput:SetPoint("TOPLEFT", self.ItemLevelText, "TOPRIGHT")
+    self.ItemLevelText:SetText("ilvl < ")
+    self.ItemLevelMaxInput:SetText(component.value[2])
+    self.ItemLevelMaxInput:GetScript("OnTextChanged")(self.ItemLevelMaxInput)
+    if component.isAdding then
+      self.ItemLevelMaxInput:SetFocus()
+    end
+    self.ItemLevelMaxInput:SetEnabled(callbackRegistry.enabled)
+  elseif component.subType == TermType.ItemLevelMore then
+    self.ItemLevelWrapper:Show()
+    self.ItemLevelDash:Hide()
+    self.ItemLevelEqualsInput:Hide()
+    self.ItemLevelMinInput:Show()
+    self.ItemLevelMaxInput:Hide()
+
+    self.ItemLevelMinInput:SetPoint("TOPLEFT", self.ItemLevelText, "TOPRIGHT")
+    self.ItemLevelText:SetText("ilvl > ")
+    self.ItemLevelMinInput:SetText(component.value[1])
+    self.ItemLevelMinInput:GetScript("OnTextChanged")(self.ItemLevelMinInput)
+    if component.isAdding then
+      self.ItemLevelMinInput:SetFocus()
+    end
+    self.ItemLevelMinInput:SetEnabled(callbackRegistry.enabled)
+  elseif component.subType == TermType.ItemLevelRange then
+    self.ItemLevelDash:Show()
+    self.ItemLevelWrapper:Show()
+    self.ItemLevelEqualsInput:Hide()
+    self.ItemLevelMinInput:Show()
+    self.ItemLevelMaxInput:Show()
+
+    self.ItemLevelMinInput:SetPoint("TOPLEFT", self.ItemLevelText, "TOPRIGHT")
+    self.ItemLevelMaxInput:SetPoint("TOPLEFT", self.ItemLevelDash, "TOPRIGHT")
+    self.ItemLevelText:SetText("ilvls ")
+    self.ItemLevelMinInput:SetText(component.value[1])
+    self.ItemLevelMinInput:GetScript("OnTextChanged")(self.ItemLevelMinInput)
+    self.ItemLevelMaxInput:SetText(component.value[2])
+    self.ItemLevelMaxInput:GetScript("OnTextChanged")(self.ItemLevelMaxInput)
+
+    if component.isAdding then
+      if component.value[1] == -1 then
+        self.ItemLevelMinInput:SetFocus()
+      else
+        self.ItemLevelMaxInput:SetFocus()
+      end
+    end
+    self.ItemLevelMinInput:SetEnabled(callbackRegistry.enabled)
+    self.ItemLevelMaxInput:SetEnabled(callbackRegistry.enabled)
+  elseif component.subType == TermType.ItemLevelEquals then
+    self.ItemLevelDash:Hide()
+    self.ItemLevelWrapper:Show()
+    self.ItemLevelEqualsInput:Show()
+    self.ItemLevelMinInput:Hide()
+    self.ItemLevelMaxInput:Hide()
+
+    self.ItemLevelEqualsInput:SetPoint("TOPLEFT", self.ItemLevelText, "TOPRIGHT")
+    self.ItemLevelText:SetText("ilvl = ")
+    self.ItemLevelEqualsInput:SetText(component.value[2])
+    self.ItemLevelEqualsInput:GetScript("OnTextChanged")(self.ItemLevelEqualsInput)
+
+    if component.isAdding then
+      self.ItemLevelEqualsInput:SetFocus()
+    end
+    self.ItemLevelEqualsInput:SetEnabled(callbackRegistry.enabled)
   end
   component.isAdding = false
 end
@@ -399,7 +616,7 @@ function TermButtonMixin:OnClick(button)
     return
   end
 
-  if self.component.subType == TermType.Keyword or (self.component.subType == TermType.Custom and button == "RightButton") then
+  if self.component.subType == TermType.Keyword or button == "RightButton" then
     local index = self.index
     MenuUtil.CreateContextMenu(self, function(_, rootDescription)
       rootDescription:CreateTitle("Swap")
@@ -448,6 +665,7 @@ function OperatorButtonMixin:OnLoad()
 
   self.AddButton = CreateFrame("Button", nil, self, "UIPanelButtonTemplate")
   self.AddButton:SetSize(26, 24)
+  self.AddButton:SetFrameLevel(10000) -- Place above any input boxes
   self.AddButton.Icon = self.AddButton:CreateTexture(nil, "ARTWORK")
   self.AddButton.Icon:SetAtlas("Garr_Building-AddFollowerPlus")
   self.AddButton.Icon:SetSize(19, 19)
@@ -473,11 +691,11 @@ function OperatorButtonMixin:OnLoad()
       table.insert(index, #self.component.value + 1)
     end
     local component
-    if text == "any" or raw == "|" then
+    if text == "any" then
       component = CreateAndInitFromMixin(ComponentMixin, RootType.Operator, OperatorType.Any, {})
-    elseif text == "all" or raw == "&" then
+    elseif text == "all" then
       component = CreateAndInitFromMixin(ComponentMixin, RootType.Operator, OperatorType.All, {})
-    elseif text == "not" or raw == "!" then
+    elseif text == "not" then
       component = CreateAndInitFromMixin(ComponentMixin, RootType.Operator, OperatorType.Not, {})
     elseif text:match("\".*\"") then
       text = text:match("\"(.*)\"")
@@ -487,7 +705,7 @@ function OperatorButtonMixin:OnLoad()
       if matches[1] then
         component = CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.Keyword, matches[1])
       else
-        component = CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.Custom, text)
+        component = GetComponent(text)
       end
     end
     if component then
@@ -764,8 +982,18 @@ local function CombineForOutput(joiner, elements)
     if entry.type == RootType.Term then
       if entry.subType == TermType.Custom then
         result = result .. entry.value
-      else
+      elseif entry.subType == TermType.Keyword then
         result = result .. "#" .. entry.value
+      elseif entry.subType == TermType.ItemLevelLess or entry.subType == TermType.ItemLevelMore or entry.subType == TermType.ItemLevelRange or entry.subType == TermType.ItemLevelEquals then
+        if entry.value[1] == -1 and entry.value[2] ~= -1 then
+          result = result .. "<" .. entry.value[2]
+        elseif entry.value[1] ~= -1 and entry.value[2] == -1 then
+          result = result .. ">" .. entry.value[1]
+        elseif entry.value[1] ~= -1 and entry.value[1] == entry.value[2] then
+          result = result .. entry.value[1]
+        elseif entry.value[1] ~= -1 and entry.value[2] ~= -1 then
+          result = result .. entry.value[1] .. "-" .. entry.value[2]
+        end
       end
     else
       if entry.subType == OperatorType.Any then

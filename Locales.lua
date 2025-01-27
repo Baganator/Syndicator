@@ -159,6 +159,11 @@ L["CUT"] = "Cut"
 L["PASTE"] = "Paste"
 L["NO_MATCHING_KEYWORDS"] = "No matching keywords"
 L["CUSTOM_SEARCH"] = "Custom search"
+L["ITEM_LEVEL"] = "Item level"
+L["ITEM_LEVEL_LESS"] = "Less than, <"
+L["ITEM_LEVEL_MORE"] = "More than, >"
+L["ITEM_LEVEL_RANGE"] = "Range, -"
+L["ITEM_LEVEL_EQUALS"] = "Equal to, ="
 
 local L = Locales.frFR
 --@localization(locale="frFR", format="lua_additive_table")@
