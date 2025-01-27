@@ -387,7 +387,7 @@ function TermButtonMixin:Setup(callbackRegistry, component, index, color)
     self.CustomInput.Suffix:SetTextColor(color.r, color.g, color.b)
     self.CustomInput:GetScript("OnTextChanged")(self.CustomInput)
     self.CustomInput:SetCursorPosition(0)
-    if component.isAdding and self.CustomInput:GetText() == "" then
+    if component.isAdding and component.value == "" then
       self.CustomInput:SetFocus()
     end
     self.CustomInput:SetEnabled(callbackRegistry.enabled)
