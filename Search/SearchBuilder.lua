@@ -1051,14 +1051,18 @@ function Syndicator.Search.GetSearchBuilder(parent)
     cb:TriggerEvent("OnChange")
   end
 
+  function frame:Enable()
+    frame.enabled = true
+    cb:TriggerEvent("OnChange")
+  end
+
   function frame:SetEnabled(state)
     frame.enabled = not not state
     cb:TriggerEvent("OnChange")
   end
 
-  function frame:Enable()
-    frame.enabled = true
-    cb:TriggerEvent("OnChange")
+  function frame:IsEnabled()
+    return frame.enabled
   end
 
   local rootFrame = GetOperatorButton(frame)
