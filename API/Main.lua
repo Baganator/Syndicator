@@ -47,25 +47,114 @@ function Syndicator.API.RegisterShowItemLocation(callback)
   addonTable.ShowItemLocationCallback = callback
 end
 
+local characters = {
+  "Liadou",
+  "Ninjoru",
+  "Aamjo",
+  "Lainka",
+  "Zeilje",
+  "Aaju",
+  "Kochera",
+  "Muton",
+  "Rodjo",
+  "Omro",
+  "Mit",
+  "Grakle",
+  "Dexi",
+  "Etetzienk",
+  "Dengek",
+  "Yvgilbikle",
+  "Grovexi",
+  "Nalgimi",
+  "Gryshan",
+  "Wezat",
+}
+local realms = {
+  "Daggerspine",
+  "Gnomeregan",
+  "Moonrunner",
+  "Scilla",
+}
+local guilds = {
+  "Growlers",
+  "Meowers",
+  "Squeakers",
+}
+local characterMap = {}
+local reverseCharacterMap = {}
+local realmMap = {}
+local guildMap = {}
+local reverseGuildMap = {}
+
+local function GenMap()
+  local characterIndex = 0
+  local realmIndex = 0
+  local guildIndex = 0
+  local sorted = GetKeysArray(SYNDICATOR_DATA.Characters)
+  table.sort(sorted)
+  for _, c in ipairs(sorted) do
+    local data = SYNDICATOR_DATA.Characters[c]
+    characterIndex = characterIndex + 1
+    if data.details.realm and not realmMap[data.details.realm] then
+      realmIndex = realmIndex + 1
+      realmMap[data.details.realm] = realms[realmIndex]
+    end
+    if data.details.guild and not guildMap[data.details.guild] then
+      guildIndex = guildIndex + 1
+      guildMap[data.details.guild] = {fullName = guilds[guildIndex] .. realmMap[data.details.realm], guild = guilds[guildIndex], realm = realmMap[data.details.realm]}
+      reverseGuildMap[guildMap[data.details.guild].fullName] = data.details.guild
+    end
+    characterMap[c] = {
+      fullName = characters[characterIndex] .. "-" .. realmMap[data.details.realm],
+      character = characters[characterIndex],
+      realm = realmMap[data.details.realm],
+      guild = data.details.guild and guildMap[data.details.guild].fullName,
+    }
+    reverseCharacterMap[characterMap[c].fullName] = c
+  end
+end
+
+local frame = CreateFrame("Frame")
+frame:RegisterEvent("PLAYER_LOGIN")
+frame:SetScript("OnEvent", GenMap)
+
 function Syndicator.API.GetAllCharacters()
-  return GetKeysArray(SYNDICATOR_DATA.Characters)
+  local result = GetKeysArray(SYNDICATOR_DATA.Characters)
+  local newResult = {}
+  for _, key in ipairs(result) do
+    table.insert(newResult, characterMap[key].fullName)
+  end
+  return newResult
 end
 
 -- characterFullName: string, e.g. "Martin-NormalizedRealmName"
 function Syndicator.API.GetByCharacterFullName(characterFullName)
-  return SYNDICATOR_DATA.Characters[characterFullName]
+  local c = SYNDICATOR_DATA.Characters[reverseCharacterMap[characterFullName] or characterFullName]
+  if not c then
+    return nil
+  end
+  c = CopyTable(c)
+  Mixin(c.details, characterMap[characterFullName] or characterMap[reverseCharacterMap[characterFullName]])
+  return c
 end
 
 Syndicator.API.GetCharacter = Syndicator.API.GetByCharacterFullName
 
 function Syndicator.API.GetAllGuilds()
-  return GetKeysArray(SYNDICATOR_DATA.Guilds)
+  local result = GetKeysArray(SYNDICATOR_DATA.Guilds)
+  local newResult = {}
+  for _, key in ipairs(result) do
+    table.insert(newResult, guildMap[key].fullName)
+  end
+  return newResult
 end
 
 -- guildFullName: string, e.g. "The Jokesters-NormalizedRealmName"
 function Syndicator.API.GetByGuildFullName(guildFullName)
-  if SYNDICATOR_DATA.Guilds[guildFullName] then
-    return SYNDICATOR_DATA.Guilds[guildFullName], guildFullName
+  if SYNDICATOR_DATA.Guilds[reverseGuildMap[guildFullName] or guildFullName] then
+    local g = CopyTable(SYNDICATOR_DATA.Guilds[reverseGuildMap[guildFullName] or guildFullName])
+    Mixin(g.details, guildMap[reverseGuildMap[guildFullName]] or guildMap[guildFullName])
+    return g, guildMap[guildFullName] and guildMap[guildFullName].fullName or guildFullName
   end
 end
 
@@ -77,11 +166,11 @@ function Syndicator.API.GetWarband(index)
 end
 
 function Syndicator.API.GetCurrentCharacter()
-  return Syndicator.BagCache and Syndicator.BagCache.currentCharacter
+  return Syndicator.BagCache and characterMap[Syndicator.BagCache.currentCharacter].fullName
 end
 
 function Syndicator.API.GetCurrentGuild()
-  return Syndicator.GuildCache and Syndicator.GuildCache.currentGuild
+  return Syndicator.GuildCache and guildMap[Syndicator.GuildCache.currentGuild].fullName
 end
 
 function Syndicator.API.DeleteCharacter(characterFullName)
