@@ -16,7 +16,7 @@ local function CacheCharacter(character, callback)
     end
   end
 
-  local characterData = CopyTable(SYNDICATOR_DATA.Characters[character])
+  local characterData = CopyTable(Syndicator.API.GetCharacter(character))
 
   local bagsList = {}
   for _, bag in ipairs(characterData.bags) do
@@ -65,7 +65,7 @@ end
 local function CacheGuild(guild, callback)
   local guildList = {}
   local linkToTabIndex = {}
-  for tabIndex, tab in ipairs(CopyTable(SYNDICATOR_DATA.Guilds[guild].bank)) do
+  for tabIndex, tab in ipairs(CopyTable(Syndicator.API.GetGuild(guild).bank)) do
     for _, item in ipairs(tab.slots) do
       if item.itemLink then
         linkToTabIndex[item.itemLink] = tabIndex
@@ -152,11 +152,11 @@ function Syndicator.Search.RequestSearchEverywhereResults(searchTerm, callback)
       Warband = {},
     }
 
-    for c in pairs(SYNDICATOR_DATA.Characters) do
+    for _, c in ipairs(Syndicator.API.GetAllCharacters()) do
       pending.Characters[c] = true
     end
 
-    for g in pairs(SYNDICATOR_DATA.Guilds) do
+    for _, g in ipairs(Syndicator.API.GetAllGuilds()) do
       pending.Guilds[g] = true
     end
 
@@ -261,7 +261,7 @@ function Syndicator.Search.CombineSearchEverywhereResults(results, callback)
       local source = CopyTable(r.source)
       source.itemCount = r.itemCount
       if source.character then
-        local characterData = SYNDICATOR_DATA.Characters[source.character]
+        local characterData = Syndicator.API.GetCharacter(source.character)
         if not characterData.details.hidden and (source.container ~= "equipped" or Syndicator.Config.Get(Syndicator.Config.Options.SHOW_EQUIPPED_ITEMS_IN_TOOLTIPS)) then
           if seenCharacters[key][source.character .. "_" .. source.container] then
             local entry = items[key].sources[seenCharacters[key][source.character .. "_" .. source.container]]
@@ -275,7 +275,7 @@ function Syndicator.Search.CombineSearchEverywhereResults(results, callback)
           items[key].itemCount = items[key].itemCount + r.itemCount
         end
       elseif source.guild then
-        local guildData = SYNDICATOR_DATA.Guilds[source.guild]
+        local guildData = Syndicator.API.GetGuild(source.guild)
         if not guildData.details.hidden then
           if seenGuilds[key][source.guild] then
             local entry = items[key].sources[seenGuilds[key][source.guild]]
@@ -361,7 +361,7 @@ local function PrintSource(indent, source, searchTerm)
     if addonTable.ShowItemLocationCallback then
       character = GetLink(source, searchTerm, source.character)
     end
-    local characterData = SYNDICATOR_DATA.Characters[source.character]
+    local characterData = Syndicator.API.GetCharacter(source.character)
     local className = characterData.details.className
     if className then
       character = "|c" .. (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[className].colorStr .. character .. "|r"

@@ -323,11 +323,11 @@ function SyndicatorItemSummariesMixin:GetTooltipInfo(key, sameConnectedRealm, sa
     if charactersByRealm then
       for char, summary in pairs(charactersByRealm) do
         local byKey = summary[key]
-        local characterDetails = SYNDICATOR_DATA.Characters[char .. "-" .. r].details
+        local characterDetails = Syndicator.API.GetCharacter(char .. "-" .. r).details
         if byKey ~= nil and characterDetails.show.inventory and (not sameFaction or characterDetails.faction == currentFaction) then
           table.insert(result.characters, {
-            character = char,
-            realmNormalized = r,
+            character = characterDetails.character,
+            realmNormalized = characterDetails.realmNormalized,
             className = characterDetails.className,
             race = characterDetails.race,
             sex = characterDetails.sex,
@@ -348,7 +348,7 @@ function SyndicatorItemSummariesMixin:GetTooltipInfo(key, sameConnectedRealm, sa
         local guildDetails = SYNDICATOR_DATA.Guilds[guild .. "-" .. r].details
         if byKey ~= nil and guildDetails.show.inventory and (not sameFaction or guildDetails.faction == currentFaction) then
           table.insert(result.guilds, {
-            guild = guild,
+            guild = guildDetails.guild,
             realmNormalized = r,
             bank = byKey.bank or 0
           })
@@ -359,7 +359,7 @@ function SyndicatorItemSummariesMixin:GetTooltipInfo(key, sameConnectedRealm, sa
 
   local currentGuild = Syndicator.API.GetCurrentGuild()
   if currentGuild then
-    local currentGuildDetails = SYNDICATOR_DATA.Guilds[currentGuild].details
+    local currentGuildDetails = Syndicator.API.GetGuild(currentGuild).details
     if not FindInTableIf(result.guilds, function(a) return a.guild == currentGuildDetails.guild and a.realmNormalized == currentGuildDetails.realm end) and self.SV.Guilds.ByRealm[currentGuildDetails.realm] then
       local summary = self.SV.Guilds.ByRealm[currentGuildDetails.realm][currentGuildDetails.guild]
       if summary then
