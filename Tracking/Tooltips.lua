@@ -246,7 +246,7 @@ function Syndicator.Tooltips.AddCurrencyLines(tooltip, currencyID)
     appendRealm = true
   end
 
-  tooltip:AddLine(SYNDICATOR_L_ALL_CHARACTERS_COLON .. " " .. WHITE_FONT_COLOR:WrapTextInColorCode(FormatLargeNumber(quantity)))
+  tooltip:AddDoubleLine(SYNDICATOR_L_ALL_CHARACTERS_COLON, WHITE_FONT_COLOR:WrapTextInColorCode(FormatLargeNumber(quantity)))
   for index = 1, math.min(#summary, Syndicator.Config.Get("tooltips_character_limit")) do
     local s = summary[index]
     local character = s.character
