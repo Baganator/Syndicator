@@ -58,7 +58,7 @@ Search\GetGroupingKey.lua
 Search\OfflineList.lua
 Search\OfflineList.xml
 Search\SearchEverywhere.lua
-Search\SearchBuilder.lua
+Search\UI\Builder.lua
 Search\Utilities.lua
 
 API\Main.lua

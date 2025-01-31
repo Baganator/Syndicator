@@ -1194,3 +1194,117 @@ function Syndicator.Search.GetSearchBuilder(parent)
 
   return frame
 end
+
+-- holder enforces the bounds of the search widget, should have height 30px
+function Syndicator.Search.GetSearchBuilderScrollable(holder, skinner)
+  local scrollBox = CreateFrame("Frame", nil, holder, "WowScrollBox")
+  local view = CreateScrollBoxLinearView()
+  view:SetHorizontal(true)
+  local SearchBox = Syndicator.Search.GetSearchBuilder(scrollBox)
+  SearchBox:RegisterCallback("OnResize", function()
+    scrollBox:FullUpdate(ScrollBoxConstants.UpdateImmediately)
+  end)
+  SearchBox:RegisterCallback("OnSkin", function(_, ...)
+    skinner(...)
+  end)
+  SearchBox.scrollable = true
+  SearchBox:SetPoint("TOPLEFT")
+  SearchBox:SetHeight(30)
+  scrollBox:SetPoint("TOPLEFT", 15, 0)
+  scrollBox:SetPoint("RIGHT", -15, 0)
+  scrollBox:SetHeight(30)
+  scrollBox:Init(view)
+  do
+    local function Scroll(frame, direction)
+      local elapsed = 0
+      local delay = 0.1
+      local stepCount = 0
+      frame:SetScript("OnUpdate", function(tbl, dt)
+        elapsed = elapsed + dt
+        if elapsed > delay then
+          elapsed = 0
+
+          local visibleExtentPercentage = scrollBox:GetVisibleExtentPercentage();
+          if visibleExtentPercentage > 0 then
+            local pages = 1 / visibleExtentPercentage;
+            local magnitude = .8;
+            local span = pages - 1;
+            if span > 0 then
+              scrollBox:ScrollInDirection((1 / span) * magnitude, direction)
+            end
+          end
+        end
+      end)
+    end
+    local leftButton = CreateFrame("Button", nil, holder)
+    leftButton:SetSize(9, 15)
+    leftButton:SetPoint("RIGHT", scrollBox, "LEFT", -5, 0)
+    leftButton:SetScript("OnEnter", function()
+      leftButton:SetAlpha(1)
+    end)
+    leftButton:SetScript("OnLeave", function()
+      leftButton:SetAlpha(0.8)
+    end)
+    leftButton:SetAlpha(0.8)
+    leftButton:SetScript("OnMouseDown", function()
+      Scroll(leftButton, ScrollControllerMixin.Directions.Decrease)
+    end)
+    leftButton:SetScript("OnMouseUp", function()
+      leftButton:SetScript("OnUpdate", nil)
+    end)
+    leftButton:SetScript("OnHide", function()
+      leftButton:SetScript("OnUpdate", nil)
+    end)
+    leftButton:SetNormalAtlas("Minimal_SliderBar_Button_Left")
+    SearchBox:TriggerEvent("OnSkin", "ScrollButton", leftButton, {"left"})
+    local rightButton = CreateFrame("Button", nil, holder)
+    rightButton:SetSize(9, 15)
+    rightButton:SetPoint("LEFT", scrollBox, "RIGHT", 5, 0)
+    rightButton:SetScript("OnMouseDown", function()
+      Scroll(rightButton, ScrollControllerMixin.Directions.Increase)
+    end)
+    rightButton:SetScript("OnMouseUp", function()
+      rightButton:SetScript("OnUpdate", nil)
+    end)
+    rightButton:SetScript("OnHide", function()
+      rightButton:SetScript("OnUpdate", nil)
+    end)
+    rightButton:SetScript("OnEnter", function()
+      rightButton:SetAlpha(1)
+    end)
+    rightButton:SetScript("OnLeave", function()
+      rightButton:SetAlpha(0.8)
+    end)
+    rightButton:SetAlpha(0.8)
+    rightButton:SetNormalAtlas("Minimal_SliderBar_Button_Right")
+    SearchBox:TriggerEvent("OnSkin", "ScrollButton", rightButton, {"right"})
+    local function Update(scrollPercentage, visibleExtentPercentage)
+      if visibleExtentPercentage < 1 then
+        leftButton:SetShown(scrollPercentage > 0)
+        rightButton:SetShown(scrollPercentage < 1)
+      else
+        leftButton:Hide()
+        rightButton:Hide()
+      end
+    end
+    scrollBox:RegisterCallback(BaseScrollBoxEvents.OnScroll, function(_, scrollPercentage, visibleExtentPercentage)
+      Update(scrollPercentage, visibleExtentPercentage)
+    end)
+    scrollBox:RegisterCallback(BaseScrollBoxEvents.OnSizeChanged, function(_, visibleExtentPercentage)
+      if visibleExtentPercentage >= 1 then
+        leftButton:Hide()
+        rightButton:Hide()
+      end
+    end)
+    scrollBox:RegisterCallback(BaseScrollBoxEvents.OnAllowScrollChanged, function(_, allowScroll)
+      if not allowScroll then
+        leftButton:Hide()
+        rightButton:Hide()
+      else
+        Update(scrollBox:GetScrollPercentage(), scrollBox:GetVisibleExtentPercentage())
+      end
+    end)
+  end
+
+  return SearchBox
+end
