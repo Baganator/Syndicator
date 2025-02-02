@@ -53,7 +53,7 @@ if Syndicator.Constants.IsClassic then
         rightText = rightFontString:GetText(),
         rightColor = CreateColor(rightFontString:GetTextColor()),
       }
-      if entry.rightText == "" or entry.rightText == nil then
+      if not rightFontString:IsShown() or entry.rightText == "" or entry.rightText == nil then
         entry.rightText = nil
         entry.rightColor = nil
       end
