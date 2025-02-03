@@ -582,6 +582,7 @@ function TermButtonMixin:Setup(callbackRegistry, component, index, color)
     self.ItemLevelMinInput:GetScript("OnTextChanged")(self.ItemLevelMinInput)
     self.ItemLevelMaxInput:SetText(component.value[2])
     self.ItemLevelMaxInput:GetScript("OnTextChanged")(self.ItemLevelMaxInput)
+    self.ItemLevelMaxInput:SetFrameLevel(self.ItemLevelMinInput:GetFrameLevel() + 1)
 
     if component.isAdding then
       if component.value[1] == -1 then
@@ -619,8 +620,8 @@ function TermButtonMixin:OnClick(button)
   if self.component.subType == TermType.Keyword or button == "RightButton" then
     local index = self.index
     MenuUtil.CreateContextMenu(self, function(_, rootDescription)
-      rootDescription:CreateTitle("Swap")
-      GetKeywordMenu(rootDescription, index, self.callbackRegistry, SYNDICATOR_L_SWAP)
+      rootDescription:CreateTitle(REPLACE)
+      GetKeywordMenu(rootDescription, index, self.callbackRegistry, "Swap")
       rootDescription:CreateDivider()
       local wrapButton = rootDescription:CreateButton(SYNDICATOR_L_WRAP_WITH)
       GetOperatorMenu(wrapButton, index, self.callbackRegistry, "Wrap")
