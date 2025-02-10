@@ -746,9 +746,7 @@ function OperatorButtonMixin:OnLoad()
       self:Resize()
     end
 
-    if not self.AddInput:GetText():match("^%s*$") then
-      self.AddContextMenu:GenerateMenu()
-    end
+    self.AddContextMenu:GenerateMenu()
   end)
   self.AddInput:SetHeight(22)
 
