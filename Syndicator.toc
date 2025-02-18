@@ -1,6 +1,6 @@
 ## Interface: 110005, 110007
-## Interface-Cata: 40401
-## Interface-Vanilla: 11505, 11506
+## Interface-Cata: 40401, 40402
+## Interface-Vanilla: 11506
 ## Title: Syndicator
 ## Version: @project-version@
 ## Author: plusmouse
