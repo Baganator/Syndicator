@@ -1,4 +1,4 @@
-if not Syndicator.Constants.IsRetail then
+if Syndicator.Constants.IsLegacyAH then
   return
 end
 

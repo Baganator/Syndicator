@@ -41,8 +41,8 @@ Tracking\EquippedCache.lua
 Tracking\CurrencyCache.lua
 Tracking\GuildCache.lua
 Tracking\VoidCache.lua
-Tracking\AuctionCacheRetail.lua
-Tracking\AuctionCacheClassic.lua
+Tracking\AuctionCacheModern.lua
+Tracking\AuctionCacheLegacy.lua
 Tracking\ItemSummaries.lua
 Tracking\Tooltips.lua
 Tracking\CurrencyTooltipData.lua

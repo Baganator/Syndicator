@@ -1,4 +1,4 @@
-if not Syndicator.Constants.IsClassic then
+if not Syndicator.Constants.IsLegacyAH then
   return
 end
 
