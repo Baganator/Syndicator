@@ -105,6 +105,7 @@ function Syndicator.SlashCmd.CustomiseUI()
 end
 
 local COMMANDS = {
+  [""] = function() Settings.OpenToCategory(SYNDICATOR_L_SYNDICATOR) end,
   ["c"] = Syndicator.SlashCmd.Config,
   ["config"] = Syndicator.SlashCmd.Config,
   ["d"] = Syndicator.SlashCmd.Debug,
@@ -120,9 +121,7 @@ function Syndicator.SlashCmd.Handler(input)
   local split = {strsplit("\a", (input:gsub("%s+","\a")))}
 
   local root = split[1]
-  if root == "" then
-    Syndicator.Utilities.Message("Command missing")
-  elseif COMMANDS[root] ~= nil then
+  if COMMANDS[root] ~= nil then
     table.remove(split, 1)
     COMMANDS[root](unpack(split))
   else
