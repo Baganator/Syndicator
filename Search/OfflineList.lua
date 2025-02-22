@@ -30,6 +30,7 @@ end
 function SyndicatorOfflineListSearchMixin:StartSearch(baseInfoItems, text, finishedCallback)
   if text == "" then
     finishedCallback(baseInfoItems)
+    return
   end
 
   self.list = {}
