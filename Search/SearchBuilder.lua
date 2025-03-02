@@ -1130,6 +1130,9 @@ function Syndicator.Search.GetSearchBuilder(parent)
     else
       place.value[index[#index]] = component
     end
+    if component.type == RootType.Term and component.subType == TermType.Custom then
+      component.isAdding = true
+    end
     cb:TriggerEvent("OnChange")
   end)
 
