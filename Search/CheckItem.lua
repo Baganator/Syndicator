@@ -123,6 +123,11 @@ local function SwordCheck(details)
   return details.classID == Enum.ItemClass.Weapon and (details.subClassID == Enum.ItemWeaponSubclass.Sword2H or details.subClassID == Enum.ItemWeaponSubclass.Sword1H)
 end
 
+local function RingCheck(details)
+  GetInvType(details)
+  return details.invType == "INVTYPE_FINGER"
+end
+
 local function StaffCheck(details)
   GetClassSubClass(details)
   return details.classID == Enum.ItemClass.Weapon and (details.subClassID == 10)
@@ -774,6 +779,7 @@ AddKeywordLocalised("KEYWORD_AXE", AxeCheck, SYNDICATOR_L_GROUP_WEAPON_TYPE)
 AddKeywordLocalised("KEYWORD_MACE", MaceCheck, SYNDICATOR_L_GROUP_WEAPON_TYPE)
 AddKeywordLocalised("KEYWORD_SWORD", SwordCheck, SYNDICATOR_L_GROUP_WEAPON_TYPE)
 AddKeywordLocalised("KEYWORD_STAFF", StaffCheck, SYNDICATOR_L_GROUP_WEAPON_TYPE)
+AddKeywordLocalised("KEYWORD_RING", RingCheck, SYNDICATOR_L_GROUP_ARMOR_TYPE)
 AddKeywordLocalised("KEYWORD_REAGENT", ReagentCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
 AddKeywordLocalised("KEYWORD_FOOD", FoodCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
 AddKeywordLocalised("KEYWORD_DRINK", FoodCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
