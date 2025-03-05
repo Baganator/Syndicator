@@ -125,7 +125,7 @@ end
 
 local function StaffCheck(details)
   GetClassSubClass(details)
-  return details.classID == Enum.ItemClass.Weapon and (details.subClassID == Enum.ItemWeaponSubclass.Stave)
+  return details.classID == Enum.ItemClass.Weapon and (details.subClassID == 10)
 end
 
 local function MountCheck(details)
