@@ -763,11 +763,11 @@ end
 
 AddKeywordLocalised("KEYWORD_PET", PetCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
 AddKeywordLocalised("KEYWORD_BATTLE_PET", PetCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
-AddKeywordLocalised("KEYWORD_SOULBOUND", SoulboundCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_BOP", SoulboundCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_BOE", BindOnEquipCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_BWE", BindOnEquipCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_BOU", BindOnUseCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_SOULBOUND", SoulboundCheck, SYNDICATOR_L_GROUP_BINDING_TYPE)
+AddKeywordLocalised("KEYWORD_BOP", SoulboundCheck, SYNDICATOR_L_GROUP_BINDING_TYPE)
+AddKeywordLocalised("KEYWORD_BOE", BindOnEquipCheck, SYNDICATOR_L_GROUP_BINDING_TYPE)
+AddKeywordLocalised("KEYWORD_BWE", BindOnEquipCheck, SYNDICATOR_L_GROUP_BINDING_TYPE)
+AddKeywordLocalised("KEYWORD_BOU", BindOnUseCheck, SYNDICATOR_L_GROUP_BINDING_TYPE)
 AddKeywordLocalised("KEYWORD_EQUIPMENT", EquipmentCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
 AddKeywordLocalised("KEYWORD_GEAR", EquipmentCheck, SYNDICATOR_L_GROUP_ITEM_TYPE)
 AddKeywordLocalised("KEYWORD_AXE", AxeCheck, SYNDICATOR_L_GROUP_WEAPON_TYPE)
@@ -786,8 +786,8 @@ AddKeywordLocalised("KEYWORD_SOCKET", SocketCheck, SYNDICATOR_L_GROUP_ITEM_DETAI
 AddKeywordLocalised("KEYWORD_JUNK", JunkCheck, SYNDICATOR_L_GROUP_QUALITY)
 AddKeywordLocalised("KEYWORD_TRASH", JunkCheck, SYNDICATOR_L_GROUP_QUALITY)
 AddKeywordLocalised("KEYWORD_UPGRADE", UpgradeCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_BOA", BindOnAccountCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-AddKeywordLocalised("KEYWORD_ACCOUNT_BOUND", BindOnAccountCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_BOA", BindOnAccountCheck, SYNDICATOR_L_GROUP_BINDING_TYPE)
+AddKeywordLocalised("KEYWORD_ACCOUNT_BOUND", BindOnAccountCheck, SYNDICATOR_L_GROUP_BINDING_TYPE)
 AddKeywordLocalised("KEYWORD_USE", UseCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_USABLE", UsableCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_OPEN", OpenCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
@@ -816,9 +816,9 @@ if Syndicator.Constants.IsRetail then
   AddKeywordLocalised("KEYWORD_KNOWLEDGE", KnowledgeCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
   AddKeywordLocalised("KEYWORD_SET_BONUS", SetBonusCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
   if Syndicator.Constants.WarbandBankActive then
-    AddKeywordManual(ITEM_ACCOUNTBOUND:lower(), "warbound", BindOnAccountCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-    AddKeywordManual(ITEM_ACCOUNTBOUND_UNTIL_EQUIP:lower(), "warbound until equipped", WarboundUntilEquippedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
-    AddKeywordLocalised("KEYWORD_WUE", WarboundUntilEquippedCheck, SYNDICATOR_L_GROUP_ITEM_DETAIL)
+    AddKeywordManual(ITEM_ACCOUNTBOUND:lower(), "warbound", BindOnAccountCheck, SYNDICATOR_L_GROUP_BINDING_TYPE)
+    AddKeywordManual(ITEM_ACCOUNTBOUND_UNTIL_EQUIP:lower(), "warbound until equipped", WarboundUntilEquippedCheck, SYNDICATOR_L_GROUP_BINDING_TYPE)
+    AddKeywordLocalised("KEYWORD_WUE", WarboundUntilEquippedCheck, SYNDICATOR_L_GROUP_BINDING_TYPE)
   end
 end
 
