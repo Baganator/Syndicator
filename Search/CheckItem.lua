@@ -199,7 +199,10 @@ local function GetSourceID(itemLink)
     return sourceID
   end
   local _, sourceID = C_TransmogCollection.GetItemInfo((C_Item.GetItemInfoInstant(itemLink)))
-  return sourceID
+  if sourceID then
+    return sourceID
+  end
+  return Syndicator.Search.RecoverTransmogInfo(itemLink)
 end
 
 local function IsTMogCollectedCompletionist(itemLink)
