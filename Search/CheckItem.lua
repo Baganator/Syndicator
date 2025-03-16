@@ -207,7 +207,7 @@ end
 
 local function IsTMogCollectedCompletionist(itemLink)
   local sourceID = GetSourceID(itemLink)
-  if not sourceID then
+  if not sourceID or not select(2, C_TransmogCollection.AccountCanCollectSource(sourceID)) then
     return nil
   else
     return C_TransmogCollection.PlayerHasTransmogItemModifiedAppearance(sourceID)
@@ -216,7 +216,7 @@ end
 
 local function IsTMogCollectedUnique(itemLink)
   local sourceID = GetSourceID(itemLink)
-  if not sourceID then
+  if not sourceID or not select(2, C_TransmogCollection.AccountCanCollectSource(sourceID)) then
     return
   else
     local subClass = select(7, C_Item.GetItemInfoInstant(itemLink))
