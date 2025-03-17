@@ -348,6 +348,29 @@ local function MyClassCheck(details)
   return false
 end
 
+local function GetTooltipInfoLink(details)
+  if details.tooltipInfoLink then
+    return
+  end
+
+  if not C_Item.IsItemDataCachedByID(details.itemID) then
+    C_Item.RequestLoadItemDataByID(details.itemID)
+    return
+  end
+
+  local _, spellID = C_Item.GetItemSpell(details.itemID)
+  if spellID and not C_Spell.IsSpellDataCached(spellID) then
+    C_Spell.RequestLoadSpellData(spellID)
+    return
+  end
+
+  if Syndicator.Constants.IsRetail then
+    details.tooltipInfoLink = C_TooltipInfo.GetHyperlink(details.itemLink) or {lines={}}
+  else
+    details.tooltipInfoLink = Syndicator.Utilities.DumpClassicTooltip(function(tooltip) tooltip:SetHyperlink(details.itemLink) end)
+  end
+end
+
 local function GetTooltipInfoSpell(details)
   if details.tooltipInfoSpell then
     return
@@ -705,10 +728,10 @@ local function TierTokenCheck(details)
     return false
   end
 
-  GetTooltipInfoSpell(details)
+  GetTooltipInfoLink(details)
 
-  if details.tooltipInfoSpell then
-    for _, row in ipairs(details.tooltipInfoSpell.lines) do
+  if details.tooltipInfoLink then
+    for _, row in ipairs(details.tooltipInfoLink.lines) do
       if row.leftText:match(classRestrictionsPattern) then
         return true
       end
