@@ -83,9 +83,9 @@ function SyndicatorGuildCacheMixin:GetGuildKey()
 
   local gm, gmGUID
   for i = 1, GetNumGuildMembers() do
-    local name, _, rankIndex, _, _, _, _, _, _, _, _, _, _, _, _, _, _, guid = GetGuildRosterInfo(i)
+    local name, _, rankIndex, _, _, _, _, _, _, _, _, _, _, _, _, _, guid = GetGuildRosterInfo(i)
     if rankIndex == 0 then
-      gm, gmGUID = name, gmGUID
+      gm, gmGUID = name, guid
     end
   end
 
