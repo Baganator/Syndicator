@@ -899,7 +899,7 @@ local sockets = {
   ["EMPTY_SOCKET_SINGINGWIND"] = "singing wind socket",
 }
 
-if Syndicator.Constants.IsClassic and not Syndicator.Constants.IsEra then
+if Syndicator.Constants.IsCata then
   sockets["EMPTY_SOCKET_HYDRAULIC"] = "hydraulic socket"
 end
 
