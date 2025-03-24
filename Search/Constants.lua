@@ -51,6 +51,7 @@ local ClassData = {
     {2, 15}, -- Daggers
     {2, 4}, -- One-Handed Maces
     {2, 10}, -- Staves
+    {2, 19}, -- Wands
   },
   [6] = { -- Death Knight
     {4, 4}, -- Plate
@@ -78,6 +79,7 @@ local ClassData = {
     {2, 15}, -- Daggers
     {2, 7}, -- One-Handed Swords
     {2, 10}, -- Staves
+    {2, 19}, -- Wands
   },
   [9] = { -- Warlock
     {4, 1}, -- Cloth
@@ -85,6 +87,7 @@ local ClassData = {
     {2, 15}, -- Daggers
     {2, 7}, -- One-Handed Swords
     {2, 10}, -- Staves
+    {2, 19}, -- Wands
   },
   [10] = { -- Monk
     {4, 2}, -- Leather
