@@ -270,6 +270,7 @@ function Syndicator.Search.CombineSearchEverywhereResults(results, callback)
             table.insert(items[key].sources, source)
             source.itemLink = r.itemLink
             source.itemNameLower = r.itemNameLower
+            source.realm = characterData.details.realmNormalized
             seenCharacters[key][source.character .. "_" .. source.container] = #items[key].sources
           end
           items[key].itemCount = items[key].itemCount + r.itemCount
@@ -284,6 +285,7 @@ function Syndicator.Search.CombineSearchEverywhereResults(results, callback)
             table.insert(items[key].sources, source)
             source.itemLink = r.itemLink
             source.itemNameLower = r.itemNameLower
+            source.realm = guildData.details.realm
             seenGuilds[key][source.guild] = #items[key].sources
           end
           items[key].itemCount = items[key].itemCount + r.itemCount
@@ -315,7 +317,25 @@ function Syndicator.Search.CombineSearchEverywhereResults(results, callback)
         table.insert(final, items[key])
         table.sort(items[key].sources, function(a, b)
           if a.itemCount == b.itemCount then
-            return tostring(a.container) < tostring(b.container)
+            if a.realm == b.realm then
+              if a.container == b.container then
+                if a.character then
+                  return a.character < b.character
+                elseif a.guild then
+                  return a.guild < b.guild
+                else
+                  return
+                end
+              else
+                return tostring(a.container) < tostring(b.container)
+              end
+            elseif a.realm and not b.realm then
+              return false
+            elseif b.realm and not a.realm then
+              return true
+            else
+              return a.realm < b.realm
+            end
           else
             return a.itemCount > b.itemCount
           end
