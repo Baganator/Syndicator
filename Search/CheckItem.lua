@@ -18,22 +18,38 @@ local function GetItemName(details)
   end
 end
 
-local function GetClassSubClass(details)
-  if details.classID then
-    return
-  end
+local GetClassSubClass
+if Syndicator.Constants.IsEra then
+  GetClassSubClass = function(details)
+    if details.classID then
+      return
+    end
 
-  if details.itemID == Syndicator.Constants.BattlePetCageID and details.itemLink:find("battlepet:") then
-    local petID = details.itemLink:match("battlepet:(%d+)")
-    local _, _, petType = C_PetJournal.GetPetInfoBySpeciesID(tonumber(petID))
-    details.classID = Enum.ItemClass.Battlepet
-    details.subClassID = petType - 1
-  else
-    local classID, subClassID = select(6, C_Item.GetItemInfoInstant(details.itemID))
-    details.classID = classID
-    details.subClassID = subClassID
+    local override = Syndicator.Search.Constants.TypeOverridesMap[details.itemID]
+    if override then
+      details.classID = override.classID
+      details.subClassID = override.subClassID
+    else
+      details.classID, details.subClassID = select(6, C_Item.GetItemInfoInstant(details.itemID))
+    end
+  end
+else
+  GetClassSubClass = function(details)
+    if details.classID then
+      return
+    end
+
+    if details.itemID == Syndicator.Constants.BattlePetCageID and details.itemLink:find("battlepet:") then
+      local petID = details.itemLink:match("battlepet:(%d+)")
+      local _, _, petType = C_PetJournal.GetPetInfoBySpeciesID(tonumber(petID))
+      details.classID = Enum.ItemClass.Battlepet
+      details.subClassID = petType - 1
+    else
+      details.classID, details.subClassID = select(6, C_Item.GetItemInfoInstant(details.itemID))
+    end
   end
 end
+Syndicator.Search.GetClassSubClass = GetClassSubClass
 
 local function GetInvType(details)
   if details.invType then
@@ -1876,29 +1892,51 @@ function Syndicator.Search.InitializeSearchEngine()
     end
   end
 
-  local tradeGoodsToCheck = {
-    [1] = "parts",
-    [4] = "jewelcrafting",
-    [5] = "cloth",
-    [6] = "leather",
-    [7] = "metal & stone",
-    [8] = "cooking",
-    [9] = "herb",
-    [10] = "elemental",
-    [12] = "enchanting",
-    [16] = "inscription",
-    [18] = "optional reagents",
-    [19] = "finishing reagents",
-  }
-  if Syndicator.Constants.IsClassic then
-    tradeGoodsToCheck[2] = "explosives"
-    tradeGoodsToCheck[3] = "devices"
-    tradeGoodsToCheck[8] = "meat"
-  end
-  for subClass, english in pairs(tradeGoodsToCheck) do
-    local keyword = C_Item.GetItemSubClassInfo(7, subClass)
-    if keyword ~= nil then
-      AddKeywordManual(keyword:lower(), english, function(details)
+  if not Syndicator.Constants.IsEra then
+    local tradeGoodsToCheck = {
+      [1] = "parts",
+      [4] = "jewelcrafting",
+      [5] = "cloth",
+      [6] = "leather",
+      [7] = "metal & stone",
+      [8] = "cooking",
+      [9] = "herb",
+      [10] = "elemental",
+      [12] = "enchanting",
+      [16] = "inscription",
+      [18] = "optional reagents",
+      [19] = "finishing reagents",
+    }
+    if Syndicator.Constants.IsClassic then
+      tradeGoodsToCheck[2] = "explosives"
+      tradeGoodsToCheck[3] = "devices"
+      tradeGoodsToCheck[8] = "meat"
+    end
+    for subClass, english in pairs(tradeGoodsToCheck) do
+      local keyword = C_Item.GetItemSubClassInfo(7, subClass)
+      if keyword ~= nil then
+        AddKeywordManual(keyword:lower(), english, function(details)
+          GetClassSubClass(details)
+          return details.classID == 7 and details.subClassID == subClass
+        end, SYNDICATOR_L_GROUP_TRADE_GOODS)
+      end
+    end
+  else
+    local tradeGoodsToCheck = {
+      [1] = "PARTS",
+      [2] = "EXPLOSIVES",
+      [3] = "DEVICES",
+      [5] = "CLOTH",
+      [6] = "LEATHER",
+      [7] = "METAL_AND_STONE",
+      [8] = "MEAT",
+      [9] = "HERB",
+      [10] = "ELEMENTAL",
+      [12] = "ENCHANTING",
+    }
+    for subClass, localeString in pairs(tradeGoodsToCheck) do
+        print(localeString)
+      AddKeywordLocalised("KEYWORD_SUBCLASS_" .. localeString, function(details)
         GetClassSubClass(details)
         return details.classID == 7 and details.subClassID == subClass
       end, SYNDICATOR_L_GROUP_TRADE_GOODS)
@@ -2086,6 +2124,22 @@ function Syndicator.Search.InitializeSearchEngine()
           return details.classID == Enum.ItemClass.Consumable and details.subClassID == subClass
         end, SYNDICATOR_L_GROUP_CONSUMABLE)
       end
+    end
+  else
+    local consumablesToCheck = {
+      [1] = "POTION",
+      [2] = "ELIXIR",
+      [3] = "FLASK",
+      [4] = "SCROLL",
+      [5] = "FOOD_AND_DRINK",
+      [6] = "ITEM_ENHANCEMENT",
+      [8] = "BANDAGES",
+    }
+    for subClass, localeString in pairs(consumablesToCheck) do
+      AddKeywordLocalised("KEYWORD_SUBCLASS_" .. localeString, function(details)
+        GetClassSubClass(details)
+        return details.classID == Enum.ItemClass.Consumable and details.subClassID == subClass
+      end, SYNDICATOR_L_GROUP_CONSUMABLE)
     end
   end
 
