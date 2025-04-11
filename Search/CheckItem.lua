@@ -1935,7 +1935,6 @@ function Syndicator.Search.InitializeSearchEngine()
       [12] = "ENCHANTING",
     }
     for subClass, localeString in pairs(tradeGoodsToCheck) do
-        print(localeString)
       AddKeywordLocalised("KEYWORD_SUBCLASS_" .. localeString, function(details)
         GetClassSubClass(details)
         return details.classID == 7 and details.subClassID == subClass
