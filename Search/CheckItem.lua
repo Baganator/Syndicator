@@ -406,6 +406,9 @@ local function GetTooltipInfoSpell(details)
   details.tooltipInfoSpell = details.tooltipGetter() or {lines={}}
 end
 
+Syndicator.Search.GetTooltipInfoLink = GetTooltipInfoLink
+Syndicator.Search.GetTooltipInfoSpell = GetTooltipInfoSpell
+
 local JUNK_PATTERN = "^" .. SELL_PRICE
 local function JunkCheck(details)
   if details.isJunk ~= nil then
