@@ -743,7 +743,7 @@ local function TierTokenCheck(details)
   GetInvType(details)
   GetClassSubClass(details)
 
-  if details.quality == 1 or details.invType ~= "INVTYPE_NON_EQUIP_IGNORE" or (details.classID ~= Enum.ItemClass.Consumable and details.classID ~= Enum.ItemClass.Armor and details.classID ~= Enum.ItemClass.Weapon and details.classID ~= Enum.ItemClass.Miscellaneous and details.classID ~= Enum.ItemClass.Reagent) then
+  if details.quality <= 1 or details.invType ~= "INVTYPE_NON_EQUIP_IGNORE" or (details.classID ~= Enum.ItemClass.Consumable and details.classID ~= Enum.ItemClass.Armor and details.classID ~= Enum.ItemClass.Weapon and details.classID ~= Enum.ItemClass.Miscellaneous and details.classID ~= Enum.ItemClass.Reagent) then
     return false
   end
 
