@@ -1217,7 +1217,7 @@ local stats = {
   ["VERSATILITY"] = "versatility",
 }
 
-if Syndicator.Constants.IsCata then
+if Syndicator.Constants.IsWrath or Syndicator.Constants.IsCata then
   stats = {
     ["AGILITY"] = "agility",
     ["ATTACK_POWER"] = "attack power",
