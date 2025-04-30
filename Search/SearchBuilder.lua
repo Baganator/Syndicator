@@ -1,6 +1,5 @@
 local function GetKeywordGroups()
   local searchTerms = Syndicator.Search.GetKeywords()
-  local groupsList = {}
   local groups = {}
   local seenInGroup = {}
   for _, term in ipairs(searchTerms) do
@@ -246,9 +245,9 @@ local function ProcessTerms(rawText)
 end
 
 local OperatorMap = {
-  [OperatorType.Any] = {label = SYNDICATOR_L_ANY_UPPER, tooltip = SYNDICATOR_L_ANY_TOOLTIP_TEXT, color = CreateColor(185/255, 225/255, 146/255)},
-  [OperatorType.All] = {label = SYNDICATOR_L_ALL_UPPER, tooltip = SYNDICATOR_L_ALL_TOOLTIP_TEXT, color = CreateColor(179/255, 199/255, 247/255)},
-  [OperatorType.Not] = {label = SYNDICATOR_L_NOT_UPPER, tooltip = SYNDICATOR_L_NOT_TOOLTIP_TEXT, color = CreateColor(241/255, 148/255, 184/255)},
+  [OperatorType.Any] = {label = Syndicator.Locales.ANY_UPPER, tooltip = Syndicator.Locales.ANY_TOOLTIP_TEXT, color = CreateColor(185/255, 225/255, 146/255)},
+  [OperatorType.All] = {label = Syndicator.Locales.ALL_UPPER, tooltip = Syndicator.Locales.ALL_TOOLTIP_TEXT, color = CreateColor(179/255, 199/255, 247/255)},
+  [OperatorType.Not] = {label = Syndicator.Locales.NOT_UPPER, tooltip = Syndicator.Locales.NOT_TOOLTIP_TEXT, color = CreateColor(241/255, 148/255, 184/255)},
 }
 
 local function SetupTextures(self)
@@ -271,20 +270,20 @@ local function GetOperatorMenu(rootDescription, index, callbackRegistry, event)
 end
 
 local function GetKeywordMenu(rootDescription, index, callbackRegistry, event)
-  rootDescription:CreateButton(SYNDICATOR_L_CUSTOM_SEARCH, function()
+  rootDescription:CreateButton(Syndicator.Locales.CUSTOM_SEARCH, function()
     callbackRegistry:TriggerEvent(event, CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.Custom, ""), index)
   end)
-  local itemLevelButton = rootDescription:CreateButton(SYNDICATOR_L_ITEM_LEVEL)
-  itemLevelButton:CreateButton(SYNDICATOR_L_ITEM_LEVEL_LESS, function()
+  local itemLevelButton = rootDescription:CreateButton(Syndicator.Locales.ITEM_LEVEL)
+  itemLevelButton:CreateButton(Syndicator.Locales.ITEM_LEVEL_LESS, function()
     callbackRegistry:TriggerEvent(event, CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.ItemLevelLess, {-1, -1}), index)
   end)
-  itemLevelButton:CreateButton(SYNDICATOR_L_ITEM_LEVEL_MORE, function()
+  itemLevelButton:CreateButton(Syndicator.Locales.ITEM_LEVEL_MORE, function()
     callbackRegistry:TriggerEvent(event, CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.ItemLevelMore, {-1, -1}), index)
   end)
-  itemLevelButton:CreateButton(SYNDICATOR_L_ITEM_LEVEL_RANGE, function()
+  itemLevelButton:CreateButton(Syndicator.Locales.ITEM_LEVEL_RANGE, function()
     callbackRegistry:TriggerEvent(event, CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.ItemLevelRange, {-1, -1}), index)
   end)
-  itemLevelButton:CreateButton(SYNDICATOR_L_ITEM_LEVEL_EQUALS, function()
+  itemLevelButton:CreateButton(Syndicator.Locales.ITEM_LEVEL_EQUALS, function()
     callbackRegistry:TriggerEvent(event, CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.ItemLevelEquals, {-1, -1}), index)
   end)
   rootDescription:CreateDivider()
@@ -623,23 +622,24 @@ function TermButtonMixin:OnClick(button)
       rootDescription:CreateTitle(REPLACE)
       GetKeywordMenu(rootDescription, index, self.callbackRegistry, "Swap")
       rootDescription:CreateDivider()
-      local wrapButton = rootDescription:CreateButton(SYNDICATOR_L_WRAP_WITH)
+      ---@diagnostic disable-next-line: missing-parameter
+      local wrapButton = rootDescription:CreateButton(Syndicator.Locales.WRAP_WITH)
       GetOperatorMenu(wrapButton, index, self.callbackRegistry, "Wrap")
       rootDescription:CreateDivider()
-      local button = rootDescription:CreateButton(SYNDICATOR_L_COPY, function()
+      rootDescription:CreateButton(Syndicator.Locales.COPY, function()
         self.callbackRegistry:TriggerEvent("Copy", self.component)
       end)
-      local button = rootDescription:CreateButton(SYNDICATOR_L_CUT, function()
+      rootDescription:CreateButton(Syndicator.Locales.CUT, function()
         self.callbackRegistry:TriggerEvent("Copy", self.component)
         self.callbackRegistry:TriggerEvent("Delete", index)
       end)
-      local button = rootDescription:CreateButton(DELETE, function()
+      local deleteButton = rootDescription:CreateButton(DELETE, function()
         self.callbackRegistry:TriggerEvent("Delete", index)
       end)
-      button:SetOnEnter(function()
+      deleteButton:SetOnEnter(function()
         self:SetAlpha(0.4)
       end)
-      button:SetOnLeave(function()
+      deleteButton:SetOnLeave(function()
         self:SetAlpha(1)
       end)
     end)
@@ -761,12 +761,12 @@ function OperatorButtonMixin:OnLoad()
     table.insert(insertIndex, #self.component.value + 1)
 
     if self.AddInput:GetText():match("^%s*$") then
-      rootDescription:CreateTitle(SYNDICATOR_L_INSERT)
+      rootDescription:CreateTitle(Syndicator.Locales.INSERT)
       GetOperatorMenu(rootDescription, insertIndex, self.callbackRegistry, "Insert")
       rootDescription:CreateDivider()
       GetKeywordMenu(rootDescription, insertIndex, self.callbackRegistry, "Insert")
       rootDescription:CreateDivider()
-      local button = rootDescription:CreateButton(SYNDICATOR_L_PASTE, function()
+      rootDescription:CreateButton(Syndicator.Locales.PASTE, function()
         self.callbackRegistry:TriggerEvent("Paste", insertIndex)
       end)
     else
@@ -777,7 +777,7 @@ function OperatorButtonMixin:OnLoad()
         end)
       end
       if #matches == 0 then
-        rootDescription:CreateTitle(RED_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_NO_MATCHING_KEYWORDS))
+        rootDescription:CreateTitle(RED_FONT_COLOR:WrapTextInColorCode(Syndicator.Locales.NO_MATCHING_KEYWORDS))
       end
     end
   end)
@@ -790,12 +790,12 @@ function OperatorButtonMixin:OnLoad()
   end)
   self.skinned = false
 
-  self.termPool = CreateObjectPool(function(pool)
+  self.termPool = CreateObjectPool(function()
     local ab = GetTermButton(self)
     return ab
   end, FramePool_HideAndClearAnchors or Pool_HideAndClearAnchors)
 
-  self.operatorPool = CreateObjectPool(function(pool)
+  self.operatorPool = CreateObjectPool(function()
     local ab = GetOperatorButton(self)
     return ab
   end, FramePool_HideAndClearAnchors or Pool_HideAndClearAnchors)
@@ -811,8 +811,8 @@ function OperatorButtonMixin:OnLoad()
   self.OperatorText:SetScript("OnLeave", function()
     self:OnLeave()
   end)
-  self.OperatorText:SetScript("OnMouseUp", function(_, button)
-    self:OnClick(button)
+  self.OperatorText:SetScript("OnMouseUp", function()
+    self:OnClick()
   end)
 
   self.TailText = self:CreateFontString(nil, nil, "GameFontNormal")
@@ -937,7 +937,7 @@ function OperatorButtonMixin:Resize()
   self.onResizeFunc()
 end
 
-function OperatorButtonMixin:OnClick(button)
+function OperatorButtonMixin:OnClick()
   if not self.callbackRegistry.enabled then
     return
   end
@@ -948,17 +948,18 @@ function OperatorButtonMixin:OnClick(button)
       rootDescription:CreateTitle(REPLACE)
       GetOperatorMenu(rootDescription, index, self.callbackRegistry, "Swap")
       rootDescription:CreateDivider()
-      local wrapButton = rootDescription:CreateButton(SYNDICATOR_L_WRAP_WITH)
+      ---@diagnostic disable-next-line: missing-parameter
+      local wrapButton = rootDescription:CreateButton(Syndicator.Locales.WRAP_WITH)
       GetOperatorMenu(wrapButton, index, self.callbackRegistry, "Wrap")
       if self.component.value[1] and (#index > 0 or self.component.value[1].type == RootType.Operator) then
         rootDescription:CreateDivider()
-        rootDescription:CreateButton(SYNDICATOR_L_UNWRAP, function() self.callbackRegistry:TriggerEvent("Unwrap", self.component, index) end)
+        rootDescription:CreateButton(Syndicator.Locales.UNWRAP, function() self.callbackRegistry:TriggerEvent("Unwrap", self.component, index) end)
       end
       rootDescription:CreateDivider()
-      local button = rootDescription:CreateButton(SYNDICATOR_L_COPY, function()
+      rootDescription:CreateButton(Syndicator.Locales.COPY, function()
         self.callbackRegistry:TriggerEvent("Copy", self.component)
       end)
-      local button = rootDescription:CreateButton(SYNDICATOR_L_CUT, function()
+      rootDescription:CreateButton(Syndicator.Locales.CUT, function()
         self.callbackRegistry:TriggerEvent("Copy", self.component)
         self.callbackRegistry:TriggerEvent("Delete", index)
       end)

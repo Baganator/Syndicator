@@ -3,27 +3,27 @@ local addonName = ...
 local TOOLTIP_OPTIONS = {
   {
     type = "header",
-    text = SYNDICATOR_L_TOOLTIP_SETTINGS,
+    text = Syndicator.Locales.TOOLTIP_SETTINGS,
   },
   {
     type = "checkbox",
-    text = SYNDICATOR_L_SHOW_INVENTORY,
+    text = Syndicator.Locales.SHOW_INVENTORY,
     option = "show_inventory_tooltips",
   },
   {
     type = "checkbox",
-    text = SYNDICATOR_L_SHOW_EQUIPPED,
+    text = Syndicator.Locales.SHOW_EQUIPPED,
     option = "show_equipped_items_in_tooltips",
   },
   {
     type = "checkbox",
-    text = SYNDICATOR_L_SHOW_GUILD_BANKS,
+    text = Syndicator.Locales.SHOW_GUILD_BANKS,
     option = "show_guild_banks_in_tooltips",
-    check = NotIsEraCheck,
+    check = function() return not Syndicator.Constants.IsEra end,
   },
   {
     type = "checkbox",
-    text = SYNDICATOR_L_SHOW_CURRENCY,
+    text = Syndicator.Locales.SHOW_CURRENCY,
     option = "show_currency_tooltips",
     check = function() return C_CurrencyInfo ~= nil end,
   },
@@ -32,12 +32,12 @@ local TOOLTIP_OPTIONS = {
   },
   {
     type = "checkbox",
-    text = SYNDICATOR_L_SAME_CONNECTED_REALMS,
+    text = Syndicator.Locales.SAME_CONNECTED_REALMS,
     option = "tooltips_connected_realms_only_2",
   },
   {
     type = "checkbox",
-    text = SYNDICATOR_L_SAME_FACTION,
+    text = Syndicator.Locales.SAME_FACTION,
     option = "tooltips_faction_only",
   },
   {
@@ -45,17 +45,17 @@ local TOOLTIP_OPTIONS = {
   },
   {
     type = "checkbox",
-    text = SYNDICATOR_L_SHOW_RACE_ICONS,
+    text = Syndicator.Locales.SHOW_RACE_ICONS,
     option = "show_character_race_icons",
   },
   {
     type = "checkbox",
-    text = SYNDICATOR_L_SORT_BY_NAME,
+    text = Syndicator.Locales.SORT_BY_NAME,
     option = "tooltips_sort_by_name",
   },
   {
     type = "checkbox",
-    text = SYNDICATOR_L_HOLD_SHIFT_TO_DISPLAY,
+    text = Syndicator.Locales.HOLD_SHIFT_TO_DISPLAY,
     option = "show_tooltips_on_shift",
   },
   {
@@ -64,7 +64,7 @@ local TOOLTIP_OPTIONS = {
     max = 40,
     lowText = "1",
     highText = "40",
-    valuePattern = SYNDICATOR_L_X_CHARACTERS_SHOWN,
+    valuePattern = Syndicator.Locales.X_CHARACTERS_SHOWN,
     option = "tooltips_character_limit",
   },
 }
@@ -91,9 +91,9 @@ local function MakeCharacterEditor(parent)
     frame.ShowInventoryButton:SetScript("OnEnter", function()
       GameTooltip:SetOwner(frame.ShowInventoryButton, "ANCHOR_RIGHT")
       if Syndicator.API.GetCharacter(frame.fullName).details.show.inventory then
-        GameTooltip:SetText(SYNDICATOR_L_HIDE_IN_INVENTORY_TOOLTIPS)
+        GameTooltip:SetText(Syndicator.Locales.HIDE_IN_INVENTORY_TOOLTIPS)
       else
-        GameTooltip:SetText(SYNDICATOR_L_SHOW_IN_INVENTORY_TOOLTIPS)
+        GameTooltip:SetText(Syndicator.Locales.SHOW_IN_INVENTORY_TOOLTIPS)
       end
       GameTooltip:Show()
       frame.ShowInventoryButton:SetAlpha(0.5)
@@ -122,9 +122,9 @@ local function MakeCharacterEditor(parent)
     frame.ShowGoldButton:SetScript("OnEnter", function()
       GameTooltip:SetOwner(frame.ShowGoldButton, "ANCHOR_RIGHT")
       if Syndicator.API.GetCharacter(frame.fullName).details.show.gold then
-        GameTooltip:SetText(SYNDICATOR_L_HIDE_IN_GOLD_SUMMARY)
+        GameTooltip:SetText(Syndicator.Locales.HIDE_IN_GOLD_SUMMARY)
       else
-        GameTooltip:SetText(SYNDICATOR_L_SHOW_IN_GOLD_SUMMARY)
+        GameTooltip:SetText(Syndicator.Locales.SHOW_IN_GOLD_SUMMARY)
       end
       GameTooltip:Show()
       frame.ShowGoldButton:SetAlpha(0.5)
@@ -145,7 +145,7 @@ local function MakeCharacterEditor(parent)
     end)
     frame.DeleteButton:SetScript("OnEnter", function()
       GameTooltip:SetOwner(frame.DeleteButton, "ANCHOR_RIGHT")
-      GameTooltip:SetText(SYNDICATOR_L_DELETE_CHARACTER)
+      GameTooltip:SetText(Syndicator.Locales.DELETE_CHARACTER)
       GameTooltip:Show()
       frame.DeleteButton:SetAlpha(0.5)
     end)
@@ -262,9 +262,9 @@ local function MakeGuildEditor(parent)
     frame.ShowInventoryButton:SetScript("OnEnter", function()
       GameTooltip:SetOwner(frame.ShowInventoryButton, "ANCHOR_RIGHT")
       if Syndicator.API.GetGuild(frame.fullName).details.show.inventory then
-        GameTooltip:SetText(SYNDICATOR_L_HIDE_IN_INVENTORY_TOOLTIPS)
+        GameTooltip:SetText(Syndicator.Locales.HIDE_IN_INVENTORY_TOOLTIPS)
       else
-        GameTooltip:SetText(SYNDICATOR_L_SHOW_IN_INVENTORY_TOOLTIPS)
+        GameTooltip:SetText(Syndicator.Locales.SHOW_IN_INVENTORY_TOOLTIPS)
       end
       GameTooltip:Show()
       frame.ShowInventoryButton:SetAlpha(0.5)
@@ -293,9 +293,9 @@ local function MakeGuildEditor(parent)
     frame.ShowGoldButton:SetScript("OnEnter", function()
       GameTooltip:SetOwner(frame.ShowGoldButton, "ANCHOR_RIGHT")
       if Syndicator.API.GetGuild(frame.fullName).details.show.gold then
-        GameTooltip:SetText(SYNDICATOR_L_HIDE_IN_GOLD_SUMMARY)
+        GameTooltip:SetText(Syndicator.Locales.HIDE_IN_GOLD_SUMMARY)
       else
-        GameTooltip:SetText(SYNDICATOR_L_SHOW_IN_GOLD_SUMMARY)
+        GameTooltip:SetText(Syndicator.Locales.SHOW_IN_GOLD_SUMMARY)
       end
       GameTooltip:Show()
       frame.ShowGoldButton:SetAlpha(0.5)
@@ -316,7 +316,7 @@ local function MakeGuildEditor(parent)
     end)
     frame.DeleteButton:SetScript("OnEnter", function()
       GameTooltip:SetOwner(frame.DeleteButton, "ANCHOR_RIGHT")
-      GameTooltip:SetText(SYNDICATOR_L_DELETE_GUILD)
+      GameTooltip:SetText(Syndicator.Locales.DELETE_GUILD)
       GameTooltip:Show()
       frame.DeleteButton:SetAlpha(0.5)
     end)
@@ -413,12 +413,12 @@ function Syndicator.Options.Initialize()
 
   local header = optionsFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalHuge")
   header:SetPoint("TOPLEFT", optionsFrame, 15, -15)
-  header:SetText(NORMAL_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_SYNDICATOR))
+  header:SetText(NORMAL_FONT_COLOR:WrapTextInColorCode(Syndicator.Locales.SYNDICATOR))
 
   local version = C_AddOns.GetAddOnMetadata(addonName, "Version")
   local versionText = optionsFrame:CreateFontString(nil, "ARTWORK", "GameFontNormal")
   versionText:SetPoint("TOPLEFT", header, "BOTTOMLEFT", 0, -5)
-  versionText:SetText(WHITE_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_VERSION_COLON_X:format(version)))
+  versionText:SetText(WHITE_FONT_COLOR:WrapTextInColorCode(Syndicator.Locales.VERSION_COLON_X:format(version)))
 
   local lastItem = versionText
 
@@ -426,10 +426,10 @@ function Syndicator.Options.Initialize()
   for _, entry in ipairs(TOOLTIP_OPTIONS) do
     if entry.check == nil or entry.check() then
       if entry.type == "header" then
-        local header = optionsFrame:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
-        header:SetPoint("TOPLEFT", lastItem, "BOTTOMLEFT", 0, -10 + yOffset)
-        header:SetText(entry.text)
-        lastItem = header
+        local headerText = optionsFrame:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
+        headerText:SetPoint("TOPLEFT", lastItem, "BOTTOMLEFT", 0, -10 + yOffset)
+        headerText:SetText(entry.text)
+        lastItem = headerText
       elseif entry.type == "checkbox" then
         local checkButton = CreateFrame("CheckButton", nil, optionsFrame, "UICheckButtonTemplate")
         checkButton:SetPoint("TOPLEFT", lastItem, "BOTTOMLEFT", 0, -5 + yOffset)
@@ -505,16 +505,16 @@ function Syndicator.Options.Initialize()
   characterEditor:SetSize(320, 210)
   local characterHeader = optionsFrame:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
   characterHeader:SetPoint("BOTTOMLEFT", characterEditor, "TOPLEFT", 0, 5)
-  characterHeader:SetText(SYNDICATOR_L_CHARACTERS)
+  characterHeader:SetText(Syndicator.Locales.CHARACTERS)
 
   local guildEditor = MakeGuildEditor(optionsFrame)
   guildEditor:SetPoint("TOPRIGHT", optionsFrame, -15, -320)
   guildEditor:SetSize(320, 130)
   local guildHeader = optionsFrame:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
   guildHeader:SetPoint("BOTTOMLEFT", guildEditor, "TOPLEFT", 0, 5)
-  guildHeader:SetText(SYNDICATOR_L_GUILDS)
+  guildHeader:SetText(Syndicator.Locales.GUILDS)
 
-  local category = Settings.RegisterCanvasLayoutCategory(optionsFrame, SYNDICATOR_L_SYNDICATOR)
-  category.ID = SYNDICATOR_L_SYNDICATOR
+  local category = Settings.RegisterCanvasLayoutCategory(optionsFrame, Syndicator.Locales.SYNDICATOR)
+  category.ID = Syndicator.Locales.SYNDICATOR
   Settings.RegisterAddOnCategory(category)
 end

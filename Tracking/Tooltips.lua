@@ -137,28 +137,28 @@ function Syndicator.Tooltips.AddItemLines(tooltip, summaries, itemLink)
     return
   end
 
-  AddDoubleLine(SYNDICATOR_L_INVENTORY, LINK_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_TOTAL_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(totals))))
+  AddDoubleLine(Syndicator.Locales.INVENTORY, LINK_FONT_COLOR:WrapTextInColorCode(Syndicator.Locales.TOTAL_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(totals))))
 
   local charactersShown = 0
   for _, s in ipairs(tooltipInfo.characters) do
     local entries = {}
     if s.bags > 0 then
-      table.insert(entries, SYNDICATOR_L_BAGS_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.bags)))
+      table.insert(entries, Syndicator.Locales.BAGS_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.bags)))
     end
     if s.bank > 0 then
-      table.insert(entries, SYNDICATOR_L_BANK_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.bank)))
+      table.insert(entries, Syndicator.Locales.BANK_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.bank)))
     end
     if s.mail > 0 then
-      table.insert(entries, SYNDICATOR_L_MAIL_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.mail)))
+      table.insert(entries, Syndicator.Locales.MAIL_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.mail)))
     end
     if s.equipped > 0 then
-      table.insert(entries, SYNDICATOR_L_EQUIPPED_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.equipped)))
+      table.insert(entries, Syndicator.Locales.EQUIPPED_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.equipped)))
     end
     if s.void > 0 then
-      table.insert(entries, SYNDICATOR_L_VOID_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.void)))
+      table.insert(entries, Syndicator.Locales.VOID_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.void)))
     end
     if s.auctions > 0 then
-      table.insert(entries, SYNDICATOR_L_AUCTIONS_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.auctions)))
+      table.insert(entries, Syndicator.Locales.AUCTIONS_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.auctions)))
     end
     local character = s.character
     if appendRealm then
@@ -182,7 +182,7 @@ function Syndicator.Tooltips.AddItemLines(tooltip, summaries, itemLink)
 
   for index = 1, math.min(#tooltipInfo.guilds, Syndicator.Config.Get("tooltips_character_limit")) do
     local s = tooltipInfo.guilds[index]
-    local output = SYNDICATOR_L_GUILD_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.bank))
+    local output = Syndicator.Locales.GUILD_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(s.bank))
     local guild = TRANSMOGRIFY_FONT_COLOR:WrapTextInColorCode(s.guild)
     if appendRealm then
       guild = guild .. "-" .. s.realmNormalized
@@ -200,7 +200,7 @@ function Syndicator.Tooltips.AddItemLines(tooltip, summaries, itemLink)
     if Syndicator.Config.Get(Syndicator.Config.Options.SHOW_CHARACTER_RACE_ICONS) then
       icon = Syndicator.Utilities.GetWarbandIcon() .. " "
     end
-    AddDoubleLine("  " .. icon .. PASSIVE_SPELL_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_WARBAND), LINK_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_BANK_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(tooltipInfo.warband[1]))))
+    AddDoubleLine("  " .. icon .. PASSIVE_SPELL_FONT_COLOR:WrapTextInColorCode(Syndicator.Locales.WARBAND), LINK_FONT_COLOR:WrapTextInColorCode(Syndicator.Locales.BANK_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(tooltipInfo.warband[1]))))
   end
   tooltip:Show()
 end
@@ -246,7 +246,7 @@ function Syndicator.Tooltips.AddCurrencyLines(tooltip, currencyID)
     appendRealm = true
   end
 
-  tooltip:AddDoubleLine(SYNDICATOR_L_ALL_CHARACTERS_COLON, WHITE_FONT_COLOR:WrapTextInColorCode(FormatLargeNumber(quantity)))
+  tooltip:AddDoubleLine(Syndicator.Locales.ALL_CHARACTERS_COLON, WHITE_FONT_COLOR:WrapTextInColorCode(FormatLargeNumber(quantity)))
   for index = 1, math.min(#summary, Syndicator.Config.Get("tooltips_character_limit")) do
     local s = summary[index]
     local character = s.character

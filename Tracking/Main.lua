@@ -1,5 +1,5 @@
 local function AddItemCheck()
-  return Syndicator.Config.Get(Syndicator.Config.Options.SHOW_INVENTORY_TOOLTIPS) and (not Syndicator.Config.Get(Syndicator.Config.Options.SHOW_TOOLTIPS_ON_SHIFT) or IsShiftKeyDown()) 
+  return Syndicator.Config.Get(Syndicator.Config.Options.SHOW_INVENTORY_TOOLTIPS) and (not Syndicator.Config.Get(Syndicator.Config.Options.SHOW_TOOLTIPS_ON_SHIFT) or IsShiftKeyDown())
 end
 
 local function AddToItemTooltip(tooltip, summaries, itemLink)
@@ -117,7 +117,11 @@ local function SetupDataProcessing()
 
   SetupCacheMixin(SyndicatorGuildCacheMixin, "GuildCache")
 
-  SetupCacheMixin(SyndicatorAuctionCacheMixin, "AuctionCache")
+  if Syndicator.Constants.IsLegacyAH then
+    SetupCacheMixin(SyndicatorAuctionCacheLegacyMixin, "AuctionCache")
+  else
+    SetupCacheMixin(SyndicatorAuctionCacheModernMixin, "AuctionCache")
+  end
 end
 
 local function SetupItemSummaries()
@@ -133,9 +137,9 @@ local function SetupTooltips()
       return tooltip == GameTooltip or tooltip == GameTooltipTooltip or tooltip == ItemRefTooltip or tooltip == GarrisonShipyardMapMissionTooltipTooltip or (not tooltip:IsForbidden() and (tooltip:GetName() or ""):match("^NotGameTooltip"))
     end
 
-    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tooltip, data)
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Item, function(tooltip)
       if ValidateTooltip(tooltip) and Syndicator.ItemSummaries then
-        local itemName, itemLink = TooltipUtil.GetDisplayedItem(tooltip)
+        local _, itemLink = TooltipUtil.GetDisplayedItem(tooltip)
 
         local info = tooltip.processingInfo
         -- not info checked because some weird tooltips are missing it (probably
@@ -170,7 +174,7 @@ local function SetupTooltips()
         end
       end
     end)
-    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Currency, function(tooltip, data)
+    TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Currency, function(tooltip)
       if ValidateTooltip(tooltip) and Syndicator.ItemSummaries then
         local data = tooltip:GetPrimaryTooltipData()
         if AddCurrencyCheck() then
@@ -181,7 +185,7 @@ local function SetupTooltips()
   else
     local function SetItemTooltipHandler(tooltip)
       local ready = true
-      tooltip:HookScript("OnTooltipSetItem", function(tooltip)
+      tooltip:HookScript("OnTooltipSetItem", function()
         if not ready or not Syndicator.ItemSummaries then
           return
         end
@@ -191,7 +195,7 @@ local function SetupTooltips()
         end
         ready = false
       end)
-      tooltip:HookScript("OnTooltipCleared", function(tooltip)
+      tooltip:HookScript("OnTooltipCleared", function()
         ready = true
       end)
     end
@@ -225,12 +229,12 @@ local function SetupTooltips()
   end
 
   if BattlePetToolTip_Show then
-    local function PetTooltipShow(tooltip, speciesID, level, breedQuality, maxHealth, power, speed, ...)
+    local function PetTooltipShow(tooltip, speciesID, level, breedQuality, maxHealth, power, speed)
       if not AddItemCheck() or not Syndicator.ItemSummaries then
         return
       end
       -- Reconstitute item link from tooltip arguments
-      local name, icon, petType = C_PetJournal.GetPetInfoBySpeciesID(speciesID)
+      local name = C_PetJournal.GetPetInfoBySpeciesID(speciesID)
       local itemString = "battlepet"
       for _, part in ipairs({speciesID, level, breedQuality, maxHealth, power, speed}) do
         itemString = itemString .. ":" .. part

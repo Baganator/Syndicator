@@ -160,24 +160,24 @@ for _, typeDetails in ipairs(classDetails) do
 end
 
 Syndicator.Search.Constants.KeywordGroupOrder = {
-  SYNDICATOR_L_GROUP_ITEM_TYPE,
-  SYNDICATOR_L_GROUP_ITEM_DETAIL,
-  SYNDICATOR_L_GROUP_BINDING_TYPE,
-  SYNDICATOR_L_GROUP_QUALITY,
+  Syndicator.Locales.GROUP_ITEM_TYPE,
+  Syndicator.Locales.GROUP_ITEM_DETAIL,
+  Syndicator.Locales.GROUP_BINDING_TYPE,
+  Syndicator.Locales.GROUP_QUALITY,
 
-  SYNDICATOR_L_GROUP_SLOT,
-  SYNDICATOR_L_GROUP_WEAPON_TYPE,
-  SYNDICATOR_L_GROUP_ARMOR_TYPE,
-  SYNDICATOR_L_GROUP_STAT,
-  SYNDICATOR_L_GROUP_SOCKET,
+  Syndicator.Locales.GROUP_SLOT,
+  Syndicator.Locales.GROUP_WEAPON_TYPE,
+  Syndicator.Locales.GROUP_ARMOR_TYPE,
+  Syndicator.Locales.GROUP_STAT,
+  Syndicator.Locales.GROUP_SOCKET,
 
-  SYNDICATOR_L_GROUP_TRADE_GOODS,
-  SYNDICATOR_L_GROUP_RECIPE,
-  SYNDICATOR_L_GROUP_GLYPH,
-  SYNDICATOR_L_GROUP_CONSUMABLE,
+  Syndicator.Locales.GROUP_TRADE_GOODS,
+  Syndicator.Locales.GROUP_RECIPE,
+  Syndicator.Locales.GROUP_GLYPH,
+  Syndicator.Locales.GROUP_CONSUMABLE,
 
-  SYNDICATOR_L_GROUP_EXPANSION,
-  SYNDICATOR_L_GROUP_BATTLE_PET,
+  Syndicator.Locales.GROUP_EXPANSION,
+  Syndicator.Locales.GROUP_BATTLE_PET,
 }
 
 -- Special case for era because Blizzard doesn't tag the consumables or trade

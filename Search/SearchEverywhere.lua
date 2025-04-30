@@ -1,4 +1,5 @@
-local _, addonTable = ...
+---@class addonTableSyndicator
+local addonTable = select(2, ...)
 
 local cache = {}
 
@@ -44,7 +45,7 @@ local function CacheCharacter(character, callback)
   for _, slot in pairs(characterData.equipped or {}) do
     table.insert(equippedList, slot)
   end
-  for label, containers in pairs(characterData.containerInfo or {}) do
+  for _, containers in pairs(characterData.containerInfo or {}) do
     for _, item in pairs(containers) do
       table.insert(equippedList, item)
     end
@@ -228,7 +229,7 @@ end
 local function GetKeys(results, callback)
   local waiting = #results
   for _, r in ipairs(results) do
-    local key = Syndicator.Search.GetGroupingKey(r, function(key)
+    Syndicator.Search.GetGroupingKey(r, function(key)
       r.key = key
       waiting = waiting - 1
       if waiting == 0 then
@@ -291,7 +292,6 @@ function Syndicator.Search.CombineSearchEverywhereResults(results, callback)
           items[key].itemCount = items[key].itemCount + r.itemCount
         end
       elseif source.warband then
-        local warbandData = SYNDICATOR_DATA.Warband[source.warband]
         if seenWarband[key][source.warband] then
           local entry = items[key].sources[seenWarband[key][source.warband]]
           entry.itemCount = entry.itemCount + source.itemCount
@@ -324,7 +324,7 @@ function Syndicator.Search.CombineSearchEverywhereResults(results, callback)
                 elseif a.guild then
                   return a.guild < b.guild
                 else
-                  return
+                  return false
                 end
               else
                 return tostring(a.container) < tostring(b.container)
@@ -355,7 +355,7 @@ local function GetLink(source, searchTerm, text)
     mode = "character"
   elseif source.warband then
     mode = "warband"
-    text = SYNDICATOR_L_WARBAND
+    text = Syndicator.Locales.WARBAND
   else
     return text
   end
@@ -366,12 +366,12 @@ local function GetLink(source, searchTerm, text)
 end
 
 local CONTAINER_TYPE_TO_TEXT = {
-  bag = SYNDICATOR_L_BAGS_LOWER,
-  bank = SYNDICATOR_L_BANK_LOWER,
-  mail = SYNDICATOR_L_MAIL_LOWER,
-  equipped = SYNDICATOR_L_EQUIPPED_LOWER,
-  void = SYNDICATOR_L_VOID_LOWER,
-  auctions = SYNDICATOR_L_AUCTIONS_LOWER,
+  bag = Syndicator.Locales.BAGS_LOWER,
+  bank = Syndicator.Locales.BANK_LOWER,
+  mail = Syndicator.Locales.MAIL_LOWER,
+  equipped = Syndicator.Locales.EQUIPPED_LOWER,
+  void = Syndicator.Locales.VOID_LOWER,
+  auctions = Syndicator.Locales.AUCTIONS_LOWER,
 }
 
 local function PrintSource(indent, source, searchTerm)
@@ -392,17 +392,17 @@ local function PrintSource(indent, source, searchTerm)
     if addonTable.ShowItemLocationCallback then
       guild = GetLink(source, searchTerm, source.guild)
     end
-    print(indent, SYNDICATOR_L_GUILD_LOWER .. count, TRANSMOGRIFY_FONT_COLOR:WrapTextInColorCode(guild))
+    print(indent, Syndicator.Locales.GUILD_LOWER .. count, TRANSMOGRIFY_FONT_COLOR:WrapTextInColorCode(guild))
   elseif source.warband then
     local warband = source.warband
     if addonTable.ShowItemLocationCallback then
       warband = GetLink(source, searchTerm, source.warband)
     end
-    print(indent, SYNDICATOR_L_WARBAND_LOWER .. count, PASSIVE_SPELL_FONT_COLOR:WrapTextInColorCode(warband))
+    print(indent, Syndicator.Locales.WARBAND_LOWER .. count, PASSIVE_SPELL_FONT_COLOR:WrapTextInColorCode(warband))
   end
 end
 
-EventRegistry:RegisterCallback("SetItemRef", function(_, link, text, button, chatFrame)
+EventRegistry:RegisterCallback("SetItemRef", function(_, link)
     local linkType, addonName, searchText, mode, entity, container, itemLink = strsplit(":", link)
     if linkType == "addon" and addonName == "SyndicatorSearch" then
       -- Revert changes to item link to make it fit in the addon link
@@ -414,22 +414,22 @@ end)
 
 function Syndicator.Search.SearchEverywhereAndPrintResults(searchTerm)
   if searchTerm:match("|H") then
-    Syndicator.Utilities.Message(SYNDICATOR_L_CANNOT_SEARCH_BY_ITEM_LINK)
+    Syndicator.Utilities.Message(Syndicator.Locales.CANNOT_SEARCH_BY_ITEM_LINK)
     return
   end
   searchTerm = searchTerm:lower()
   Syndicator.Search.RequestSearchEverywhereResults(searchTerm, function(results)
-    print(GREEN_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_SEARCHED_EVERYWHERE_COLON) .. " " .. YELLOW_FONT_COLOR:WrapTextInColorCode(searchTerm))
-    Syndicator.Search.CombineSearchEverywhereResults(results, function(results)
+    print(GREEN_FONT_COLOR:WrapTextInColorCode(Syndicator.Locales.SEARCHED_EVERYWHERE_COLON) .. " " .. YELLOW_FONT_COLOR:WrapTextInColorCode(searchTerm))
+    Syndicator.Search.CombineSearchEverywhereResults(results, function(combinedResults)
       local indent = "       "
-      for _, r in ipairs(results) do
+      for _, r in ipairs(combinedResults) do
         print("   " .. r.itemLink, BLUE_FONT_COLOR:WrapTextInColorCode("x" .. FormatLargeNumber(r.itemCount)))
         for _, s in ipairs(r.sources) do
           PrintSource(indent, s, s.itemNameLower)
         end
       end
-      if #results == 0 then
-        print(indent, RED_FONT_COLOR:WrapTextInColorCode(SYNDICATOR_L_NO_RESULTS_FOUND))
+      if #combinedResults == 0 then
+        print(indent, RED_FONT_COLOR:WrapTextInColorCode(Syndicator.Locales.NO_RESULTS_FOUND))
       end
     end)
   end)

@@ -1,4 +1,5 @@
-local _, addonTable = ...
+---@class addonTableSyndicator
+local addonTable = select(2, ...)
 
 -- Returns details about which not hidden characters and guilds contain items
 -- matching the item link.

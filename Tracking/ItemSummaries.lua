@@ -32,10 +32,10 @@ function SyndicatorItemSummariesMixin:OnLoad()
         Pending = { true },
       },
     }
-    for character, data in pairs(SYNDICATOR_DATA.Characters) do
+    for character, _ in pairs(SYNDICATOR_DATA.Characters) do
       SYNDICATOR_SUMMARIES.Characters.Pending[character] = true
     end
-    for guild, data in pairs(SYNDICATOR_DATA.Guilds) do
+    for guild, _ in pairs(SYNDICATOR_DATA.Guilds) do
       SYNDICATOR_SUMMARIES.Guilds.Pending[guild] = true
     end
   end
@@ -105,8 +105,8 @@ function SyndicatorItemSummariesMixin:GenerateCharacterSummary(characterName, st
   local summary = {}
   if state == CharacterUpdates.Bags then
     summary = self.SV.Characters.ByRealm[details.details.realmNormalized][details.details.character] or summary
-    for key, details in pairs(summary) do
-      details.bags = 0
+    for _, summaryDetails in pairs(summary) do
+      summaryDetails.bags = 0
     end
   end
 
