@@ -66,8 +66,10 @@ function SyndicatorCurrencyCacheMixin:OnEvent(eventName, ...)
     SYNDICATOR_DATA.Characters[self.currentCharacter].money = GetMoney()
     Syndicator.CallbackRegistry:TriggerEvent("CurrencyCacheUpdate", self.currentCharacter)
   elseif eventName == "ACCOUNT_MONEY" or eventName == "BANKFRAME_OPENED" then
-    SYNDICATOR_DATA.Warband[1].money = C_Bank.FetchDepositedMoney(Enum.BankType.Account)
-    Syndicator.CallbackRegistry:TriggerEvent("WarbandCurrencyCacheUpdate", 1)
+    if C_PlayerInfo.HasAccountInventoryLock() then
+      SYNDICATOR_DATA.Warband[1].money = C_Bank.FetchDepositedMoney(Enum.BankType.Account)
+      Syndicator.CallbackRegistry:TriggerEvent("WarbandCurrencyCacheUpdate", 1)
+    end
   elseif eventName == "CURRENCY_TRANSFER_LOG_UPDATE" then
     local sourceCharacter = self.pendingTransfer.sourceCharacter
     if SYNDICATOR_DATA.Characters[sourceCharacter] then
