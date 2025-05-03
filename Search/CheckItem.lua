@@ -749,7 +749,9 @@ local function TierTokenCheck(details)
 
   if details.tooltipInfoLink then
     for _, row in ipairs(details.tooltipInfoLink.lines) do
-      if row.leftText:match(classRestrictionsPattern) then
+      if row.leftText == ITEM_UNIQUE then
+        return false
+      elseif row.leftText:match(classRestrictionsPattern) then
         return true
       end
     end
