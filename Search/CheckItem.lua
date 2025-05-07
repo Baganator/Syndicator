@@ -1411,60 +1411,6 @@ local function ItemLevelMaxPatternCheck(details, text)
   return details.itemLevel and details.itemLevel >= tonumber(maxText)
 end
 
-local function ExpansionPatternCheck(details, text)
-  local itemMajor, itemMinor, itemPatch = Syndicator.Search.GetExpansionInfo(details.itemID)
-  if not itemMajor then
-    return false
-  end
-
-  local major, minor, patch = text:match("(%d+)%.(%d*)%.?(%d*)")
-  major, minor, patch = tonumber(major), tonumber(minor), tonumber(patch)
-
-  if not minor then
-    return major == itemMajor
-  elseif not patch then
-    return major == itemMajor and minor == itemMinor
-  else
-    return major == itemMajor and minor == itemMinor and patch == itemPatch
-  end
-end
-
-local function ExpansionMinPatternCheck(details, text)
-  local itemMajor, itemMinor, itemPatch = Syndicator.Search.GetExpansionInfo(details.itemID)
-  if not itemMajor then
-    return false
-  end
-
-  local major, minor, patch = text:match("(%d+)%.(%d*)%.?(%d*)")
-  major, minor, patch = tonumber(major), tonumber(minor), tonumber(patch)
-
-  if not minor then
-    return major <= itemMajor
-  elseif not patch then
-    return major <= itemMajor and minor <= itemMinor
-  else
-    return major <= itemMajor and minor <= itemMinor and patch <= itemPatch
-  end
-end
-
-local function ExpansionMaxPatternCheck(details, text)
-  local itemMajor, itemMinor, itemPatch = Syndicator.Search.GetExpansionInfo(details.itemID)
-  if not itemMajor then
-    return false
-  end
-
-  local major, minor, patch = text:match("(%d+)%.(%d*)%.?(%d*)")
-  major, minor, patch = tonumber(major), tonumber(minor), tonumber(patch)
-
-  if not minor then
-    return major >= itemMajor
-  elseif not patch then
-    return major >= itemMajor and minor >= itemMinor
-  else
-    return major >= itemMajor and minor >= itemMinor and patch >= itemPatch
-  end
-end
-
 local function ExactKeywordCheck(details, text)
   local keyword = text:match("^#(.*)$")
   if KEYWORDS_TO_CHECK[keyword] ~= nil then
@@ -1480,9 +1426,6 @@ local patterns = {
   ["^%d+%-%d+$"] = ItemLevelRangePatternCheck,
   ["^%>%d+$"] = ItemLevelMaxPatternCheck,
   ["^%<%d+$"] = ItemLevelMinPatternCheck,
-  ["^%d+%.%d*%.?%d*$"] = ExpansionPatternCheck,
-  ["^%>%d+%.%d*%.?%d*$"] = ExpansionMinPatternCheck,
-  ["^%<%d+%.%d*%.?%d*$"] = ExpansionMaxPatternCheck,
   ["^%#.*$"] = ExactKeywordCheck,
 }
 
