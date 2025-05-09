@@ -16,21 +16,20 @@ function Syndicator.Search.GetExpansionInfo(itemID)
       return itemVersionDetails.major, itemVersionDetails.minor, itemVersionDetails.patch
     end
   end
-  if Syndicator.Constants.IsClassic and ATTC and ATTC.SearchForField then
-    local attResults = ATTC.SearchForField("itemID", itemID)
-    if #attResults > 0 then
-      local parent = attResults[1]
+  if ATTC and ATTC.SearchForField then
+    local results = ATTC.SearchForField("itemID", itemID)
+    if #results == 1 or Syndicator.Constants.IsClassic then
+      local parent = results[1].parent
       while parent and parent.awp == nil do -- awp: short for added with patch
         parent = parent.parent
       end
       local id = parent and parent.awp
-      if not id then
-        return
+      if id then
+        local major = math.floor(id / 10000)
+        local minor = math.floor((id % 10000) / 100)
+        local patch = math.floor(id % 100)
+        return major, minor, patch
       end
-      local major = math.floor(id / 10000)
-      local minor = math.floor((id % 10000) / 100)
-      local patch = math.floor(id % 100)
-      return major, minor, patch
     end
   end
 end
