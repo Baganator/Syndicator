@@ -18,12 +18,16 @@ function Syndicator.Search.GetExpansionInfo(itemID)
   end
   if ATTC and ATTC.SearchForField then
     local results = ATTC.SearchForField("itemID", itemID)
-    if #results == 1 or Syndicator.Constants.IsClassic then
+    if #results > 0 then
       local parent = results[1].parent
-      while parent and parent.awp == nil do -- awp: short for added with patch
+      local lastAWP
+      while parent do
+        if parent.awp then -- awp: short for added with patch
+          lastAWP = parent.awp
+        end
         parent = parent.parent
       end
-      local id = parent and parent.awp
+      local id = lastAWP
       if id then
         local major = math.floor(id / 10000)
         local minor = math.floor((id % 10000) / 100)
