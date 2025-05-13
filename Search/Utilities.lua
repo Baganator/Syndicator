@@ -19,10 +19,10 @@ function Syndicator.Search.GetExpansionInfo(itemID)
   if ATTC and ATTC.SearchForField then
     local results = ATTC.SearchForField("itemID", itemID)
     if #results > 0 then
-      local isGear = Syndicator.Utilities.IsEquipment(itemID)
+      local classID = select(6, C_Item.GetItemInfoInstant(itemID))
       local parent = results[1]
       local id
-      if isGear then
+      if classID == Enum.ItemClass.Consumable or classID == Enum.ItemClass.Armor or classID == Enum.ItemClass.Weapon or classID == Enum.ItemClass.Miscellaneous or classID == Enum.ItemClass.Reagent then
         while parent do
           if parent.awp then -- awp: short for added with patch
             id = parent.awp
