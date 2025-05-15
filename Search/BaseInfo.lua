@@ -8,7 +8,9 @@ function Syndicator.Search.GetBaseInfo(cacheData)
   info.isBound = cacheData.isBound or false
   info.hasLoot = cacheData.hasLoot or false
 
-  if C_TooltipInfo then
+  if Syndicator.Constants.IsBrokenTooltipScanning then
+    info.tooltipGetter = function() return {lines = {}} end
+  elseif C_TooltipInfo then
     info.tooltipGetter = function() return C_TooltipInfo.GetHyperlink(cacheData.itemLink) end
   else
     info.tooltipGetter = function() return Syndicator.Search.DumpClassicTooltip(function(t) t:SetHyperlink(cacheData.itemLink) end) end

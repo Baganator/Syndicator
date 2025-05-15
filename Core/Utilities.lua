@@ -36,6 +36,9 @@ if Syndicator.Constants.IsClassic then
   tooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
 
   function Syndicator.Utilities.DumpClassicTooltip(tooltipSetter)
+    if Syndicator.Constants.IsBrokenTooltipScanning then
+      return {lines = {}}
+    end
     tooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
     tooltipSetter(tooltip)
 

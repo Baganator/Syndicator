@@ -20,7 +20,7 @@ Syndicator.Constants = {
 
   IsRetail = WOW_PROJECT_ID == WOW_PROJECT_MAINLINE,
   IsClassic = WOW_PROJECT_ID ~= WOW_PROJECT_MAINLINE,
-  IsMoP = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC,
+  IsMists = WOW_PROJECT_ID == WOW_PROJECT_MISTS_CLASSIC,
   IsCata = WOW_PROJECT_ID == WOW_PROJECT_CATACLYSM_CLASSIC,
   IsWrath = WOW_PROJECT_ID == WOW_PROJECT_WRATH_CLASSIC,
   IsBC = WOW_PROJECT_ID == WOW_PROJECT_BURNING_CRUSADE_CLASSIC,
@@ -40,6 +40,8 @@ Syndicator.Constants = {
 
   MailExpiryDuration = 30 * 24 * 60 * 60,
 }
+
+Syndicator.Constants.IsBrokenTooltipScanning = Syndicator.Constants.IsMists
 
 if Syndicator.Constants.IsRetail then
   table.insert(Syndicator.Constants.AllBagIndexes, Enum.BagIndex.ReagentBag)
