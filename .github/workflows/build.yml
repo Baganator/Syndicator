@@ -15,9 +15,6 @@ on:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        type: [retail, classic, wrath, cata, mists]
 
     runs-on: ubuntu-latest
     steps:
@@ -27,7 +24,7 @@ jobs:
 
     - uses: BigWigsMods/packager@master
       with:
-        args: -p 988370 -a b6XVx0Gp -g ${{matrix.type}}
+        args: -p 988370 -a b6XVx0Gp
       env:
         CF_API_KEY: ${{ secrets.plusmouse_curseforge }}
         WAGO_API_TOKEN: ${{ secrets.plusmouse_wago }}
