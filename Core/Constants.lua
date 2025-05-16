@@ -41,7 +41,7 @@ Syndicator.Constants = {
   MailExpiryDuration = 30 * 24 * 60 * 60,
 }
 
-Syndicator.Constants.IsBrokenTooltipScanning = Syndicator.Constants.IsMists
+Syndicator.Constants.IsBrokenTooltipScanning = false
 
 if Syndicator.Constants.IsRetail then
   table.insert(Syndicator.Constants.AllBagIndexes, Enum.BagIndex.ReagentBag)
