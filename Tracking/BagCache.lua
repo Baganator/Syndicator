@@ -129,10 +129,11 @@ function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
 
   -- Guessing that these events may be fired when a new warband tab is purchased
   elseif eventName == "BANK_TABS_CHANGED" or eventName == "PLAYER_ACCOUNT_BANK_TAB_SLOTS_CHANGED" then
-    if self.bankOpen or time() - self.craftingTime < craftingItemUpdateDelay then
+    if (self.bankOpen or time() - self.craftingTime < craftingItemUpdateDelay) and C_PlayerInfo.HasAccountInventoryLock() then
       self:ScanWarbandSlots()
-      for bagID in pairs(warbandBags) do
-        self.pending.warband[bagID] = true
+      local tab = ...
+      if tab then
+        self.pending.warband[Syndicator.Constants.AllWarbandIndexes[tab]] = true
       end
       self:QueueCaching()
     end
