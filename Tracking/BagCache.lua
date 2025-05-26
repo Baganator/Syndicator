@@ -89,7 +89,7 @@ function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
       self.pending.bags[bagID] = true
     elseif bankBags[bagID] and self.bankOpen then
       self.pending.bank[bagID] = true
-    elseif warbandBags[bagID] and self.bankOpen then
+    elseif warbandBags[bagID] and self.bankOpen and C_PlayerInfo.HasAccountInventoryLock() then
       self.pending.warband[bagID] = true
     end
     self:QueueCaching()
@@ -206,7 +206,7 @@ function SyndicatorBagCacheMixin:UpdateContainerSlots()
 end
 
 function SyndicatorBagCacheMixin:ScanWarbandSlots()
-  if C_Bank == nil or C_Bank.FetchPurchasedBankTabData == nil then
+  if C_Bank == nil or C_Bank.FetchPurchasedBankTabData == nil or not C_PlayerInfo.HasAccountInventoryLock() then
     return
   end
 
