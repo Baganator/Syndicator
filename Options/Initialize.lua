@@ -59,6 +59,16 @@ local TOOLTIP_OPTIONS = {
     option = "show_tooltips_on_shift",
   },
   {
+  type = "checkbox",
+  text = Syndicator.Locales.SHOW_BLANK_LINE_BEFORE_INVENTORY,
+  option = "show_blank_line_before_inventory",
+  },
+  {
+  type = "checkbox",
+  text = Syndicator.Locales.SHOW_TOTAL_LINE_AFTER_CHARACTERS,
+  option = "show_total_line_after_characters",
+  },
+  {
     type = "slider",
     min = 1,
     max = 40,

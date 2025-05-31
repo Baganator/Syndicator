@@ -39,6 +39,8 @@ L["DELETE_CHARACTER"] = "Delete Character"
 L["DELETE_GUILD"] = "Delete Guild"
 L["CHARACTERS"] = "Characters"
 L["GUILDS"] = "Guilds"
+L["SHOW_BLANK_LINE_BEFORE_INVENTORY"] = "Add a blank line before inventory"
+L["SHOW_TOTAL_LINE_AFTER_CHARACTERS"] = "Show total quantity after all characters (not before)"
 
 L["ALL_CHARACTERS_COLON"] = "All Characters:"
 
