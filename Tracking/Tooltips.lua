@@ -137,7 +137,15 @@ function Syndicator.Tooltips.AddItemLines(tooltip, summaries, itemLink)
     return
   end
 
-  AddDoubleLine(Syndicator.Locales.INVENTORY, LINK_FONT_COLOR:WrapTextInColorCode(Syndicator.Locales.TOTAL_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(totals))))
+  local blankLineAdded = false
+  if Syndicator.Config.Get(Syndicator.Config.Options.SHOW_BLANK_LINE_BEFORE_INVENTORY) then
+    tooltip:AddLine(" ")
+    blankLineAdded = true
+  end
+
+  if not Syndicator.Config.Get(Syndicator.Config.Options.SHOW_TOTAL_LINE_AFTER_CHARACTERS) then
+    AddDoubleLine(Syndicator.Locales.INVENTORY, LINK_FONT_COLOR:WrapTextInColorCode(Syndicator.Locales.TOTAL_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(totals))))
+  end
 
   local charactersShown = 0
   for _, s in ipairs(tooltipInfo.characters) do
@@ -202,6 +210,14 @@ function Syndicator.Tooltips.AddItemLines(tooltip, summaries, itemLink)
     end
     AddDoubleLine("  " .. icon .. PASSIVE_SPELL_FONT_COLOR:WrapTextInColorCode(Syndicator.Locales.WARBAND), LINK_FONT_COLOR:WrapTextInColorCode(Syndicator.Locales.BANK_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(tooltipInfo.warband[1]))))
   end
+
+  if Syndicator.Config.Get(Syndicator.Config.Options.SHOW_TOTAL_LINE_AFTER_CHARACTERS) then
+    if Syndicator.Config.Get(Syndicator.Config.Options.SHOW_BLANK_LINE_BEFORE_INVENTORY) and not blankLineAdded then
+      tooltip:AddLine(" ")
+    end
+    AddDoubleLine(Syndicator.Locales.INVENTORY, LINK_FONT_COLOR:WrapTextInColorCode(Syndicator.Locales.TOTAL_X:format(WHITE_FONT_COLOR:WrapTextInColorCode(totals))))
+  end
+
   tooltip:Show()
 end
 
