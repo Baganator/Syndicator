@@ -374,7 +374,7 @@ local function CatalystUpgradeCheck(details)
     return false, true
   end
 
-  return select(5, TransmogUpgradeMaster_API.IsAppearanceMissing(details.itemLink)) == true
+  return select(4, TransmogUpgradeMaster_API.IsAppearanceMissing(details.itemLink)) == true
 end
 
 
