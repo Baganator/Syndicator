@@ -72,3 +72,20 @@ FramePool_HideAndClearAnchors = function(frame) end
 
 --Tooltips
 CUSTOM_CLASS_COLORS = {}
+
+-- Lifted from the type definitions in Numy's Transmog Upgrade Master addon
+TransmogUpgradeMaster_API = {}
+--- @return boolean isCacheWarmedUp
+--- @return number progress # a number between 0 and 1, where 1 means caching has finished
+function TransmogUpgradeMaster_API.IsCacheWarmedUp()
+end
+
+--- @param itemLink string
+--- @param classID number? # defaults to the player's class
+--- @return boolean? canCatalyse # whether the item can be catalysed; if false, the catalystAppearanceMissing return values will be nil
+--- @return boolean? canUpgrade # whether the item can be upgraded to the next tier; if false, the upgradeAppearanceMissing return values will be nil
+--- @return boolean? catalystAppearanceMissing # true if the item will teach a new appearance when catalysed
+--- @return boolean? catalystUpgradeAppearanceMissing # true if the item will teach a new appearance when catalysed AND upgraded to the next tier
+--- @return boolean? upgradeAppearanceMissing # true if the item will teach a new appearance when upgraded to the next tier
+function TransmogUpgradeMaster_API.IsAppearanceMissing(itemLink, classID)
+end

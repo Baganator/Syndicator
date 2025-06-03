@@ -335,6 +335,48 @@ local function UncollectedCheck(details)
   return result or false, result == true
 end
 
+local function CatalystCheck(details)
+  if not TransmogUpgradeMaster_API then
+    return false
+  end
+
+  if not C_Item.IsItemDataCachedByID(details.itemID) then
+    C_Item.RequestLoadItemDataByID(details.itemID)
+    return nil
+  end
+
+  if not C_TransmogCollection.GetItemInfo(details.itemLink) then
+    return false
+  end
+
+  if not TransmogUpgradeMaster_API.IsCacheWarmedUp() then
+    return nil, true
+  end
+
+  return select(3, TransmogUpgradeMaster_API.IsAppearanceMissing(details.itemLink)) == true
+end
+
+local function CatalystUpgradeCheck(details)
+  if not TransmogUpgradeMaster_API then
+    return false
+  end
+
+  if not C_Item.IsItemDataCachedByID(details.itemID) then
+    C_Item.RequestLoadItemDataByID(details.itemID)
+    return nil
+  end
+
+  if not C_TransmogCollection.GetItemInfo(details.itemLink) then
+    return false
+  end
+
+  if not TransmogUpgradeMaster_API.IsCacheWarmedUp() then
+    return nil
+  end
+
+  return select(5, TransmogUpgradeMaster_API.IsAppearanceMissing(details.itemLink)) == true
+end
+
 
 local alwaysMatchClass = {
   ["INVTYPE_CLOAK"] = true,
@@ -890,6 +932,8 @@ if Syndicator.Constants.IsRetail then
   AddKeywordManual(WORLD_QUEST_REWARD_FILTERS_ANIMA:lower(), "anima", AnimaCheck, Syndicator.Locales.GROUP_ITEM_DETAIL)
   AddKeywordLocalised("KEYWORD_KNOWLEDGE", KnowledgeCheck, Syndicator.Locales.GROUP_ITEM_DETAIL)
   AddKeywordLocalised("KEYWORD_SET_BONUS", SetBonusCheck, Syndicator.Locales.GROUP_ITEM_DETAIL)
+  AddKeywordLocalised("KEYWORD_CATALYST", CatalystCheck, Syndicator.Locales.GROUP_ITEM_DETAIL)
+  AddKeywordLocalised("KEYWORD_CATALYST_UPGRADE", CatalystUpgradeCheck, Syndicator.Locales.GROUP_ITEM_DETAIL)
   if Syndicator.Constants.WarbandBankActive then
     AddKeywordManual(ITEM_ACCOUNTBOUND:lower(), "warbound", BindOnAccountCheck, Syndicator.Locales.GROUP_BINDING_TYPE)
     AddKeywordManual(ITEM_ACCOUNTBOUND_UNTIL_EQUIP:lower(), "warbound until equipped", WarboundUntilEquippedCheck, Syndicator.Locales.GROUP_BINDING_TYPE)
