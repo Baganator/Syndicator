@@ -345,12 +345,12 @@ local function CatalystCheck(details)
     return nil
   end
 
-  if not C_TransmogCollection.GetItemInfo(details.itemLink) then
+  if not C_Item.IsDressableItemByID(details.itemID) then
     return false
   end
 
   if not TransmogUpgradeMaster_API.IsCacheWarmedUp() then
-    return nil, true
+    return false, true
   end
 
   return select(3, TransmogUpgradeMaster_API.IsAppearanceMissing(details.itemLink)) == true
@@ -366,12 +366,12 @@ local function CatalystUpgradeCheck(details)
     return nil
   end
 
-  if not C_TransmogCollection.GetItemInfo(details.itemLink) then
+  if not C_Item.IsDressableItemByID(details.itemID) then
     return false
   end
 
   if not TransmogUpgradeMaster_API.IsCacheWarmedUp() then
-    return nil
+    return false, true
   end
 
   return select(5, TransmogUpgradeMaster_API.IsAppearanceMissing(details.itemLink)) == true
