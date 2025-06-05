@@ -13,35 +13,22 @@ function Syndicator.Search.GetExpansionInfo(itemID)
   if ItemVersion then
     local itemVersionDetails = ItemVersion.API:getItemVersion(itemID, true)
     if itemVersionDetails then
-      return itemVersionDetails.major, itemVersionDetails.minor, itemVersionDetails.patch
+      return itemVersionDetails.major
     end
   end
   if ATTC and ATTC.SearchForField then
     local results = ATTC.SearchForField("itemID", itemID)
     if #results > 0 then
-      local classID = select(6, C_Item.GetItemInfoInstant(itemID))
       local parent = results[1]
-      local id
-      if classID == Enum.ItemClass.Consumable or classID == Enum.ItemClass.Armor or classID == Enum.ItemClass.Weapon or classID == Enum.ItemClass.Miscellaneous or classID == Enum.ItemClass.Reagent then
-        while parent do
-          if parent.awp then -- awp: short for added with patch
-            id = parent.awp
-          end
-          parent = parent.parent
+      local xpac
+      while parent and not xpac do
+        if parent.expansionID then
+          xpac = parent.expansionID
         end
-      else
-        while parent and not id do
-          if parent.awp then -- awp: short for added with patch
-            id = parent.awp
-          end
-          parent = parent.parent
-        end
+        parent = parent.parent
       end
-      if id then
-        local major = math.floor(id / 10000)
-        local minor = math.floor((id % 10000) / 100)
-        local patch = math.floor(id % 100)
-        return major, minor, patch
+      if xpac then
+        return xpac
       end
     end
   end
