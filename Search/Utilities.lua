@@ -23,7 +23,7 @@ function Syndicator.Search.GetExpansionInfo(itemID)
       local xpac
       while parent and not xpac do
         if parent.expansionID then
-          xpac = parent.expansionID
+          xpac = math.floor(parent.expansionID)
         end
         parent = parent.parent
       end
