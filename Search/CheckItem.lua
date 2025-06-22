@@ -1455,6 +1455,27 @@ local function ItemLevelMaxPatternCheck(details, text)
   return details.itemLevel and details.itemLevel >= tonumber(maxText)
 end
 
+local function AvgItemLevelPatternCheck(details, text)
+  if GetItemLevel(details) == false then
+    return false
+  end
+
+  local op1, op2, diff = text:match("^([<>=]?)avgilvl([+-]?)(%d*)$")
+  local avgIlvl = floor(GetAverageItemLevel() + 0.5)
+
+  if tonumber(diff) then
+    avgIlvl = avgIlvl + tonumber(diff) * (op2 == "-" and -1 or 1)
+  end
+
+  if op1 == "<" then
+    return details.itemLevel < avgIlvl
+  elseif op1 == ">" then
+    return details.itemLevel > avgIlvl
+  else
+    return details.itemLevel == avgIlvl
+  end
+end
+
 local function ExactKeywordCheck(details, text)
   local keyword = text:match("^#(.*)$")
   if KEYWORDS_TO_CHECK[keyword] ~= nil then
@@ -1470,6 +1491,7 @@ local patterns = {
   ["^%d+%-%d+$"] = ItemLevelRangePatternCheck,
   ["^%>%d+$"] = ItemLevelMaxPatternCheck,
   ["^%<%d+$"] = ItemLevelMinPatternCheck,
+  ["^[<>=]?avgilvl[+-]?%d*$"] = AvgItemLevelPatternCheck,
   ["^%#.*$"] = ExactKeywordCheck,
 }
 
