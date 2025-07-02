@@ -30,7 +30,11 @@ if Syndicator.Constants.IsEra then
       details.classID = override.classID
       details.subClassID = override.subClassID
     else
-      details.classID, details.subClassID = select(6, C_Item.GetItemInfoInstant(details.itemID))
+      local _
+      _, _, _, details.invType, _, details.classID, details.subClassID = C_Item.GetItemInfoInstant(details.itemID)
+      if details.invType == "INVTYPE_CLOAK" then
+        details.subClassID = 0
+      end
     end
   end
 else
@@ -45,7 +49,11 @@ else
       details.classID = Enum.ItemClass.Battlepet
       details.subClassID = petType - 1
     else
-      details.classID, details.subClassID = select(6, C_Item.GetItemInfoInstant(details.itemID))
+      local _
+      _, _, _, details.invType, _, details.classID, details.subClassID = C_Item.GetItemInfoInstant(details.itemID)
+      if details.invType == "INVTYPE_CLOAK" then
+        details.subClassID = 0
+      end
     end
   end
 end
@@ -55,7 +63,9 @@ local function GetInvType(details)
   if details.invType then
     return
   end
-  details.invType = (select(4, C_Item.GetItemInfoInstant(details.itemID))) or "NONE"
+  local _
+  _, _, _, details.invType = C_Item.GetItemInfoInstant(details.itemID)
+  details.invType = details.invType or "NONE"
 end
 
 local function PetCheck(details)
@@ -1083,7 +1093,8 @@ function Syndicator.Search.GetExpansion(details)
   if not Syndicator.Constants.IsRetail then
     return -1
   else
-    return (select(15, C_Item.GetItemInfo(details.itemID)))
+    local _, _, _, _, _, _, _, _, _, _, _, _, _, _, xpac = C_Item.GetItemInfo(details.itemID)
+    return xpac
   end
 end
 for key, expansionID in pairs(TextToExpansion) do
@@ -1956,8 +1967,7 @@ function Syndicator.Search.InitializeSearchEngine()
   -- cloth armor, but excluding cloaks
   AddKeywordManual(C_Item.GetItemSubClassInfo(Enum.ItemClass.Armor, 1):lower(), "cloth", function(details)
     GetClassSubClass(details)
-    GetInvType(details)
-    return details.classID == Enum.ItemClass.Armor and details.subClassID == 1 and details.invType ~= "INVTYPE_CLOAK"
+    return details.classID == Enum.ItemClass.Armor and details.subClassID == Enum.ItemArmorSubclass.Cloth
   end, Syndicator.Locales.GROUP_ARMOR_TYPE)
 
   local weaponTypesToCheck = {
