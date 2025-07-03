@@ -40,6 +40,18 @@ local battlePetTooltip = {
   "battlePetSpeed",
 }
 
+function Syndicator.Utilities.MapPetReturnsToTooltipInfo(_, ...)
+  local result = {}
+  for index, entry in ipairs({...}) do
+    if not battlePetTooltip[index] then
+      break
+    end
+    result[battlePetTooltip[index]] = entry
+  end
+
+  return result
+end
+
 function Syndicator.Utilities.RecoverBattlePetLink(tooltipInfo, itemLink, quality)
   if not tooltipInfo or not tooltipInfo[battlePetTooltip[1]] then
     return itemLink, quality

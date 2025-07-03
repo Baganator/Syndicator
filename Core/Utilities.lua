@@ -32,7 +32,8 @@ function Syndicator.Utilities.GetCharacterFullName()
 end
 
 if Syndicator.Constants.IsClassic then
-  local tooltip = CreateFrame("GameTooltip", "BaganatorUtilitiesScanTooltip", nil, "GameTooltipTemplate")
+  local tooltip = CreateFrame("GameTooltip", "SyndicatorUtilitiesScanTooltip", nil, "GameTooltipTemplate")
+  Syndicator.Utilities.ScanningTooltip = tooltip
   tooltip:SetOwner(WorldFrame, "ANCHOR_NONE")
 
   function Syndicator.Utilities.DumpClassicTooltip(tooltipSetter)

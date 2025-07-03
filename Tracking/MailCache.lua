@@ -15,7 +15,12 @@ local PENDING_NEW_MAIL_OUTGOING_EVENTS = {
 -- is supplied on the attachment link, missing all the battle pet stats (retail
 -- only)
 local function ExtractBattlePetLink(mailIndex, attachmentIndex, itemLink, quality)
-  local tooltipInfo = C_TooltipInfo.GetInboxItem(mailIndex, attachmentIndex)
+  local tooltipInfo
+  if C_TooltipInfo then
+    tooltipInfo = C_TooltipInfo.GetInboxItem(mailIndex, attachmentIndex)
+  else
+    tooltipInfo = Syndicator.Utilities.MapPetReturnsToTooltipInfo(Syndicator.Utilities.ScanningTooltip:SetInboxItem(mailIndex, attachmentIndex))
+  end
   return Syndicator.Utilities.RecoverBattlePetLink(tooltipInfo, itemLink, quality)
 end
 

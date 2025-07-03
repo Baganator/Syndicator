@@ -306,7 +306,12 @@ function SyndicatorGuildCacheMixin:ExamineBankTab(tabIndex, callback)
       local texture, itemCount, locked, isFiltered, quality = GetGuildBankItemInfo(tabIndex, slotIndex)
 
       if itemID == Syndicator.Constants.BattlePetCageID then
-        local tooltipInfo = C_TooltipInfo.GetGuildBankItem(tabIndex, slotIndex)
+        local tooltipInfo
+        if C_TooltipInfo then
+          tooltipInfo = C_TooltipInfo.GetGuildBankItem(tabIndex, slotIndex)
+        else
+          tooltipInfo = Syndicator.Utilities.MapPetReturnsToTooltipInfo(Syndicator.Utilities.ScanningTooltip:SetGuildBankItem(tabIndex, slotIndex))
+        end
         itemLink, quality = Syndicator.Utilities.RecoverBattlePetLink(tooltipInfo, itemLink, quality)
       end
 
