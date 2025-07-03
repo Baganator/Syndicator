@@ -355,10 +355,6 @@ local function CatalystCheck(details)
     return nil
   end
 
-  if not C_Item.IsDressableItemByID(details.itemID) then
-    return false
-  end
-
   if not TransmogUpgradeMaster_API.IsCacheWarmedUp() then
     return false, true
   end
@@ -374,10 +370,6 @@ local function CatalystUpgradeCheck(details)
   if not C_Item.IsItemDataCachedByID(details.itemID) then
     C_Item.RequestLoadItemDataByID(details.itemID)
     return nil
-  end
-
-  if not C_Item.IsDressableItemByID(details.itemID) then
-    return false
   end
 
   if not TransmogUpgradeMaster_API.IsCacheWarmedUp() then
