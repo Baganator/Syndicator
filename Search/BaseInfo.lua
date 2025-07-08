@@ -3,7 +3,7 @@ function Syndicator.Search.GetBaseInfo(cacheData)
 
   info.itemLink = cacheData.itemLink
   info.itemID = cacheData.itemID
-  info.quality = cacheData.quality
+  info.quality = cacheData.quality or 0
   info.itemCount = cacheData.itemCount or 1
   info.isBound = cacheData.isBound or false
   info.hasLoot = cacheData.hasLoot or false
