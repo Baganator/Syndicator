@@ -781,6 +781,7 @@ local function SetBonusCheck(details)
 end
 
 local classRestrictionsPattern = ITEM_CLASSES_ALLOWED:gsub("%%s", ".+")
+local multipleUniquesPattern = ITEM_UNIQUE_MULTIPLE:gsub("%%d", ".+")
 -- Check for items with the appropriate item class (which have a lot of
 -- variation), not common (to exclude glyphs) and have a class restriction.
 local function TierTokenCheck(details)
@@ -795,7 +796,7 @@ local function TierTokenCheck(details)
 
   if details.tooltipInfoLink then
     for _, row in ipairs(details.tooltipInfoLink.lines) do
-      if row.leftText == ITEM_UNIQUE then
+      if row.leftText == ITEM_UNIQUE or row.leftText:match(multipleUniquesPattern) then
         return false
       elseif row.leftText:match(classRestrictionsPattern) then
         return true
