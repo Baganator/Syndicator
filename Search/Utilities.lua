@@ -85,7 +85,6 @@ if Syndicator.Constants.IsRetail then
       return cache[itemLink]
     end
 
-    local start = debugprofilestop()
     local playerActor = modelScene:GetPlayerActor()
     local invType = select(4, C_Item.GetItemInfoInstant(itemLink))
     local slot = SlotMap[invType]

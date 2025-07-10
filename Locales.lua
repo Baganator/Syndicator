@@ -138,6 +138,8 @@ L["KEYWORD_SUBCLASS_ELEMENTAL"] = "elemental"
 L["KEYWORD_SUBCLASS_ENCHANTING"] = "enchanting"
 L["KEYWORD_CATALYST"] = "catalyst"
 L["KEYWORD_CATALYST_UPGRADE"] = "catalyst upgrade"
+L["KEYWORD_ENSEMBLE"] = "ensemble"
+L["KEYWORD_ARSENAL"] = "arsenal"
 
 L["GROUP_ARMOR_TYPE"] = "Armor Type"
 L["GROUP_BATTLE_PET"] = "Battle Pet Type"

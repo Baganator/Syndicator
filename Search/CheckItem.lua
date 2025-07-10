@@ -219,6 +219,56 @@ local function KnowledgeCheck(details)
   return spellName == baseKnowledgeName and (spellInfo.iconID == 236225 or spellInfo.iconID == 136175)
 end
 
+local function EnsembleCheck(details)
+  GetInvType(details)
+  GetClassSubClass(details)
+
+  if not C_Item.IsItemDataCachedByID(details.itemID) then
+    C_Item.RequestLoadItemDataByID(details.itemID)
+    return nil
+  end
+
+  if details.classID == Enum.ItemClass.Consumable and details.invType == "INVTYPE_NON_EQUIP_IGNORE" and C_Item.IsDressableItemByID(details.itemID) then
+    if details.setSources == nil then
+      local setID = C_Item.GetItemLearnTransmogSet(details.itemLink)
+      if setID then
+        details.setSources = C_Transmog.GetAllSetAppearancesByID(setID)
+      end
+    end
+    if not details.setSources then
+      return true
+    end
+    local invSlot = details.setSources[1].invSlot
+    return invSlot ~= 16 and invSlot ~= 17
+  end
+  return false
+end
+
+local function ArsenalCheck(details)
+  GetInvType(details)
+  GetClassSubClass(details)
+
+  if not C_Item.IsItemDataCachedByID(details.itemID) then
+    C_Item.RequestLoadItemDataByID(details.itemID)
+    return nil
+  end
+
+  if details.classID == Enum.ItemClass.Consumable and details.invType == "INVTYPE_NON_EQUIP_IGNORE" and C_Item.IsDressableItemByID(details.itemID) then
+    if details.setSources == nil then
+      local setID = C_Item.GetItemLearnTransmogSet(details.itemLink)
+      if setID then
+        details.setSources = C_Transmog.GetAllSetAppearancesByID(setID)
+      end
+    end
+    if not details.setSources then
+      return false
+    end
+    local invSlot = details.setSources[1].invSlot
+    return invSlot == 16 and invSlot == 17
+  end
+  return false
+end
+
 local function GetSourceID(itemLink)
   local _, sourceID = C_TransmogCollection.GetItemInfo(itemLink)
   if sourceID then
@@ -792,6 +842,15 @@ local function TierTokenCheck(details)
     return false
   end
 
+  if not C_Item.IsItemDataCachedByID(details.itemID) then
+    C_Item.RequestLoadItemDataByID(details.itemID)
+    return nil
+  end
+
+  if C_Item.IsDressableItemByID(details.itemID) then
+    return false
+  end
+
   GetTooltipInfoLink(details)
 
   if details.tooltipInfoLink then
@@ -929,6 +988,8 @@ AddKeywordLocalised("KEYWORD_LOCKED", LockedCheck, Syndicator.Locales.GROUP_ITEM
 AddKeywordLocalised("KEYWORD_REFUNDABLE", RefundableCheck, Syndicator.Locales.GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_CRAFTED", CraftedCheck, Syndicator.Locales.GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_TIER_TOKEN", TierTokenCheck, Syndicator.Locales.GROUP_ITEM_TYPE)
+AddKeywordLocalised("KEYWORD_ENSEMBLE", EnsembleCheck, Syndicator.Locales.GROUP_ITEM_TYPE)
+AddKeywordLocalised("KEYWORD_ARSENAL", ArsenalCheck, Syndicator.Locales.GROUP_ITEM_TYPE)
 
 if Syndicator.Constants.IsRetail then
   AddKeywordLocalised("KEYWORD_COSMETIC", CosmeticCheck, Syndicator.Locales.GROUP_QUALITY)
