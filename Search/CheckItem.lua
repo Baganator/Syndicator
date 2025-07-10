@@ -238,8 +238,8 @@ local function EnsembleCheck(details)
     if not details.setSources then
       return true
     end
-    local invSlot = details.setSources[1].invSlot
-    return invSlot ~= 16 and invSlot ~= 17 and invSlot ~= 10
+    local invSlot = details.setSources[1].invSlot + 1
+    return invSlot ~= 16 and invSlot ~= 17
   end
   return false
 end
@@ -263,8 +263,8 @@ local function ArsenalCheck(details)
     if not details.setSources then
       return false
     end
-    local invSlot = details.setSources[1].invSlot
-    return invSlot == 16 or invSlot == 17 or invSlot == 10
+    local invSlot = details.setSources[1].invSlot + 1
+    return invSlot == 16 or invSlot == 17
   end
   return false
 end
