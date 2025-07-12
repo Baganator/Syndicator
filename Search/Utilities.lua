@@ -116,46 +116,46 @@ end
 do
   local priceSources = {}
   priceSources["none"] = {
-    func = function(itemLink, itemID)
-      return 0
+    func = function(itemLink)
+      return -2 -- special value, says everything matches this price
     end,
     priority = 1000,
     validation = function() return false end
   }
   priceSources["auctionator-latest"] = {
-    func = function(itemLink, itemID)
+    func = function(itemLink)
       return Auctionator.API.v1.GetAuctionPriceByItemLink("Syndicator", itemLink)
     end,
     priority = 100,
     validation = function() return Auctionator ~= nil end
   }
   priceSources["tradeskillmaster-dbmarket"] = {
-    func = function(itemLink, itemID)
+    func = function(itemLink)
       return TSM_API.GetCustomPriceValue("dbmarket", TSM_API.ToItemString(itemLink))
     end,
     priority = 30,
     validation = function() return TSM_API ~= nil end
   }
   priceSources["tradeskillmaster-dbrecent"] = {
-    func = function(itemLink, itemID)
+    func = function(itemLink)
       return TSM_API.GetCustomPriceValue("dbrecent", TSM_API.ToItemString(itemLink))
     end,
     validation = function() return TSM_API ~= nil end
   }
   priceSources["tradeskillmaster-dbregionmarketavg"] = {
-    func = function(itemLink, itemID)
+    func = function(itemLink)
       return TSM_API.GetCustomPriceValue("dbregionmarketavg", TSM_API.ToItemString(itemLink))
     end,
     validation = function() return TSM_API ~= nil end
   }
   priceSources["tradeskillmaster-dbregionsaleavg"] = {
-    func = function(itemLink, itemID)
+    func = function(itemLink)
       return TSM_API.GetCustomPriceValue("dbregionmarketavg", TSM_API.ToItemString(itemLink))
     end,
     validation = function() return TSM_API ~= nil end
   }
   priceSources["undermineexchange-realm"] = {
-    func = function(itemLink, itemID)
+    func = function(itemLink)
       local o = {}
       OEMarketInfo(itemID, o)
       return o["realm"] or o["region"]
@@ -164,9 +164,9 @@ do
     validation = function() return OEMarketInfo ~= nil end
   }
   priceSources["undermineexchange-region"] = {
-    func = function(itemLink, itemID)
+    func = function(itemLink)
       local o = {}
-      OEMarketInfo(itemID, o)
+      OEMarketInfo(itemLink, o)
       return o["region"]
     end,
     validation = function() return OEMarketInfo ~= nil end
@@ -176,7 +176,7 @@ do
   frame:RegisterEvent("PLAYER_LOGIN")
   frame:SetScript("OnEvent", function()
     local current = priceSources[Syndicator.Config.Get(Syndicator.Config.Options.AUCTION_VALUE_SOURCE)]
-    if not current or not current.validation() then
+    if not Syndicator.Config.Get(Syndicator.Config.Options.NO_AUCTION_VALUE_SOURCE) and (not current or not current.validation()) then
       local options = {}
       for key, details in pairs(priceSources) do
         if details.priority and details.validation() then
@@ -193,7 +193,9 @@ do
     Syndicator.Search.GetAuctionValue = current.func
   end)
   Syndicator.CallbackRegistry:RegisterCallback("AuctionValueSourceChanged", function()
-    local current = priceSources[Syndicator.Config.Get(Syndicator.Config.Options.AUCTION_VALUE_SOURCE)]
+    local key = Syndicator.Config.Get(Syndicator.Config.Options.AUCTION_VALUE_SOURCE)
+    Syndicator.Config.Set(Syndicator.Config.Options.NO_AUCTION_VALUE_SOURCE, key == "none")
+    local current = priceSources[key]
     Syndicator.Search.GetAuctionValue = current.func
   end)
 end

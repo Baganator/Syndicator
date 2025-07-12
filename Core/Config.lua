@@ -16,6 +16,7 @@ Syndicator.Config.Options = {
   SHOW_TOTAL_LINE_AFTER_CHARACTERS = "show_total_line_after_characters",
 
   AUCTION_VALUE_SOURCE = "auction_value_source",
+  NO_AUCTION_VALUE_SOURCE = "no_auction_value_source",
 
   DEBUG = "debug",
   DEBUG_TIMERS = "debug_timers",
@@ -35,6 +36,7 @@ Syndicator.Config.Defaults = {
   [Syndicator.Config.Options.SHOW_BLANK_LINE_BEFORE_INVENTORY] = false,
   [Syndicator.Config.Options.SHOW_TOTAL_LINE_AFTER_CHARACTERS] = false,
   [Syndicator.Config.Options.AUCTION_VALUE_SOURCE] = "", -- "auctionator" ,"oribos-region", "oribos-realm", "tradeskillmaster-dbrecent", etc.
+  [Syndicator.Config.Options.NO_AUCTION_VALUE_SOURCE] = false,
 
   [Syndicator.Config.Options.DEBUG] = false,
   [Syndicator.Config.Options.DEBUG_TIMERS] = false,

@@ -1519,7 +1519,7 @@ end
 
 local function GetAuctionValue(details)
   if details.auctionValue then
-    return details.auctionValue ~= -1
+    return details.auctionValue >= 0
   end
   BindOnAccountCheck(details)
   if details.accountBound == true or details.isBound then
@@ -1533,14 +1533,14 @@ local function GetAuctionValue(details)
     return
   end
 
-  details.auctionValue = Syndicator.Search.GetAuctionValue(details.itemLink, details.itemID) or -1
+  details.auctionValue = Syndicator.Search.GetAuctionValue(details.itemLink) or -1
 
-  return details.auctionValue ~= -1
+  return details.auctionValue >= 0
 end
 
 local function AHValuePatternCheck(details, text)
   if GetAuctionValue(details) == false then
-    return false
+    return details.auctionValue == -2
   end
 
   local operator, value, scale = text:match("^([><=]?)(%d+)([gsc])$")
