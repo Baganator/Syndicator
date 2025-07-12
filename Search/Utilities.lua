@@ -157,8 +157,8 @@ do
   priceSources["undermineexchange-realm"] = {
     func = function(itemLink)
       local o = {}
-      OEMarketInfo(itemID, o)
-      return o["realm"] or o["region"]
+      OEMarketInfo(itemLink, o)
+      return o["market"] or o["region"]
     end,
     priority = 50,
     validation = function() return OEMarketInfo ~= nil end
