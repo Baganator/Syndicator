@@ -434,6 +434,47 @@ function Syndicator.Options.Initialize()
 
   local yOffset = 0
   local spacing = 2
+
+  do
+    local dropdownWrapper = CreateFrame("Frame", nil, optionsFrame)
+    dropdownWrapper:SetHeight(30)
+    dropdownWrapper:SetPoint("TOPLEFT", lastItem, "BOTTOMLEFT", 0, -spacing - 10 + yOffset)
+    dropdownWrapper:SetPoint("RIGHT", optionsFrame)
+    local text = dropdownWrapper:CreateFontString("ARTWORK", nil, "GameFontHighlight")
+    text:SetText(SYNDICATOR_L_AUCTION_VALUE_SOURCE)
+    text:SetPoint("LEFT", dropdownWrapper)
+    local dropdown = CreateFrame("DropdownButton", nil, dropdownWrapper, "WowStyle1DropdownTemplate")
+    dropdown:SetWidth(250)
+    dropdown:SetPoint("LEFT", text, "RIGHT", 15, 0)
+    dropdown:SetupMenu(function(_, rootDescription)
+      local entries = {}
+      table.insert(entries, {label = NONE, value = "none"})
+      if Auctionator then
+        table.insert(entries, {label = "Auctionator", value = "auctionator-latest"})
+      end
+      if TSM_API then
+        table.insert(entries, {label = "TradeSkillMaster DBMarket", value = "tradeskillmaster-dbmarket"})
+        table.insert(entries, {label = "TradeSkillMaster DBRecent", value = "tradeskillmaster-dbrecent"})
+        table.insert(entries, {label = "TradeSkillMaster DBRegionMarketAvg", value = "tradeskillmaster-dbregionmarketavg"})
+        table.insert(entries, {label = "TradeSkillMaster DBRegionSaleAvg", value = "tradeskillmaster-dbregionsaleavg"})
+      end
+      if OEMarketInfo then
+        table.insert(entries, {label = "Undermine Exchange Realm", value = "undermineexchange-realm"})
+        table.insert(entries, {label = "Undermine Exchange Region", value = "undermineexchange-region"})
+      end
+
+      for _, entry in ipairs(entries) do
+        rootDescription:CreateRadio(entry.label, function()
+          return Syndicator.Config.Get(Syndicator.Config.Options.AUCTION_VALUE_SOURCE) == entry.value
+        end, function()
+          Syndicator.Config.Set(Syndicator.Config.Options.AUCTION_VALUE_SOURCE, entry.value)
+          Syndicator.CallbackRegistry:TriggerEvent("AuctionValueSourceChanged")
+        end)
+      end
+    end)
+    lastItem = dropdownWrapper
+  end
+
   for _, entry in ipairs(TOOLTIP_OPTIONS) do
     if entry.check == nil or entry.check() then
       if entry.type == "header" then
@@ -507,59 +548,19 @@ function Syndicator.Options.Initialize()
     end
   end
 
-  do
-    local dropdownWrapper = CreateFrame("Frame", nil, optionsFrame)
-    dropdownWrapper:SetHeight(30)
-    dropdownWrapper:SetPoint("TOPLEFT", lastItem, "BOTTOMLEFT", 0, -spacing - 10 + yOffset)
-    dropdownWrapper:SetPoint("RIGHT", optionsFrame)
-    local text = dropdownWrapper:CreateFontString("ARTWORK", nil, "GameFontHighlight")
-    text:SetText(SYNDICATOR_L_AUCTION_VALUE_SOURCE)
-    text:SetPoint("LEFT", dropdownWrapper)
-    local dropdown = CreateFrame("DropdownButton", nil, dropdownWrapper, "WowStyle1DropdownTemplate")
-    dropdown:SetWidth(250)
-    dropdown:SetPoint("LEFT", text, "RIGHT", 15, 0)
-    dropdown:SetupMenu(function(_, rootDescription)
-      local entries = {}
-      table.insert(entries, {label = NONE, value = "none"})
-      if Auctionator then
-        table.insert(entries, {label = "Auctionator", value = "auctionator-latest"})
-      end
-      if TSM_API then
-        table.insert(entries, {label = "TradeSkillMaster DBMarket", value = "tradeskillmaster-dbmarket"})
-        table.insert(entries, {label = "TradeSkillMaster DBRecent", value = "tradeskillmaster-dbrecent"})
-        table.insert(entries, {label = "TradeSkillMaster DBRegionMarketAvg", value = "tradeskillmaster-dbregionmarketavg"})
-        table.insert(entries, {label = "TradeSkillMaster DBRegionSaleAvg", value = "tradeskillmaster-dbregionsaleavg"})
-      end
-      if OEMarketInfo then
-        table.insert(entries, {label = "Undermine Exchange Realm", value = "undermineexchange-realm"})
-        table.insert(entries, {label = "Undermine Exchange Region", value = "undermineexchange-region"})
-      end
-
-      for _, entry in ipairs(entries) do
-        rootDescription:CreateRadio(entry.label, function()
-          return Syndicator.Config.Get(Syndicator.Config.Options.AUCTION_VALUE_SOURCE) == entry.value
-        end, function()
-          Syndicator.Config.Set(Syndicator.Config.Options.AUCTION_VALUE_SOURCE, entry.value)
-          Syndicator.CallbackRegistry:TriggerEvent("AuctionValueSourceChanged")
-        end)
-      end
-    end)
-    lastItem = dropdownWrapper
-  end
-
   optionsFrame.OnCommit = function() end
   optionsFrame.OnDefault = function() end
   optionsFrame.OnRefresh = function() end
 
   local characterEditor = MakeCharacterEditor(optionsFrame)
-  characterEditor:SetPoint("TOPRIGHT", optionsFrame, -15, -75)
+  characterEditor:SetPoint("TOPRIGHT", optionsFrame, -15, -115)
   characterEditor:SetSize(320, 210)
   local characterHeader = optionsFrame:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
   characterHeader:SetPoint("BOTTOMLEFT", characterEditor, "TOPLEFT", 0, 5)
   characterHeader:SetText(Syndicator.Locales.CHARACTERS)
 
   local guildEditor = MakeGuildEditor(optionsFrame)
-  guildEditor:SetPoint("TOPRIGHT", optionsFrame, -15, -320)
+  guildEditor:SetPoint("TOPRIGHT", optionsFrame, -15, -360)
   guildEditor:SetSize(320, 130)
   local guildHeader = optionsFrame:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
   guildHeader:SetPoint("BOTTOMLEFT", guildEditor, "TOPLEFT", 0, 5)
