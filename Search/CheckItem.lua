@@ -228,7 +228,7 @@ local function EnsembleCheck(details)
     return nil
   end
 
-  if details.classID == Enum.ItemClass.Consumable and details.invType == "INVTYPE_NON_EQUIP_IGNORE" and C_Item.IsDressableItemByID(details.itemID) then
+  if details.classID == Enum.ItemClass.Consumable and details.invType == "INVTYPE_NON_EQUIP_IGNORE" and (C_Item.IsDressableItemByID or IsDressableItem)(details.itemID) then
     if details.setSources == nil then
       local setID = C_Item.GetItemLearnTransmogSet(details.itemLink)
       if setID then
@@ -253,7 +253,7 @@ local function ArsenalCheck(details)
     return nil
   end
 
-  if details.classID == Enum.ItemClass.Consumable and details.invType == "INVTYPE_NON_EQUIP_IGNORE" and C_Item.IsDressableItemByID(details.itemID) then
+  if details.classID == Enum.ItemClass.Consumable and details.invType == "INVTYPE_NON_EQUIP_IGNORE" and (C_Item.IsDressableItemByID or IsDressableItem)(details.itemID) then
     if details.setSources == nil then
       local setID = C_Item.GetItemLearnTransmogSet(details.itemLink)
       if setID then
@@ -847,7 +847,7 @@ local function TierTokenCheck(details)
     return nil
   end
 
-  if C_Item.IsDressableItemByID(details.itemID) then
+  if (C_Item.IsDressableItemByID or IsDressableItem)(details.itemID) then
     return false
   end
 
