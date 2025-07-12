@@ -552,16 +552,22 @@ local function BindOnEquipCheck(details)
 end
 
 local function BindOnAccountCheck(details)
+  if details.accountBound ~= nil then
+    return details.accountBound
+  end
+
   GetTooltipInfoSpell(details)
 
   if details.tooltipInfoSpell then
+    details.accountBound = false
     for _, row in ipairs(details.tooltipInfoSpell.lines) do
       if tIndexOf(Syndicator.Constants.AccountBoundTooltipLines, row.leftText) ~= nil or
           (not details.isBound and tIndexOf(Syndicator.Constants.AccountBoundTooltipLinesNotBound, row.leftText) ~= nil) then
-        return true
+        details.accountBound = true
+        break
       end
     end
-    return false
+    return details.accountBound
   end
 end
 
@@ -1487,12 +1493,19 @@ local function ItemLevelPatternCheck(details, text)
     return false
   end
 
-  local wantedItemLevel = tonumber(text)
-  return details.itemLevel and details.itemLevel == wantedItemLevel
-end
+  local operator, value = text:match("([><=]?)(%d+)")
 
-local function ExactItemLevelPatternCheck(details, text)
-  return ItemLevelPatternCheck(details, (text:match("%d+")))
+  local wantedItemLevel = tonumber(value)
+
+  if operator == "" or operator == "=" then
+    return details.itemLevel and details.itemLevel == wantedItemLevel
+  elseif operator == "<" then
+  return details.itemLevel and details.itemLevel <= wantedItemLevel
+  elseif operator == ">" then
+    return details.itemLevel and details.itemLevel >= wantedItemLevel
+  else
+    error("Unexpected item level operator")
+  end
 end
 
 local function ItemLevelRangePatternCheck(details, text)
@@ -1504,22 +1517,50 @@ local function ItemLevelRangePatternCheck(details, text)
   return details.itemLevel and details.itemLevel >= tonumber(minText) and details.itemLevel <= tonumber(maxText)
 end
 
-local function ItemLevelMinPatternCheck(details, text)
-  if GetItemLevel(details) == false then
+local function GetAuctionValue(details)
+  if details.auctionValue then
+    return details.auctionValue ~= -1
+  end
+  BindOnAccountCheck(details)
+  if details.accountBound == true or details.isBound then
+    details.auctionValue = -1
     return false
+  elseif details.accountBound == nil then
+    return
+  end
+  if not C_Item.IsItemDataCachedByID(details.itemID) then
+    C_Item.RequestLoadItemDataByID(details.itemID)
+    return
   end
 
-  local minText = text:match("%d+")
-  return details.itemLevel and details.itemLevel <= tonumber(minText)
+  details.auctionValue = Syndicator.Search.GetAuctionValue(details.itemLink, details.itemID) or -1
+
+  return details.auctionValue ~= -1
 end
 
-local function ItemLevelMaxPatternCheck(details, text)
-  if GetItemLevel(details) == false then
+local function AHValuePatternCheck(details, text)
+  if GetAuctionValue(details) == false then
     return false
   end
 
-  local maxText = text:match("%d+")
-  return details.itemLevel and details.itemLevel >= tonumber(maxText)
+  local operator, value, scale = text:match("^([><=]?)(%d+)([gsc])$")
+
+  local wantedAuctionValue = tonumber(value)
+  if scale == "g" then
+    wantedAuctionValue = wantedAuctionValue * 10000
+  elseif scale == "s" then
+    wantedAuctionValue = wantedAuctionValue * 100
+  end
+
+  if operator == "" or operator == "=" then
+    return details.auctionValue and details.auctionValue == wantedAuctionValue
+  elseif operator == "<" then
+    return details.auctionValue and details.auctionValue <= wantedAuctionValue
+  elseif operator == ">" then
+    return details.auctionValue and details.auctionValue >= wantedAuctionValue
+  else
+    error("Unexpected auction value operator")
+  end
 end
 
 local function ExactKeywordCheck(details, text)
@@ -1532,11 +1573,12 @@ local function ExactKeywordCheck(details, text)
 end
 
 local patterns = {
-  ["^%d+$"] = ItemLevelPatternCheck,
-  ["^=%d+$"] = ExactItemLevelPatternCheck,
+  ["^[><=]?%d+$"] = ItemLevelPatternCheck,
   ["^%d+%-%d+$"] = ItemLevelRangePatternCheck,
-  ["^%>%d+$"] = ItemLevelMaxPatternCheck,
-  ["^%<%d+$"] = ItemLevelMinPatternCheck,
+
+  ["^[><=]?%d+[gsc]$"] = AHValuePatternCheck,
+  ["^%d+[gsc]%-%d+[gsc]$"] = AHValueRangePatternCheck,
+
   ["^%#.*$"] = ExactKeywordCheck,
 }
 

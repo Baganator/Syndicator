@@ -89,6 +89,8 @@ Syndicator.Constants.Events = {
   "AuctionsCacheUpdate",
 
   "Ready",
+
+  "AuctionValueSourceChanged"
 }
 
 -- Hidden currencies for all characters tooltips as they are shared between characters

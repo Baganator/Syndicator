@@ -422,7 +422,7 @@ function Syndicator.Options.Initialize()
   optionsFrame:Hide()
 
   local header = optionsFrame:CreateFontString(nil, "ARTWORK", "GameFontNormalHuge")
-  header:SetPoint("TOPLEFT", optionsFrame, 15, -15)
+  header:SetPoint("TOPLEFT", optionsFrame, 15, -10)
   header:SetText(NORMAL_FONT_COLOR:WrapTextInColorCode(Syndicator.Locales.SYNDICATOR))
 
   local version = C_AddOns.GetAddOnMetadata(addonName, "Version")
@@ -433,6 +433,7 @@ function Syndicator.Options.Initialize()
   local lastItem = versionText
 
   local yOffset = 0
+  local spacing = 2
   for _, entry in ipairs(TOOLTIP_OPTIONS) do
     if entry.check == nil or entry.check() then
       if entry.type == "header" then
@@ -442,7 +443,7 @@ function Syndicator.Options.Initialize()
         lastItem = headerText
       elseif entry.type == "checkbox" then
         local checkButton = CreateFrame("CheckButton", nil, optionsFrame, "UICheckButtonTemplate")
-        checkButton:SetPoint("TOPLEFT", lastItem, "BOTTOMLEFT", 0, -5 + yOffset)
+        checkButton:SetPoint("TOPLEFT", lastItem, "BOTTOMLEFT", 0, -spacing + yOffset)
         checkButton:SetScript("OnClick", function(self)
           Syndicator.Config.Set(entry.option, self:GetChecked())
         end)
@@ -467,9 +468,9 @@ function Syndicator.Options.Initialize()
         lastItem = checkButton
       elseif entry.type == "slider" then
         local sliderWrapper = CreateFrame("Frame", nil, optionsFrame)
-        sliderWrapper:SetPoint("TOPLEFT", lastItem, "BOTTOMLEFT", -5 + yOffset)
+        sliderWrapper:SetPoint("TOPLEFT", lastItem, "BOTTOMLEFT", -spacing + yOffset)
         sliderWrapper:SetPoint("RIGHT", optionsFrame)
-        sliderWrapper:SetHeight(60)
+        sliderWrapper:SetHeight(55)
         local slider = CreateFrame("Slider", nil, sliderWrapper, "UISliderTemplate")
         slider:SetHeight(20)
         slider:SetPoint("RIGHT", sliderWrapper, -30, -10)
@@ -501,9 +502,49 @@ function Syndicator.Options.Initialize()
       end
       yOffset = 0
       if entry.type == "spacing" then
-        yOffset = -20
+        yOffset = -17
       end
     end
+  end
+
+  do
+    local dropdownWrapper = CreateFrame("Frame", nil, optionsFrame)
+    dropdownWrapper:SetHeight(30)
+    dropdownWrapper:SetPoint("TOPLEFT", lastItem, "BOTTOMLEFT", 0, -spacing - 10 + yOffset)
+    dropdownWrapper:SetPoint("RIGHT", optionsFrame)
+    local text = dropdownWrapper:CreateFontString("ARTWORK", nil, "GameFontHighlight")
+    text:SetText(SYNDICATOR_L_AUCTION_VALUE_SOURCE)
+    text:SetPoint("LEFT", dropdownWrapper)
+    local dropdown = CreateFrame("DropdownButton", nil, dropdownWrapper, "WowStyle1DropdownTemplate")
+    dropdown:SetWidth(250)
+    dropdown:SetPoint("LEFT", text, "RIGHT", 15, 0)
+    dropdown:SetupMenu(function(_, rootDescription)
+      local entries = {}
+      table.insert(entries, {label = NONE, value = "none"})
+      if Auctionator then
+        table.insert(entries, {label = "Auctionator", value = "auctionator-latest"})
+      end
+      if TSM_API then
+        table.insert(entries, {label = "TradeSkillMaster DBMarket", value = "tradeskillmaster-dbmarket"})
+        table.insert(entries, {label = "TradeSkillMaster DBRecent", value = "tradeskillmaster-dbrecent"})
+        table.insert(entries, {label = "TradeSkillMaster DBRegionMarketAvg", value = "tradeskillmaster-dbregionmarketavg"})
+        table.insert(entries, {label = "TradeSkillMaster DBRegionSaleAvg", value = "tradeskillmaster-dbregionsaleavg"})
+      end
+      if OEMarketInfo then
+        table.insert(entries, {label = "Undermine Exchange Realm", value = "undermineexchange-realm"})
+        table.insert(entries, {label = "Undermine Exchange Region", value = "undermineexchange-region"})
+      end
+
+      for _, entry in ipairs(entries) do
+        rootDescription:CreateRadio(entry.label, function()
+          return Syndicator.Config.Get(Syndicator.Config.Options.AUCTION_VALUE_SOURCE) == entry.value
+        end, function()
+          Syndicator.Config.Set(Syndicator.Config.Options.AUCTION_VALUE_SOURCE, entry.value)
+          Syndicator.CallbackRegistry:TriggerEvent("AuctionValueSourceChanged")
+        end)
+      end
+    end)
+    lastItem = dropdownWrapper
   end
 
   optionsFrame.OnCommit = function() end
@@ -511,7 +552,7 @@ function Syndicator.Options.Initialize()
   optionsFrame.OnRefresh = function() end
 
   local characterEditor = MakeCharacterEditor(optionsFrame)
-  characterEditor:SetPoint("TOPRIGHT", optionsFrame, -15, -80)
+  characterEditor:SetPoint("TOPRIGHT", optionsFrame, -15, -75)
   characterEditor:SetSize(320, 210)
   local characterHeader = optionsFrame:CreateFontString("ARTWORK", nil, "GameFontNormalLarge")
   characterHeader:SetPoint("BOTTOMLEFT", characterEditor, "TOPLEFT", 0, 5)
