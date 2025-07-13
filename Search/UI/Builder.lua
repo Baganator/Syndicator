@@ -335,6 +335,7 @@ local function GetKeywordMenu(rootDescription, index, callbackRegistry, event)
       root:CreateButton(entry, function()
         callbackRegistry:TriggerEvent(event, CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.Keyword, entry), index)
       end)
+      root:SetScrollMode(25 * 20)
     end
   end
 end
