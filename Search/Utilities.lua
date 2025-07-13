@@ -120,7 +120,7 @@ do
       return -2 -- special value, says everything matches this price
     end,
     priority = 1000,
-    validation = function() return false end
+    validation = function() return true end
   }
   priceSources["auctionator-latest"] = {
     func = function(itemLink)
@@ -175,8 +175,9 @@ do
   local frame = CreateFrame("Frame")
   frame:RegisterEvent("PLAYER_LOGIN")
   frame:SetScript("OnEvent", function()
-    local current = priceSources[Syndicator.Config.Get(Syndicator.Config.Options.AUCTION_VALUE_SOURCE)]
-    if not Syndicator.Config.Get(Syndicator.Config.Options.NO_AUCTION_VALUE_SOURCE) and (not current or not current.validation()) then
+    local key = Syndicator.Config.Get(Syndicator.Config.Options.AUCTION_VALUE_SOURCE)
+    local current = priceSources[key]
+    if not current or not current.validation() or (key == "none" and not Syndicator.Config.Get(Syndicator.Config.Options.NO_AUCTION_VALUE_SOURCE)) then
       local options = {}
       for key, details in pairs(priceSources) do
         if details.priority and details.validation() then
@@ -188,6 +189,8 @@ do
       if #options > 0 then
         current = options[1]
         Syndicator.Config.Set(Syndicator.Config.Options.AUCTION_VALUE_SOURCE, options[1].key)
+      else
+        error("unexpected missing \"none\" price source")
       end
     end
     Syndicator.Search.GetAuctionValue = current.func
