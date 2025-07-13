@@ -42,6 +42,26 @@ local function GetMatches(text)
   return result
 end
 
+local function ScaleGoldValue(scaling, value)
+  if scaling == "g" then
+    return value*10000
+  elseif scaling == "s" then
+    return value*100
+  else
+    return value
+  end
+end
+
+local function GoldToScale(value)
+  if value%10000 == 0 then
+    return (value / 10000) .. "g"
+  elseif value%100 == 0 then
+    return (value / 100) .. "s"
+  else
+    return value .. "c"
+  end
+end
+
 local groups
 
 local RootType = {
@@ -56,6 +76,10 @@ local TermType = {
   ItemLevelMore = 4,
   ItemLevelRange = 5,
   ItemLevelEquals = 6,
+  AuctionValueLess = 7,
+  AuctionValueMore = 8,
+  --AuctionValueRange = 5,
+  AuctionValueEquals = 9,
 }
 
 local OperatorType = {
@@ -86,8 +110,16 @@ local function GetComponent(text)
     return CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.ItemLevelMore, {tonumber(text:match("%d+")), -1})
   elseif text:match("^%d+%-%d+$") then
     return CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.ItemLevelRange, {tonumber(text:match("^%d+")), tonumber(text:match("%d+$"))})
-  elseif text:match("^%d+$") then
-    return CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.ItemLevelEquals, {tonumber(text), tonumber(text)})
+  elseif text:match("^=?%d+$") then
+    return CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.ItemLevelEquals, {tonumber(text:match("%d+")), tonumber(text:match("%d+"))})
+  elseif text:match("^<%d+[gsc]$") then
+    return CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.AuctionValueLess, {ScaleGoldValue(text:match("[gsc]"), tonumber(text:match("%d+")))})
+  elseif text:match("^>%d+[gsc]$") then
+    return CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.AuctionValueMore, {ScaleGoldValue(text:match("[gsc]"), tonumber(text:match("%d+")))})
+  --[[elseif text:match("^%d+%-%d+$") then
+    return CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.AuctionValueRange, {tonumber(text:match("^%d+")), tonumber(text:match("%d+$"))})]]
+  elseif text:match("^=?%d+[gsc]$") then
+    return CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.AuctionValueEquals, {ScaleGoldValue(text:match("[gsc]"), tonumber(text:match("%d+")))})
   elseif text ~= "(" and text ~= ")" then
     return CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.Custom, text)
   end
@@ -285,6 +317,16 @@ local function GetKeywordMenu(rootDescription, index, callbackRegistry, event)
   end)
   itemLevelButton:CreateButton(Syndicator.Locales.ITEM_LEVEL_EQUALS, function()
     callbackRegistry:TriggerEvent(event, CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.ItemLevelEquals, {-1, -1}), index)
+  end)
+  local auctionValueButton = rootDescription:CreateButton(Syndicator.Locales.AUCTION_VALUE)
+  auctionValueButton:CreateButton(Syndicator.Locales.ITEM_LEVEL_LESS, function()
+    callbackRegistry:TriggerEvent(event, CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.AuctionValueLevelLess, {0}), index)
+  end)
+  auctionValueButton:CreateButton(Syndicator.Locales.ITEM_LEVEL_MORE, function()
+    callbackRegistry:TriggerEvent(event, CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.AuctionValueMore, {0}), index)
+  end)
+  auctionValueButton:CreateButton(Syndicator.Locales.ITEM_LEVEL_EQUALS, function()
+    callbackRegistry:TriggerEvent(event, CreateAndInitFromMixin(ComponentMixin, RootType.Term, TermType.AuctionValueEquals, {0}), index)
   end)
   rootDescription:CreateDivider()
   for _, group in ipairs(groups) do
@@ -499,6 +541,149 @@ function TermButtonMixin:OnLoad()
     SizeItemLevel()
     self.onResizeFunc()
   end)
+
+  self.AuctionValueWrapper = CreateFrame("Frame", nil, self)
+  self.AuctionValueWrapper:SetAllPoints()
+  self.AuctionValueText = self.AuctionValueWrapper:CreateFontString("ARTWORK", nil, "GameFontNormal")
+  self.AuctionValueText:SetPoint("TOPLEFT")
+  self.AuctionValueText:SetHeight(22)
+
+  local function SizeAuctionValue()
+    self:SetWidth(
+      (self.AuctionValueCopperInput.WidthChecker:GetUnboundedStringWidth() or 0) +
+      (self.AuctionValueSilverInput.WidthChecker:GetUnboundedStringWidth() or 0) +
+      (self.AuctionValueGoldInput.WidthChecker:GetUnboundedStringWidth() or 0) +
+      (self.AuctionValueCopperSymbolText:GetUnboundedStringWidth() or 0) +
+      (self.AuctionValueSilverSymbolText:GetUnboundedStringWidth() or 0) +
+      (self.AuctionValueGoldSymbolText:GetUnboundedStringWidth() or 0) +
+      self.AuctionValueText:GetUnboundedStringWidth() +
+      5 * 3
+    )
+  end
+
+  self.AuctionValueGoldInput = GetInput()
+  self.AuctionValueGoldInput:SetParent(self.AuctionValueWrapper)
+  self.AuctionValueGoldInput:SetPoint("TOPLEFT", self.AuctionValueText, "TOPRIGHT", 0, 0)
+  self.AuctionValueGoldInput.Placeholder = self.AuctionValueGoldInput:CreateFontString(nil, nil, "GameFontNormal")
+  self.AuctionValueGoldInput.Placeholder:SetText(LIGHTGRAY_FONT_COLOR:WrapTextInColorCode("0"))
+  self.AuctionValueGoldInput.Placeholder:SetAllPoints(self.AuctionValueGoldInput.WidthChecker)
+  self.AuctionValueGoldInput:SetScript("OnEnterPressed", function()
+    self.component.isAdding = true
+    self.component.addingPosition = 2
+    self.AuctionValueGoldInput:ClearFocus()
+  end)
+  self.AuctionValueGoldInput:SetScript("OnTabPressed", function()
+    self.component.isAdding = true
+    self.component.addingPosition = 2
+    self.AuctionValueGoldInput:ClearFocus()
+  end)
+  self.AuctionValueGoldSymbolText = self.AuctionValueWrapper:CreateFontString("ARTWORK", nil, "GameFontHighlight")
+  self.AuctionValueGoldSymbolText:SetText(BLUE_FONT_COLOR:WrapTextInColorCode(GOLD_AMOUNT_SYMBOL))
+  self.AuctionValueGoldSymbolText:SetPoint("TOPLEFT", self.AuctionValueGoldInput.WidthChecker, "TOPRIGHT", 0, 0)
+  self.AuctionValueGoldSymbolText:SetHeight(22)
+
+  self.AuctionValueGoldInput:SetScript("OnTextChanged", function()
+    local text = self.AuctionValueGoldInput:GetText()
+    if not text:match("^%d+$") then
+      self.component.value[1] = self.component.value[1] - math.floor(self.component.value[1] / 10000) + self.component.value[1]%10000
+      self.AuctionValueGoldInput:SetText("0")
+    else
+      self.component.value[1] = self.component.value[1] - math.floor(self.component.value[1]) + self.component.value[1]%10000 + tonumber(text) * 10000
+      self.AuctionValueGoldInput:SetText(math.floor(self.component.value[1]/10000))
+    end
+    if self.AuctionValueGoldInput:GetText() == "" or self.AuctionValueGoldInput:GetText() == "0" then
+      self.AuctionValueGoldInput:SetText("")
+      self.AuctionValueGoldInput.Placeholder:Show()
+      self.AuctionValueGoldInput.WidthChecker:SetText("0")
+      self.AuctionValueGoldInput:SetWidth(self.AuctionValueGoldInput.WidthChecker:GetUnboundedStringWidth() + 20)
+    else
+      self.AuctionValueGoldInput.Placeholder:Hide()
+      self.AuctionValueGoldInput.WidthChecker:SetText(self.AuctionValueGoldInput:GetText())
+      self.AuctionValueGoldInput:SetWidth(self.AuctionValueGoldInput.WidthChecker:GetUnboundedStringWidth() + 20)
+    end
+    SizeAuctionValue()
+    self.onResizeFunc()
+  end)
+
+  self.AuctionValueSilverInput = GetInput()
+  self.AuctionValueSilverInput:SetParent(self.AuctionValueWrapper)
+  self.AuctionValueSilverInput:SetPoint("TOPLEFT", self.AuctionValueGoldSymbolText, "TOPRIGHT", 5, 0)
+  self.AuctionValueSilverInput.Placeholder = self.AuctionValueSilverInput:CreateFontString(nil, nil, "GameFontNormal")
+  self.AuctionValueSilverInput.Placeholder:SetText(LIGHTGRAY_FONT_COLOR:WrapTextInColorCode("0"))
+  self.AuctionValueSilverInput.Placeholder:SetAllPoints(self.AuctionValueSilverInput.WidthChecker)
+  self.AuctionValueSilverInput:SetScript("OnEnterPressed", function()
+    self.component.isAdding = true
+    self.component.addingPosition = 3
+    self.AuctionValueSilverInput:ClearFocus()
+  end)
+  self.AuctionValueSilverInput:SetScript("OnTabPressed", function()
+    self.component.isAdding = true
+    self.component.addingPosition = 3
+    self.AuctionValueSilverInput:ClearFocus()
+  end)
+  self.AuctionValueSilverSymbolText = self.AuctionValueWrapper:CreateFontString("ARTWORK", nil, "GameFontHighlight")
+  self.AuctionValueSilverSymbolText:SetText(BLUE_FONT_COLOR:WrapTextInColorCode(SILVER_AMOUNT_SYMBOL))
+  self.AuctionValueSilverSymbolText:SetPoint("TOPLEFT", self.AuctionValueSilverInput.WidthChecker, "TOPRIGHT", 0, 0)
+  self.AuctionValueSilverSymbolText:SetHeight(22)
+  self.AuctionValueSilverInput:SetFrameLevel(self.AuctionValueGoldInput:GetFrameLevel() + 1)
+
+  self.AuctionValueSilverInput:SetScript("OnTextChanged", function()
+    local text = self.AuctionValueSilverInput:GetText()
+    if not text:match("^%d+$") then
+      self.component.value[1] = self.component.value[1] - self.component.value[1]%10000 + self.component.value[1]%100
+      self.AuctionValueSilverInput:SetText("")
+    else
+      self.component.value[1] = self.component.value[1] - self.component.value[1]%10000 + self.component.value[1]%100 + tonumber(text) * 100
+      self.AuctionValueSilverInput:SetText(math.floor(self.component.value[1]%10000/100))
+    end
+    if self.AuctionValueSilverInput:GetText() == "" or self.AuctionValueSilverInput:GetText() == "0" then
+      self.AuctionValueSilverInput:SetText("")
+      self.AuctionValueSilverInput.Placeholder:Show()
+      self.AuctionValueSilverInput.WidthChecker:SetText("0")
+      self.AuctionValueSilverInput:SetWidth(self.AuctionValueSilverInput.WidthChecker:GetUnboundedStringWidth() + 20)
+    else
+      self.AuctionValueSilverInput.Placeholder:Hide()
+      self.AuctionValueSilverInput.WidthChecker:SetText(self.AuctionValueSilverInput:GetText())
+      self.AuctionValueSilverInput:SetWidth(self.AuctionValueSilverInput.WidthChecker:GetUnboundedStringWidth() + 20)
+    end
+    SizeAuctionValue()
+    self.onResizeFunc()
+  end)
+
+  self.AuctionValueCopperInput = GetInput()
+  self.AuctionValueCopperInput:SetParent(self.AuctionValueWrapper)
+  self.AuctionValueCopperInput:SetPoint("TOPLEFT", self.AuctionValueSilverSymbolText, "TOPRIGHT", 5, 0)
+  self.AuctionValueCopperInput.Placeholder = self.AuctionValueCopperInput:CreateFontString(nil, nil, "GameFontNormal")
+  self.AuctionValueCopperInput.Placeholder:SetText(LIGHTGRAY_FONT_COLOR:WrapTextInColorCode("0"))
+  self.AuctionValueCopperInput.Placeholder:SetAllPoints(self.AuctionValueCopperInput.WidthChecker)
+  self.AuctionValueCopperSymbolText = self.AuctionValueWrapper:CreateFontString("ARTWORK", nil, "GameFontHighlight")
+  self.AuctionValueCopperSymbolText:SetText(BLUE_FONT_COLOR:WrapTextInColorCode(COPPER_AMOUNT_SYMBOL))
+  self.AuctionValueCopperSymbolText:SetPoint("TOPLEFT", self.AuctionValueCopperInput.WidthChecker, "TOPRIGHT", 0, 0)
+  self.AuctionValueCopperSymbolText:SetHeight(22)
+  self.AuctionValueCopperInput:SetFrameLevel(self.AuctionValueSilverInput:GetFrameLevel() + 1)
+
+  self.AuctionValueCopperInput:SetScript("OnTextChanged", function()
+    local text = self.AuctionValueCopperInput:GetText()
+    if not text:match("^%d+$") then
+      self.component.value[1] = self.component.value[1] - self.component.value[1]%100
+      self.AuctionValueCopperInput:SetText("")
+    else
+      self.component.value[1] = self.component.value[1] - self.component.value[1]%100 + tonumber(text)
+      self.AuctionValueCopperInput:SetText(self.component.value[1]%100)
+    end
+    if self.AuctionValueCopperInput:GetText() == "" or self.AuctionValueCopperInput:GetText() == "0" then
+      self.AuctionValueCopperInput:SetText("")
+      self.AuctionValueCopperInput.Placeholder:Show()
+      self.AuctionValueCopperInput.WidthChecker:SetText("0")
+      self.AuctionValueCopperInput:SetWidth(self.AuctionValueCopperInput.WidthChecker:GetUnboundedStringWidth() + 20)
+    else
+      self.AuctionValueCopperInput.Placeholder:Hide()
+      self.AuctionValueCopperInput.WidthChecker:SetText(self.AuctionValueCopperInput:GetText())
+      self.AuctionValueCopperInput:SetWidth(self.AuctionValueCopperInput.WidthChecker:GetUnboundedStringWidth() + 20)
+    end
+    SizeAuctionValue()
+    self.onResizeFunc()
+  end)
 end
 function TermButtonMixin:OnEnter()
   self.HoverTexture:Show()
@@ -516,6 +701,7 @@ function TermButtonMixin:Setup(callbackRegistry, component, index, color)
   self.KeywordText:Hide()
   self.CustomInput:Hide()
   self.ItemLevelWrapper:Hide()
+  self.AuctionValueWrapper:Hide()
 
   self.component = component
   self.index = index
@@ -608,8 +794,33 @@ function TermButtonMixin:Setup(callbackRegistry, component, index, color)
       self.ItemLevelEqualsInput:SetFocus()
     end
     self.ItemLevelEqualsInput:SetEnabled(callbackRegistry.enabled)
+  elseif component.subType == TermType.AuctionValueLess or component.subType == TermType.AuctionValueMore or component.subType == TermType.AuctionValueEquals then
+    self.AuctionValueWrapper:Show()
+    if component.subType == TermType.AuctionValueLess then
+      self.AuctionValueText:SetText(Syndicator.Locales.AUCTION_LOWER .. " < ")
+    elseif component.subType == TermType.AuctionValueMore then
+      self.AuctionValueText:SetText(Syndicator.Locales.AUCTION_LOWER .. " > ")
+    else
+      self.AuctionValueText:SetText(Syndicator.Locales.AUCTION_LOWER .. " = ")
+    end
+    self.AuctionValueCopperInput:SetText(component.value[1]%100)
+    self.AuctionValueCopperInput:GetScript("OnTextChanged")(self.AuctionValueCopperInput)
+    self.AuctionValueSilverInput:SetText(math.floor(component.value[1]%10000/100))
+    self.AuctionValueSilverInput:GetScript("OnTextChanged")(self.AuctionValueSilverInput)
+    self.AuctionValueGoldInput:SetText(math.floor(component.value[1]/10000))
+    self.AuctionValueGoldInput:GetScript("OnTextChanged")(self.AuctionValueGoldInput)
+    if component.isAdding then
+      if component.addingPosition == 2 then
+        self.AuctionValueSilverInput:SetFocus()
+      elseif component.addingPosition == 3 then
+        self.AuctionValueCopperInput:SetFocus()
+      else
+        self.AuctionValueGoldInput:SetFocus()
+      end
+    end
   end
   component.isAdding = false
+  component.addingPosition = nil
 end
 function TermButtonMixin:OnClick(button)
   if not self.callbackRegistry.enabled then
@@ -994,6 +1205,12 @@ local function CombineForOutput(joiner, elements)
         elseif entry.value[1] ~= -1 and entry.value[2] ~= -1 then
           result = result .. entry.value[1] .. "-" .. entry.value[2]
         end
+      elseif entry.subType == TermType.AuctionValueLess then
+        result = result .. "<" .. GoldToScale(entry.value[1])
+      elseif entry.subType == TermType.AuctionValueMore then
+        result = result .. ">" .. GoldToScale(entry.value[1])
+      elseif entry.subType == TermType.AuctionValueEquals then
+        result = result .. "=" .. GoldToScale(entry.value[1])
       end
     else
       if entry.subType == OperatorType.Any then

@@ -189,6 +189,8 @@ L["ITEM_LEVEL_LESS"] = "Less than, <"
 L["ITEM_LEVEL_MORE"] = "More than, >"
 L["ITEM_LEVEL_RANGE"] = "Range, -"
 L["ITEM_LEVEL_EQUALS"] = "Equal to, ="
+L["AUCTION_LOWER"] = "auction"
+L["AUCTION_VALUE"] = "Auction value"
 
 local L = Locales.frFR
 --@localization(locale="frFR", format="lua_additive_table")@
