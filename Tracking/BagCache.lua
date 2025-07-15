@@ -40,23 +40,27 @@ function SyndicatorBagCacheMixin:OnLoad()
     "BANKFRAME_OPENED",
     "BANKFRAME_CLOSED",
     "PLAYERBANKSLOTS_CHANGED",
-    "PLAYERBANKBAGSLOTS_CHANGED",
   })
+  if not Syndicator.Constants.CharacterBankTabsActive then
+    self:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED")
+  end
   if Syndicator.Constants.IsRetail then
+    if not Syndicator.Constants.CharacterBankTabsActive then
+      self:RegisterEvent("REAGENTBANK_UPDATE")
+      self:RegisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED")
+    end
     -- Bank items reagent bank updating
-    self:RegisterEvent("REAGENTBANK_UPDATE")
-    self:RegisterEvent("PLAYERREAGENTBANKSLOTS_CHANGED")
     self:RegisterEvent("TRADE_SKILL_ITEM_CRAFTED_RESULT")
     -- Keystone level changing due to start/end of an M+ dungeon
     self:RegisterEvent("ITEM_CHANGED")
     self:RegisterEvent("CHALLENGE_MODE_START")
     self:RegisterEvent("CHALLENGE_MODE_COMPLETED")
 
-    if Syndicator.Constants.WarbandBankActive then
-      self:RegisterEvent("BANK_TABS_CHANGED")
-      self:RegisterEvent("BANK_TAB_SETTINGS_UPDATED")
-      self:RegisterEvent("PLAYER_ACCOUNT_BANK_TAB_SLOTS_CHANGED")
-    end
+    self:RegisterEvent("BANK_TABS_CHANGED")
+    self:RegisterEvent("BANK_TAB_SETTINGS_UPDATED")
+    self:RegisterEvent("PLAYER_ACCOUNT_BANK_TAB_SLOTS_CHANGED")
+  else
+    self:RegisterEvent("PLAYERBANKBAGSLOTS_CHANGED")
   end
 
   self.craftingTime = 0
@@ -95,7 +99,14 @@ function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
     self:QueueCaching()
 
   elseif eventName == "PLAYERBANKSLOTS_CHANGED" then
-    if self.bankOpen then
+    if Syndicator.Constants.CharacterBankTabsActive then
+      if self.bankOpen or time() - self.craftingTime < craftingItemUpdateDelay then
+        local tab = ...
+        if tab then
+          self.pending.bank[Syndicator.Constants.AllBankIndexes[tab]] = true
+        end
+      end
+    elseif self.bankOpen then
       self.pending.bank[Enum.BagIndex.Bank] = true
       self:QueueCaching()
     end
@@ -123,19 +134,24 @@ function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
 
   elseif eventName == "BANK_TAB_SETTINGS_UPDATED" then
     if self.bankOpen then
-      self:ScanWarbandSlots()
+      self:ScanBankTabs()
       self:QueueCaching()
     end
 
   -- Guessing that these events may be fired when a new warband tab is purchased
-  elseif eventName == "BANK_TABS_CHANGED" or eventName == "PLAYER_ACCOUNT_BANK_TAB_SLOTS_CHANGED" then
+  elseif eventName == "BANK_TABS_CHANGED" then
+    if self.bankOpen then
+      self:ScanBankTabs()
+      self:QueueCaching()
+    end
+
+  elseif eventName == "PLAYER_ACCOUNT_BANK_TAB_SLOTS_CHANGED" then
     if (self.bankOpen or time() - self.craftingTime < craftingItemUpdateDelay) and C_PlayerInfo.HasAccountInventoryLock() then
-      self:ScanWarbandSlots()
       local tab = ...
       if tab then
         self.pending.warband[Syndicator.Constants.AllWarbandIndexes[tab]] = true
+        self:QueueCaching()
       end
-      self:QueueCaching()
     end
 
   elseif eventName == "BANKFRAME_OPENED" then
@@ -149,7 +165,7 @@ function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
       end
     end
     self:ScanContainerBagSlots()
-    self:ScanWarbandSlots()
+    self:ScanBankTabs()
     self:QueueCaching()
 
   elseif eventName == "BANKFRAME_CLOSED" then
@@ -192,7 +208,7 @@ function SyndicatorBagCacheMixin:UpdateContainerSlots()
     end
   end
 
-  if self.bankOpen then
+  if self.bankOpen and not Syndicator.Constants.CharacterBankTabsActive then
     local bank = SYNDICATOR_DATA.Characters[self.currentCharacter].bank
     for index, bagID in ipairs(Syndicator.Constants.AllBankIndexes) do
       local numSlots = C_Container.GetContainerNumSlots(bagID)
@@ -206,8 +222,24 @@ function SyndicatorBagCacheMixin:UpdateContainerSlots()
   self:QueueCaching()
 end
 
-function SyndicatorBagCacheMixin:ScanWarbandSlots()
-  if C_Bank == nil or C_Bank.FetchPurchasedBankTabData == nil or not C_PlayerInfo.HasAccountInventoryLock() then
+function SyndicatorBagCacheMixin:ScanBankTabs()
+  if C_Bank == nil or C_Bank.FetchPurchasedBankTabData == nil then
+    return
+  end
+
+  local allTabs = C_Bank.FetchPurchasedBankTabData(Enum.BankType.Character)
+  local bank = SYNDICATOR_DATA.Characters[self.currentCharacter].bankTabs
+
+  for index, tabDetails in ipairs(allTabs) do
+    if not bank[index] then
+      bank[index] = { slots = {}, iconTexture = QUESTION_MARK_ICON, name = "", depositFlags = 0 }
+    end
+    bank[index].iconTexture = tabDetails.icon
+    bank[index].name = tabDetails.name
+    bank[index].depositFlags = tabDetails.depositFlags
+  end
+
+  if not C_PlayerInfo.HasAccountInventoryLock() then
     return
   end
 
@@ -264,7 +296,7 @@ function SyndicatorBagCacheMixin:ScanContainerBagSlots()
     self.pending.containerBags.bags = true
   end
 
-  if self.bankOpen then
+  if self.bankOpen and not Syndicator.Constants.CharacterBankTabsActive then
     containerInfo.bank = {}
     for index = 1, Syndicator.Constants.BankBagSlotsCount do
       local inventorySlot = BankButtonIDToInvSlotID(index, 1)
@@ -371,26 +403,42 @@ function SyndicatorBagCacheMixin:OnUpdate()
     end
   end
 
-  local bank = SYNDICATOR_DATA.Characters[self.currentCharacter].bank
 
-  if self.bankOpen then
+  if not Syndicator.Constants.CharacterBankTabsActive then
+    if self.bankOpen then
+      local bank = SYNDICATOR_DATA.Characters[self.currentCharacter].bank
+      for bagID in pairs(self.pending.bank) do
+        local bagIndex = bankBags[bagID]
+        bank[bagIndex] = {}
+        local bagData = bank[bagIndex]
+        if bagID ~= Enum.BagIndex.Reagentbank or IsReagentBankUnlocked() then
+          for slotID = 1, C_Container.GetContainerNumSlots(bagID) do
+            DoSlot(bagID, slotID, bagData)
+          end
+        end
+      end
+    elseif self.pending.bank[Enum.BagIndex.Reagentbank] and bank[bankBags[Enum.BagIndex.Reagentbank]] and IsReagentBankUnlocked() then
+      local bank = SYNDICATOR_DATA.Characters[self.currentCharacter].bank
+      local reagentBankData = bank[bankBags[Enum.BagIndex.Reagentbank]]
+      for slotID in pairs(self.pending.reagentBankSlots) do
+        if #reagentBankData >= slotID then
+          DoSlot(Enum.BagIndex.Reagentbank, slotID, reagentBankData)
+        end
+      end
+    end
+  else
+    local bankTabs = SYNDICATOR_DATA.Characters[self.currentCharacter].bankTabs
     for bagID in pairs(self.pending.bank) do
       local bagIndex = bankBags[bagID]
-      bank[bagIndex] = {}
-      local bagData = bank[bagIndex]
-      if bagID ~= Enum.BagIndex.Reagentbank or IsReagentBankUnlocked() then
+      if bankTabs[bagIndex] then
+        bankTabs[bagIndex].slots = {}
+        local bagData = bankTabs[bagIndex].slots
         for slotID = 1, C_Container.GetContainerNumSlots(bagID) do
           DoSlot(bagID, slotID, bagData)
         end
       end
     end
-  elseif self.pending.bank[Enum.BagIndex.Reagentbank] and bank[bankBags[Enum.BagIndex.Reagentbank]] and IsReagentBankUnlocked() then
-    local reagentBankData = bank[bankBags[Enum.BagIndex.Reagentbank]]
-    for slotID in pairs(self.pending.reagentBankSlots) do
-      if #reagentBankData >= slotID then
-        DoSlot(Enum.BagIndex.Reagentbank, slotID, reagentBankData)
-      end
-    end
+    SYNDICATOR_DATA.Characters[self.currentCharacter].bank = {}
   end
 
   local warband = SYNDICATOR_DATA.Warband[1]

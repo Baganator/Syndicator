@@ -86,6 +86,7 @@ local function InitCurrentCharacter()
   characterData.mail = characterData.mail or {}
   characterData.equipped = characterData.equipped or {}
   characterData.containerInfo = characterData.containerInfo or {}
+  characterData.bankTabs = characterData.bankTabs or {}
   characterData.currencies = characterData.currencies or {}
   characterData.currencyByHeader = characterData.currencyByHeader or {}
   characterData.void = characterData.void or {}

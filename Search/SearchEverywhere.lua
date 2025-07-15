@@ -34,6 +34,13 @@ local function CacheCharacter(character, callback)
       table.insert(bankList, item)
     end
   end
+  if characterData.bankTabs then
+    for _, tab in ipairs(characterData.bankTabs) do
+      for _, item in ipairs(tab.slots) do
+        table.insert(bankList, item)
+      end
+    end
+  end
 
   finishCheck("bank", Syndicator.Search.GetBaseInfoFromList(bankList))
 
