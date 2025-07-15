@@ -239,6 +239,8 @@ function SyndicatorBagCacheMixin:ScanBankTabs()
     bank[index].depositFlags = tabDetails.depositFlags
   end
 
+  self.pending.containerBags.bank = true
+
   if not C_PlayerInfo.HasAccountInventoryLock() then
     return
   end
