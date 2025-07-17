@@ -21,7 +21,7 @@ Syndicator.Constants = {
 
   BattlePetCageID = 82800,
 
-  BankBagSlotsCount = 7,
+  BankBagSlotsCount = 0,
 
   MaxGuildBankTabItemSlots = 98,
 
@@ -49,6 +49,7 @@ if Syndicator.Constants.IsRetail then
       Enum.BagIndex.CharacterBankTab_5,
       Enum.BagIndex.CharacterBankTab_6,
     }
+    Syndicator.Constants.BankBagSlotsCount = 0
   else
     Syndicator.Constants.AllBankIndexes = {
       Enum.BagIndex.Bank,
@@ -61,6 +62,7 @@ if Syndicator.Constants.IsRetail then
       Enum.BagIndex.BankBag_7,
       Enum.BagIndex.Reagentbank,
     }
+    Syndicator.Constants.BankBagSlotsCount = 7
   end
   Syndicator.Constants.AllWarbandIndexes = {
     Enum.BagIndex.AccountBankTab_1,
@@ -81,6 +83,7 @@ if Syndicator.Constants.IsClassic then
   Syndicator.Constants.AllBankIndexes = {
     Enum.BagIndex.Bank,
   }
+  Syndicator.Constants.BankBagSlotsCount = 7
   -- Workaround for the enum containing the wrong values for the bank bag slots
   for i = 1, Syndicator.Constants.BankBagSlotsCount do
     Syndicator.Constants.AllBankIndexes[i + 1] = NUM_BAG_SLOTS + i
