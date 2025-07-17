@@ -407,8 +407,8 @@ function SyndicatorBagCacheMixin:OnUpdate()
 
 
   if not Syndicator.Constants.CharacterBankTabsActive then
+    local bank = SYNDICATOR_DATA.Characters[self.currentCharacter].bank
     if self.bankOpen then
-      local bank = SYNDICATOR_DATA.Characters[self.currentCharacter].bank
       for bagID in pairs(self.pending.bank) do
         local bagIndex = bankBags[bagID]
         bank[bagIndex] = {}
@@ -420,7 +420,6 @@ function SyndicatorBagCacheMixin:OnUpdate()
         end
       end
     elseif self.pending.bank[Enum.BagIndex.Reagentbank] and bank[bankBags[Enum.BagIndex.Reagentbank]] and IsReagentBankUnlocked() then
-      local bank = SYNDICATOR_DATA.Characters[self.currentCharacter].bank
       local reagentBankData = bank[bankBags[Enum.BagIndex.Reagentbank]]
       for slotID in pairs(self.pending.reagentBankSlots) do
         if #reagentBankData >= slotID then
