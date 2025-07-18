@@ -78,12 +78,13 @@ if Syndicator.Constants.IsEra or KeyRingButtonIDToInvSlotID then
 end
 if Syndicator.Constants.IsEra then
   Syndicator.Constants.BankBagSlotsCount = 6
+elseif Syndicator.Constants.IsClassic then
+  Syndicator.Constants.BankBagSlotsCount = 7
 end
 if Syndicator.Constants.IsClassic then
   Syndicator.Constants.AllBankIndexes = {
     Enum.BagIndex.Bank,
   }
-  Syndicator.Constants.BankBagSlotsCount = 7
   -- Workaround for the enum containing the wrong values for the bank bag slots
   for i = 1, Syndicator.Constants.BankBagSlotsCount do
     Syndicator.Constants.AllBankIndexes[i + 1] = NUM_BAG_SLOTS + i
