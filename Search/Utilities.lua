@@ -171,6 +171,13 @@ do
     end,
     validation = function() return OEMarketInfo ~= nil end
   }
+  priceSources["recrystallize"] = {
+    func = function(itemLink)
+      return (RECrystallize_PriceCheck(itemLink))
+    end,
+    validation = function() return RECrystallize_PriceCheck ~= nil end,
+    priority = 40,
+  }
 
   local frame = CreateFrame("Frame")
   frame:RegisterEvent("PLAYER_LOGIN")

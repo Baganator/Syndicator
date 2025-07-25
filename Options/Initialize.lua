@@ -462,6 +462,9 @@ function Syndicator.Options.Initialize()
         table.insert(entries, {label = "Undermine Exchange Realm", value = "undermineexchange-realm"})
         table.insert(entries, {label = "Undermine Exchange Region", value = "undermineexchange-region"})
       end
+      if RECrystallize_PriceCheck then
+        table.insert(entries, {label = "Recrystallize", value = "recrystallize"})
+      end
 
       for _, entry in ipairs(entries) do
         rootDescription:CreateRadio(entry.label, function()
