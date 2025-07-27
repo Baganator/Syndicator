@@ -272,7 +272,7 @@ function SyndicatorAuctionCacheModernMixin:ProcessItemPurchase(auctionID)
 end
 
 function SyndicatorAuctionCacheModernMixin:ProcessCommodityPurchase()
-  if not self.purchasedCommodity and not self.purchasedCommodity.itemID then
+  if not self.purchasedCommodity or not self.purchasedCommodity.itemID then
     return
   end
 
