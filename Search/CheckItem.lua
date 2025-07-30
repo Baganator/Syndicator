@@ -760,6 +760,21 @@ local function UniqueCheck(details)
   return false
 end
 
+local function ConjuredCheck(details)
+  GetTooltipInfoSpell(details)
+
+  if not details.tooltipInfoSpell then
+    return
+  end
+
+  for _, row in ipairs(details.tooltipInfoSpell.lines) do
+    if row.leftText == ITEM_CONJURED then
+      return true
+    end
+  end
+  return false
+end
+
 local PVP_PATTERN = PVP_ITEM_LEVEL_TOOLTIP:gsub("%%d", ".*")
 local function PvPCheck(details)
   if not Syndicator.Utilities.IsEquipment(details.itemLink) then
@@ -990,6 +1005,7 @@ AddKeywordLocalised("KEYWORD_UNCOLLECTED", UncollectedCheck, Syndicator.Locales.
 AddKeywordLocalised("KEYWORD_MY_CLASS", MyClassCheck, Syndicator.Locales.GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_PVP", PvPCheck, Syndicator.Locales.GROUP_ITEM_DETAIL)
 AddKeywordManual(ITEM_UNIQUE:lower(), "unique", UniqueCheck, Syndicator.Locales.GROUP_ITEM_DETAIL)
+AddKeywordLocalised("KEYWORD_CONJURED", ConjuredCheck, Syndicator.Locales.GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_LOCKED", LockedCheck, Syndicator.Locales.GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_REFUNDABLE", RefundableCheck, Syndicator.Locales.GROUP_ITEM_DETAIL)
 AddKeywordLocalised("KEYWORD_CRAFTED", CraftedCheck, Syndicator.Locales.GROUP_ITEM_DETAIL)

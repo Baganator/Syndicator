@@ -141,6 +141,7 @@ L["KEYWORD_CATALYST"] = "catalyst"
 L["KEYWORD_CATALYST_UPGRADE"] = "catalyst upgrade"
 L["KEYWORD_ENSEMBLE"] = "ensemble"
 L["KEYWORD_ARSENAL"] = "arsenal"
+L["KEYWORD_CONJURED"] = "conjured"
 
 L["GROUP_ARMOR_TYPE"] = "Armor Type"
 L["GROUP_BATTLE_PET"] = "Battle Pet Type"
