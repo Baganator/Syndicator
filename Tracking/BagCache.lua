@@ -227,19 +227,27 @@ function SyndicatorBagCacheMixin:ScanBankTabs()
     return
   end
 
-  local allTabs = C_Bank.FetchPurchasedBankTabData(Enum.BankType.Character)
-  local bank = SYNDICATOR_DATA.Characters[self.currentCharacter].bankTabs
+  if Syndicator.Constants.CharacterBankTabsActive then
+    local allTabs = C_Bank.FetchPurchasedBankTabData(Enum.BankType.Character)
+    local characterData = SYNDICATOR_DATA.Characters[self.currentCharacter]
+    local bank = characterData.bankTabs
 
-  for index, tabDetails in ipairs(allTabs) do
-    if not bank[index] then
-      bank[index] = { slots = {}, iconTexture = QUESTION_MARK_ICON, name = "", depositFlags = 0 }
+    for index, tabDetails in ipairs(allTabs) do
+      if not bank[index] then
+        bank[index] = { slots = {}, iconTexture = QUESTION_MARK_ICON, name = "", depositFlags = 0 }
+      end
+      bank[index].iconTexture = tabDetails.icon
+      bank[index].name = tabDetails.name
+      bank[index].depositFlags = tabDetails.depositFlags
     end
-    bank[index].iconTexture = tabDetails.icon
-    bank[index].name = tabDetails.name
-    bank[index].depositFlags = tabDetails.depositFlags
+    if next(characterData.bank) then
+      characterData.bank = {}
+      characterData.void = {}
+      characterData.containerInfo.bank = {}
+      Syndicator.CallbackRegistry:TriggerEvent("VoidCacheUpdate", self.currentCharacter)
+    end
+    self.pending.containerBags.bank = true
   end
-
-  self.pending.containerBags.bank = true
 
   if not C_PlayerInfo.HasAccountInventoryLock() then
     return
@@ -428,7 +436,8 @@ function SyndicatorBagCacheMixin:OnUpdate()
       end
     end
   else
-    local bankTabs = SYNDICATOR_DATA.Characters[self.currentCharacter].bankTabs
+    local characterData = SYNDICATOR_DATA.Characters[self.currentCharacter]
+    local bankTabs = characterData.bankTabs
     for bagID in pairs(self.pending.bank) do
       local bagIndex = bankBags[bagID]
       if bankTabs[bagIndex] then
@@ -439,7 +448,6 @@ function SyndicatorBagCacheMixin:OnUpdate()
         end
       end
     end
-    SYNDICATOR_DATA.Characters[self.currentCharacter].bank = {}
   end
 
   local warband = SYNDICATOR_DATA.Warband[1]

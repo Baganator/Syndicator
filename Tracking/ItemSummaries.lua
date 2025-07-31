@@ -168,6 +168,16 @@ function SyndicatorItemSummariesMixin:GenerateCharacterSummary(characterName, st
       end
     end
 
+    for _, tab in pairs(details.bankTabs or {}) do
+      for _, item in pairs(tab.slots) do
+        if item.itemLink then
+          local key = Syndicator.Utilities.GetItemKey(item.itemLink)
+          GenerateBase(key)
+          summary[key].bank = summary[key].bank + item.itemCount
+        end
+      end
+    end
+
     -- or because the mail is a newer key that might not exist on another
     -- character yet
     for _, item in pairs(details.mail or {}) do
