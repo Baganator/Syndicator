@@ -100,6 +100,11 @@ function Syndicator.SlashCmd.HideGuild(...)
   end
 end
 
+function Syndicator.SlashCmd.Timers()
+  Syndicator.Config.Set(Syndicator.Config.Options.DEBUG_TIMERS, not Syndicator.Config.Get(Syndicator.Config.Options.DEBUG_TIMERS))
+  Syndicator.Utilities.Message("Performance timers: " .. (Syndicator.Config.Get(Syndicator.Config.Options.DEBUG_TIMERS) and "Enabled" or "Disabled"))
+end
+
 function Syndicator.SlashCmd.CustomiseUI()
   Syndicator.CallbackRegistry:TriggerEvent("ShowCustomise")
 end
@@ -109,6 +114,7 @@ local COMMANDS = {
   ["c"] = Syndicator.SlashCmd.Config,
   ["config"] = Syndicator.SlashCmd.Config,
   ["d"] = Syndicator.SlashCmd.Debug,
+  ["timers"] = Syndicator.SlashCmd.Timers,
   ["debug"] = Syndicator.SlashCmd.Debug,
   ["remove"] = Syndicator.SlashCmd.RemoveCharacter,
   ["removecharacter"] = Syndicator.SlashCmd.RemoveCharacter,
