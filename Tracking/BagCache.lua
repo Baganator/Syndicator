@@ -93,7 +93,7 @@ function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
       self.pending.bags[bagID] = true
     elseif bankBags[bagID] and self.bankOpen then
       self.pending.bank[bagID] = true
-    elseif warbandBags[bagID] and self.bankOpen and C_PlayerInfo.HasAccountInventoryLock() then
+    elseif warbandBags[bagID] and self.bankOpen and C_Bank.FetchBankLockedReason(Enum.BankType.Account) == nil then
       self.pending.warband[bagID] = true
     end
     self:QueueCaching()
@@ -146,7 +146,7 @@ function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
     end
 
   elseif eventName == "PLAYER_ACCOUNT_BANK_TAB_SLOTS_CHANGED" then
-    if (self.bankOpen or time() - self.craftingTime < craftingItemUpdateDelay) and C_PlayerInfo.HasAccountInventoryLock() then
+    if (self.bankOpen or time() - self.craftingTime < craftingItemUpdateDelay) and C_Bank.FetchBankLockedReason(Enum.BankType.Account) == nil then
       local tab = ...
       if tab then
         self.pending.warband[Syndicator.Constants.AllWarbandIndexes[tab]] = true
@@ -159,7 +159,7 @@ function SyndicatorBagCacheMixin:OnEvent(eventName, ...)
     for bagID in pairs(bankBags) do
       self.pending.bank[bagID] = true
     end
-    if next(warbandBags) and C_PlayerInfo.HasAccountInventoryLock() then
+    if next(warbandBags) and C_Bank.FetchBankLockedReason(Enum.BankType.Account) == nil then
       for bagID in pairs(warbandBags) do
         self.pending.warband[bagID] = true
       end
@@ -249,7 +249,7 @@ function SyndicatorBagCacheMixin:ScanBankTabs()
     self.pending.containerBags.bank = true
   end
 
-  if not C_PlayerInfo.HasAccountInventoryLock() then
+  if C_Bank.FetchBankLockedReason(Enum.BankType.Account) ~= nil then
     return
   end
 
