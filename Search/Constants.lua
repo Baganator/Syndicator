@@ -125,8 +125,11 @@ local ClassData = {
     {2, 15}, -- Daggers
     {2, 13}, -- Fist Weapons
     {2, 0}, -- One-Handed Axes
+    {2, 1}, -- Two-Handed Axes
     {2, 4}, -- One-Handed Maces
+    {2, 5}, -- Two-Handed Maces
     {2, 7}, -- One-Handed Swords
+    {2, 8}, -- Two-Handed Swords
     {2, 10}, -- Staves
   }
 }
