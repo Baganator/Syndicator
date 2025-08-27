@@ -23,6 +23,10 @@ function SyndicatorAuctionCacheLegacyMixin:OnLoad()
       }
       self.lastBidTime = GetTimePreciseSec()
       self:RegisterEvent("CHAT_MSG_SYSTEM")
+    else
+      self.lastBid = nil
+      self.lastBidTime = 0
+      self:UnregisterEvent("CHAT_MSG_SYSTEM")
     end
   end)
 end
