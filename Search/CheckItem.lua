@@ -845,8 +845,15 @@ local function LockedCheck(details)
   return false
 end
 
-local function CraftedCheck(details)
-  return details.quality ~= 7 and details.classID ~= Enum.ItemClass.Questitem and details.itemLink:match("Player-") ~= nil
+local CraftedCheck
+if Syndicator.Constants.IsEra then
+  CraftedCheck = function(details)
+    return Syndicator.Utilities.IsEquipment(details.itemLink) and CraftInfoAnywhere ~= nil and CraftInfoAnywhere.Data.ItemsToRecipes[details.itemID] ~= nil
+  end
+else
+  CraftedCheck = function(details)
+    return (details.quality ~= 7 and details.classID ~= Enum.ItemClass.Questitem and details.itemLink:match("Player%-") ~= nil)
+  end
 end
 
 local function SetBonusCheck(details)
