@@ -2088,6 +2088,7 @@ function Syndicator.Search.InitializeSearchEngine()
   end
 
   local armorTypesToCheck = {
+    [0] = "miscellaneous",
     [2] = "leather",
     [3] = "mail",
     [4] = "plate",
